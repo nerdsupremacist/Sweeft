@@ -85,7 +85,7 @@ is equivalent to:
 ```Swift
 {
     _ = something
-}**
+}
 ```
 
 #### (<-) Assignment of non-nil
