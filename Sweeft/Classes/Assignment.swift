@@ -55,6 +55,10 @@ public postfix func .?<V: Defaultable>(_ value: V?) -> V {
     return value ?? V.defaultValue
 }
 
+public postfix func .?<V: Defaultable>(_ items: [V?]) -> [V] {
+    return items => (.?)
+}
+
 //: Will confirm if value is not nil
 prefix operator .?
 

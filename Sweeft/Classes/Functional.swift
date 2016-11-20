@@ -35,6 +35,10 @@ public func =><T, V>(_ items: [T], _ handler: (T) -> (V)) -> [V] {
     return items.map(handler)
 }
 
+public func =><T>(_ items: [T], _ handler: (T) -> ()) {
+    items.forEach(handler)
+}
+
 //: Implicit Flat Map Operator
 infix operator ==>
 
@@ -48,6 +52,11 @@ infix operator |>
 public func |><V>(_ items: [V], _ handler: (V) -> Bool) -> [V] {
     return items.filter(handler)
 }
+
+public func |><V>(_ items: [V], _ handler: @escaping (V) -> Bool?) -> [V] {
+    return items |> { handler($0).? }
+}
+
 
 
 //: Will ignore the input to a function

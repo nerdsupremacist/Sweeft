@@ -16,7 +16,15 @@ class ViewController: UIViewController {
         
         let array = [1, 2, 3, nil, 5, nil]
         
-        print(array ==> !{ $0 ** 2 })
+        let res = array
+            .filter { ($0 ?? -1) & 1 == 0 }
+            .flatMap { $0 }
+        
+        print(res)
+        
+        let notEven = !(array |> !{ $0 & 1 == 0 })
+        
+        print(notEven)
         
     }
 
