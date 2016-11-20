@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/mathiasquintero/Pushie/master/logo.png" height=100>
+<img src="https://raw.githubusercontent.com/mathiasquintero/Sweeft/master/logo.png" height=250 style="display: block; margin: 0 auto;">
 
 # Sweeft
 Swift but a bit Sweeter - More Syntactic Sugar for Swift
