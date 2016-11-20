@@ -6,6 +6,8 @@ This is a collection of extensions and operators that make swift a bit sweeter. 
 *Note:* These operators are supposed to help me in the way I write Swift. Which is a functional style.
 So most of these regard possible problems and annoyances with functional programming in Swift.
 
+**Please** Contribute to make Swift a bit cooler looking... Post your ideas in the issues as enhancements
+
 ## Installing
 
 To add this to your project you have to add this to your Podfile:
