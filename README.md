@@ -17,7 +17,7 @@ So most of these regard possible problems and annoyances with functional program
 To add this to your project you have to add this to your Podfile:
 
 ```ruby
-pod Sweeft
+pod 'Sweeft'
 ```
 
 ## Usage
