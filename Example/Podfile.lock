@@ -1,0 +1,16 @@
+PODS:
+  - Sweeft (0.1.0)
+
+DEPENDENCIES:
+  - Sweeft (from `../`)
+
+EXTERNAL SOURCES:
+  Sweeft:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  Sweeft: b163a7ca03aa5910deca2ea96ea792e55ed35ae3
+
+PODFILE CHECKSUM: 9ac70fb8b422a4c80b1267beb2aa0016f74d2390
+
+COCOAPODS: 1.2.0.beta.1

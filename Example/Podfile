@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'Sweeft_Example' do
+  pod 'Sweeft', :path => '../'
+
+  target 'Sweeft_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
