@@ -1,4 +1,4 @@
-<p style="text-align:center;"><img src="https://raw.githubusercontent.com/mathiasquintero/Sweeft/master/logo.png" height=250></p>
+<div style="text-align:center;"><img src="https://raw.githubusercontent.com/mathiasquintero/Sweeft/master/logo.png" height=250></div>
 
 
 
