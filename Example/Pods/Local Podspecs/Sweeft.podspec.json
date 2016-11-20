@@ -1,6 +1,6 @@
 {
   "name": "Sweeft",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "summary": "Swift but a bit Sweeter - More Syntactic Sugar for Swift",
   "description": "A collection of different operators and extensions that make writing in Swift a bit sweeter.",
   "homepage": "https://github.com/mathiasquintero/Sweeft",
