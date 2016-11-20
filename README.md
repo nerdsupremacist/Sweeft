@@ -1,3 +1,5 @@
+<img src="https://raw.githubusercontent.com/mathiasquintero/Pushie/master/logo.png" height=100>
+
 # Sweeft
 Swift but a bit Sweeter - More Syntactic Sugar for Swift
 
