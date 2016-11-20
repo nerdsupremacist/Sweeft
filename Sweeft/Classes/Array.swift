@@ -7,7 +7,7 @@
 //
 
 import Foundation
-extension Array {
+public extension Array {
     
     func array(withFirst number: Int) -> [Element] {
         if number > count {
@@ -30,7 +30,7 @@ extension Array {
     
 }
 
-extension Array {
+public extension Array {
     
     static var defaultValue: [Element] {
         return []

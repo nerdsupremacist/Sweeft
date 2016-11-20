@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension String {
+public extension String {
     
     var isPalindrome: Bool {
         if characters.count < 2 {
@@ -29,7 +29,7 @@ extension String {
     
 }
 
-extension String {
+public extension String {
     
     func matches(pattern: String, options: NSRegularExpression.Options = []) throws -> Bool {
         let regex = try NSRegularExpression(pattern: pattern, options: options)
@@ -40,6 +40,6 @@ extension String {
 
 extension String: Defaultable {
     
-    static let defaultValue = ""
+    public static let defaultValue = ""
     
 }

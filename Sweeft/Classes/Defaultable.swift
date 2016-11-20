@@ -8,6 +8,6 @@
 
 import Foundation
 
-protocol Defaultable {
+public protocol Defaultable {
     static var defaultValue: Self { get }
 }

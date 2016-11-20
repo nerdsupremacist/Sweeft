@@ -8,7 +8,7 @@
 
 import Foundation
 
-func after(_ time: TimeInterval, in queue: DispatchQueue = .main, handler: @escaping () -> ()) {
+public func after(_ time: TimeInterval, in queue: DispatchQueue = .main, handler: @escaping () -> ()) {
     queue.asyncAfter(deadline: .now() + time) {
         handler()
     }

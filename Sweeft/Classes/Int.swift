@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension Int {
+public extension Int {
     
     var isPrime: Bool {
         let bound = Int(sqrt(Double(self))) + 1
@@ -25,6 +25,6 @@ extension Int {
 
 extension Int: Defaultable {
     
-    static let defaultValue = 0
+    public static let defaultValue = 0
     
 }

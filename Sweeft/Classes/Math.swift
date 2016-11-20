@@ -11,29 +11,29 @@ import Foundation
 //: Exponent operator
 infix operator **
 
-func **(_ a: Double, _ b: Double) -> Double {
+public func **(_ a: Double, _ b: Double) -> Double {
     return pow(a, b)
 }
 
-func **(_ a: Int, _ b: Int) -> Int {
+public func **(_ a: Int, _ b: Int) -> Int {
     return Int(Double(a) ** Double(b))
 }
 
 //: Remainder Operator
-func %(_ a: Double, _ b: Double) -> Double {
+public func %(_ a: Double, _ b: Double) -> Double {
     return a.remainder(dividingBy: b)
 }
 
 //: Will return the abs
 prefix operator |
 
-prefix func |(_ value: Int) -> Int {
+public prefix func |(_ value: Int) -> Int {
     return abs(value)
 }
 
 // Will say if a string contains a match for regex
 infix operator ~~
 
-func ~~ (left: String, right: String) -> Bool {
+public func ~~(left: String, right: String) -> Bool {
     return .?(try? left.matches(pattern: right, options: []))
 }

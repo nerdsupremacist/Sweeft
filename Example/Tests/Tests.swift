@@ -1,6 +1,6 @@
 import UIKit
 import XCTest
-import Sweeft
+//import Sweeft
 
 class Tests: XCTestCase {
     

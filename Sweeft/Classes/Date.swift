@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension Date {
+public extension Date {
     
     func string(with format: String) -> String {
         let dateFormatter = DateFormatter()
@@ -20,7 +20,7 @@ extension Date {
 
 extension Date: Defaultable {
     
-    static var defaultValue: Date {
+    public static var defaultValue: Date {
         return Date()
     }
     

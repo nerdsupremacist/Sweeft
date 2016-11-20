@@ -8,7 +8,7 @@
 
 import Foundation
 
-extension Double {
+public extension Double {
     
     var isPalindrome: Bool {
         return description.replacingOccurrences(of: ".", with: "").isPalindrome
@@ -18,6 +18,6 @@ extension Double {
 
 extension Double: Defaultable {
     
-    static let defaultValue = 0.0
+    public static let defaultValue = 0.0
     
 }

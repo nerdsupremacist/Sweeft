@@ -11,53 +11,53 @@ import Foundation
 //: Will assign the value to the variable if not nil
 infix operator <-
 
-func <-<V>(_ variable: inout V?, _ value: V?) {
+public func <-<V>(_ variable: inout V?, _ value: V?) {
     variable = value ?? variable
 }
 
-func <-<V>(_ variable: inout V, _ value: V?) {
+public func <-<V>(_ variable: inout V, _ value: V?) {
     variable = value ?? variable
 }
 
 //: Will Assign the map Result
-func <-<T>(_ items: inout [T], _ handler: (T) -> (T)) {
+public func <-<T>(_ items: inout [T], _ handler: (T) -> (T)) {
     items = items => handler
 }
 
 //: Will Assign the flatMapResult
-func <-<T>(_ items: inout [T], _ handler: (T) -> (T?)) {
+public func <-<T>(_ items: inout [T], _ handler: (T) -> (T?)) {
     items = items ==> handler
 }
 
 //: Will assign the filtered result
 infix operator <|
 
-func <|<T>(_ items: inout [T], _ handler: (T) -> Bool) {
+public func <|<T>(_ items: inout [T], _ handler: (T) -> Bool) {
     items = items |> handler
 }
 
 //: Will remove all the optional values from an array
-prefix func !<T>(_ items: [T?]) -> [T] {
+public prefix func !<T>(_ items: [T?]) -> [T] {
     return items ==> { $0 }
 }
 
 //: Will swap the two variables
 infix operator <=>
 
-func <=><V>(_ a: inout V, _ b: inout V) {
+public func <=><V>(_ a: inout V, _ b: inout V) {
     swap(&a, &b)
 }
 
 //: Will safely unwrapp any defaultable value
 postfix operator .?
 
-postfix func .?<V: Defaultable>(_ value: V?) -> V {
+public postfix func .?<V: Defaultable>(_ value: V?) -> V {
     return value ?? V.defaultValue
 }
 
 //: Will confirm if value is not nil
 prefix operator .?
 
-prefix func .?<V>(_ value: V?) -> Bool {
+public prefix func .?<V>(_ value: V?) -> Bool {
     return value != nil
 }

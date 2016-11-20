@@ -7,7 +7,7 @@
 //
 
 import Foundation
-extension CountableRange {
+public extension CountableRange {
     
     var array: [Bound] {
         return self.map { $0 }

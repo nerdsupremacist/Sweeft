@@ -10,6 +10,6 @@ import Foundation
 
 extension Bool: Defaultable {
     
-    static let defaultValue = false
+    public static let defaultValue = false
     
 }

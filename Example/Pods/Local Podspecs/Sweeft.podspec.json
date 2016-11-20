@@ -1,9 +1,9 @@
 {
   "name": "Sweeft",
   "version": "0.1.0",
-  "summary": "A short description of Sweeft.",
-  "description": "TODO: Add long description of the pod here.",
-  "homepage": "https://github.com/<GITHUB_USERNAME>/Sweeft",
+  "summary": "Swift but a bit Sweeter - More Syntactic Sugar for Swift",
+  "description": "A collection of different operators and extensions that make writing in Swift a bit sweeter.",
+  "homepage": "https://github.com/mathiasquintero/Sweeft",
   "license": {
     "type": "MIT",
     "file": "LICENSE"
@@ -12,11 +12,15 @@
     "Mathias Quintero": "mathias.quintero@tum.de"
   },
   "source": {
-    "git": "https://github.com/<GITHUB_USERNAME>/Sweeft.git",
+    "git": "https://github.com/mathiasquintero/Sweeft.git",
     "tag": "0.1.0"
   },
+  "social_media_url": "https://twitter.com/sifrinoimperial",
   "platforms": {
-    "ios": "8.0"
+    "ios": "10.0",
+    "osx": "10.12",
+    "tvos": "9.0"
   },
-  "source_files": "Sweeft/Classes/**/*"
+  "source_files": "Sweeft/Classes/**/*",
+  "frameworks": "Foundation"
 }

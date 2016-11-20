@@ -7,12 +7,17 @@
 //
 
 import UIKit
+import Sweeft
 
 class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        let array = [1, 2, 3, nil, 5, nil]
+        
+        print(array ==> !{ $0 ** 2 })
+        
     }
 
     override func didReceiveMemoryWarning() {
