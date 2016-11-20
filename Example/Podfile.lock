@@ -1,5 +1,5 @@
 PODS:
-  - Sweeft (0.1.1)
+  - Sweeft (0.1.2)
 
 DEPENDENCIES:
   - Sweeft (from `../`)
@@ -9,7 +9,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Sweeft: ed99dcecf2efd31ab49f107fc9f5522a9b00189d
+  Sweeft: 2171b61726ccf3a4e0097a56bdd1a78b8e356821
 
 PODFILE CHECKSUM: dbb504d538d34fbfdd7509e8ef2b23dd155eae76
 
