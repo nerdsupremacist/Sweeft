@@ -27,7 +27,7 @@ And now you want to store all of the even numbers in a single array. Easy right:
 var even = [Int]()
 for i in array {
     if let i = i, i % 2 == 0 {
-        even.push(i)
+        even.append(i)
     }
 }
 ```
