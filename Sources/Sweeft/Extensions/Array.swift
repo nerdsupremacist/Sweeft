@@ -89,6 +89,7 @@ public extension Array {
 
 public extension Array {
     
+    /// Default Value
     static var defaultValue: [Element] {
         return []
     }

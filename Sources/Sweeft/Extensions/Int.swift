@@ -27,6 +27,7 @@ public extension Int {
 
 extension Int: Defaultable {
     
+    /// Default Value
     public static let defaultValue = 0
     
 }

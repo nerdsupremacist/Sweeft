@@ -8,7 +8,13 @@
 
 import Foundation
 
-/// Pipe. Will pass the value to a function. Like in Bash
+/**
+ Pipe. Will pass the value to a function. Like in Bash
+ 
+ - Parameters:
+ - value: Item you want to pass
+ - function: Function you want to pass it to
+ */
 public func |<T, V>(_ value: T?, function: ((T) -> V)?) -> V? {
     guard let value = value else {
         return nil
@@ -16,7 +22,13 @@ public func |<T, V>(_ value: T?, function: ((T) -> V)?) -> V? {
     return function?(value)
 }
 
-/// Pipe. Will pass the value to a function. Like in Bash
+/**
+ Pipe. Will pass the value to a function. Like in Bash
+ 
+ - Parameters:
+ - value: Item you want to pass
+ - function: Function you want to pass it to
+ */
 public func |<T, V>(_ value: T?, function: ((T) -> V)) -> V? {
     guard let value = value else {
         return nil
@@ -24,45 +36,97 @@ public func |<T, V>(_ value: T?, function: ((T) -> V)) -> V? {
     return function(value)
 }
 
-/// Will return a function that returns if the result of the original function was not nil
+/**
+ Is nil Handler?
+ 
+ - Parameters:
+ - handler: Closure you want to evaluate
+ 
+ - Returns: a function that will return whether or not the handler evaluates an input to a value or nil
+ */
 public prefix func .?<T,V>(_ handler: @escaping ((T) -> V?)) -> (T) -> Bool {
     return { .?($0 | handler) }
 }
 
 infix operator =>
 
-/// Map array using handler.
+/**
+ Map
+ 
+ - Parameters:
+ - items: array
+ - handler: mapping function
+ 
+ - Returns: result of mapping the array with the function
+ */
 public func =><T, V>(_ items: [T], _ handler: (T) -> (V)) -> [V] {
     return items.map(handler)
 }
 
-/// Call handler for each item in array.
+/**
+ For each. Will call the handler with every element in the array
+ 
+ - Parameters:
+ - items: array
+ - handler: mapping function
+ */
 public func =><T>(_ items: [T], _ handler: (T) -> ()) {
     items.forEach(handler)
 }
 
 infix operator ==>
 
-/// FlatMap array using handler
+/**
+ FlatMap
+ 
+ - Parameters:
+ - items: array
+ - handler: mapping function
+ 
+ - Returns: result of flatMapping the array with the function
+ */
 public func ==><T, V>(_ items: [T], _ handler: (T) -> (V?)) -> [V] {
     return items.flatMap(handler)
 }
 
 infix operator |>
 
-/// Filter array using handler
+/**
+ Filter
+ 
+ - Parameters:
+ - items: array
+ - handler: includes function
+ 
+ - Returns: filtered array
+ */
 public func |><V>(_ items: [V], _ handler: (V) -> Bool) -> [V] {
     return items.filter(handler)
 }
 
-/// Filter array using handler
+/**
+ Filter
+ 
+ - Parameters:
+ - items: array
+ - handler: includes function
+ 
+ - Returns: filtered array
+ */
 public func |><V>(_ items: [V], _ handler: @escaping (V) -> Bool?) -> [V] {
     return items |> { handler($0).? }
 }
 
 prefix operator **
 
-/// Will ignore the input to a function
+/**
+ Ignore input
+ 
+ - Parameters:
+ - handler: function without input
+ 
+ - Returns: function that can take an input and drop it to call the handler.
+ */
 public prefix func **<T, V>(_ handler: @escaping () -> (V)) -> (T) -> (V) {
     return { _ in
         return handler()
@@ -71,14 +135,28 @@ public prefix func **<T, V>(_ handler: @escaping () -> (V)) -> (T) -> (V) {
 
 postfix operator **
 
-/// Will ignore the output of a function
+/**
+ Ignore ouput
+ 
+ - Parameters:
+ - handler: function with output
+ 
+ - Returns: function that will evaluate the handler but won't return its value
+ */
 public postfix func **<T, V>(_ handler: @escaping (T) -> (V)) -> (T) -> () {
     return { input in
         _ = handler(input)
     }
 }
 
-/// Will turn any function into a function that accepts it's parameters as optionals
+/**
+ Optionalize
+ 
+ - Parameters:
+ - handler: function that requires non-optionals
+ 
+ - Returns: function that can take an optioanl and will return nil in case the input is nil
+ */
 public prefix func !<T, V>(_ handler: @escaping (T) -> (V)) -> (T?) -> (V?) {
     return { $0 | handler }
 }

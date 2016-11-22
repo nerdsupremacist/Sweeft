@@ -19,6 +19,7 @@ public extension Double {
 
 extension Double: Defaultable {
     
+    /// Default Value
     public static let defaultValue = 0.0
     
 }

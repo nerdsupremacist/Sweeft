@@ -28,6 +28,7 @@ public extension Date {
 
 extension Date: Defaultable {
     
+    /// Default Value
     public static var defaultValue: Date {
         return Date()
     }

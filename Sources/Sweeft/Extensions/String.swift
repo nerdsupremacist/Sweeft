@@ -57,7 +57,8 @@ public extension String {
 }
 
 extension String: Defaultable {
-    
+
+    /// Default Value
     public static let defaultValue = ""
     
 }
