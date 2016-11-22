@@ -51,10 +51,30 @@ Now to be clear, the last two solutions are following the same principles.
 
 ## Installing
 
-To add this to your project you have to add this to your Podfile:
+Sweeft is available both as a Pod in Cocoapods and as a Dependency in the Swift Package Manager. So you can choose how you include Sweeft into your project.
+
+### Cocoapods
+
+Add 'Sweeft' to your Podfile:
 
 ```ruby
 pod 'Sweeft'
+```
+
+### Swift Package Manager
+
+Add 'Sweeft' to your Package.swift:
+
+```Swift
+import PackageDescription
+
+let package = Package(
+    // ... your project details
+    dependencies: [
+        // As a required dependency
+        .Package(url: "ssh://git@github.com/mathiasquintero/Sweeft.git", majorVersion: 0)
+    ]
+)
 ```
 
 ## Usage
