@@ -10,6 +10,7 @@ import Foundation
 
 public extension String {
     
+    /// Will say if the String is a palindrome
     var isPalindrome: Bool {
         if characters.count < 2 {
             return true
@@ -21,6 +22,14 @@ public extension String {
         return substring(with: range).isPalindrome
     }
     
+    /**
+     Will try to decipher the Date coded into a string
+     
+     - Parameters:
+     - with format: format in which the date is coded (Optional: default is "dd:MM:yyyy hh:mm")
+     
+     - Returns: Date object for the time
+     */
     func date(using format: String) -> Date? {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = format
@@ -31,6 +40,15 @@ public extension String {
 
 public extension String {
     
+    /**
+     Will say if a String matches a RegEx
+     
+     - Parameters:
+     - pattern: RegEx you want to match
+     - options: Extra options (Optional: Default is [])
+     
+     - Returns: Whether or not the string matches
+     */
     func matches(pattern: String, options: NSRegularExpression.Options = []) throws -> Bool {
         let regex = try NSRegularExpression(pattern: pattern, options: options)
         return regex.numberOfMatches(in: self, options: [], range: NSRange(location: 0, length: 0.distance(to: utf16.count))) != 0

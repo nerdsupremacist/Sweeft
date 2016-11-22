@@ -8,32 +8,33 @@
 
 import Foundation
 
-//: Exponent operator
 infix operator **
 
+/// Exponentiates
 public func **(_ a: Double, _ b: Double) -> Double {
     return pow(a, b)
 }
 
+/// Exponentiates
 public func **(_ a: Int, _ b: Int) -> Int {
     return Int(Double(a) ** Double(b))
 }
 
-//: Remainder Operator
+/// Remainder Operator
 public func %(_ a: Double, _ b: Double) -> Double {
     return a.remainder(dividingBy: b)
 }
 
-//: Will return the abs
 prefix operator |
 
+/// Will return the abs
 public prefix func |(_ value: Int) -> Int {
     return abs(value)
 }
 
-// Will say if a string contains a match for regex
 infix operator ~~
 
+/// Will say if a string contains a match for regex
 public func ~~(left: String, right: String) -> Bool {
     return .?(try? left.matches(pattern: right, options: []))
 }

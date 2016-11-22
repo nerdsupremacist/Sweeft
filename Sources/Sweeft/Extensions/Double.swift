@@ -10,8 +10,9 @@ import Foundation
 
 public extension Double {
     
+    /// Will say if the string representation is a palindrome. (Without signing or dots.)
     var isPalindrome: Bool {
-        return description.replacingOccurrences(of: ".", with: "").isPalindrome
+        return abs(self).description.replacingOccurrences(of: ".", with: "").isPalindrome
     }
     
 }

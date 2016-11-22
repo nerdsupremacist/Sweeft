@@ -8,6 +8,9 @@
 
 import Foundation
 
+/// A Type with a Default Value
 public protocol Defaultable {
+    
+    /// Default Value for Type
     static var defaultValue: Self { get }
 }

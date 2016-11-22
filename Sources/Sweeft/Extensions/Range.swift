@@ -9,6 +9,7 @@
 import Foundation
 public extension CountableRange {
     
+    /// Will turn into an array
     var array: [Bound] {
         return self.map { $0 }
     }

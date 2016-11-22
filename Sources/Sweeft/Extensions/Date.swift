@@ -10,7 +10,15 @@ import Foundation
 
 public extension Date {
     
-    func string(with format: String) -> String {
+    /**
+     Will turn a Date into a readable format
+     
+     - Parameters:
+     - with format: format in which you want the date (Optional: default is "dd:MM:yyyy hh:mm")
+     
+     - Returns: String representation of the date
+     */
+    func string(with format: String = "dd:MM:yyyy hh:mm") -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = format
         return dateFormatter.string(from: self)

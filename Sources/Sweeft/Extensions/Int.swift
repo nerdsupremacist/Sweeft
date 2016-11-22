@@ -10,6 +10,7 @@ import Foundation
 
 public extension Int {
     
+    /// Will say it is prime
     var isPrime: Bool {
         let bound = Int(sqrt(Double(self))) + 1
         return (2...bound)
@@ -17,8 +18,9 @@ public extension Int {
             .isEmpty
     }
     
+    /// Will say if the string representation is a palindrome. (Without signing)
     var isPalindrome: Bool {
-        return description.isPalindrome
+        return abs(self).description.isPalindrome
     }
     
 }
