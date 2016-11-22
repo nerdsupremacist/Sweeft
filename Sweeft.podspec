@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'Sweeft'
-  s.version          = '0.1.3'
+  s.version          = '0.1.4'
   s.summary          = 'Swift but a bit Sweeter - More Syntactic Sugar for Swift'
 
   s.description      = "A collection of different operators and extensions that make writing in Swift a bit sweeter."
@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   s.osx.deployment_target = '10.12'
   s.tvos.deployment_target = '9.0'
 
-  s.source_files = 'Sweeft/Classes/**/*'
+  s.source_files = 'Sources/Sweeft/**/*'
 
   # s.resource_bundles = {
   #   'Sweeft' => ['Sweeft/Assets/*.png']
