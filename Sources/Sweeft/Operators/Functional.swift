@@ -124,7 +124,7 @@ public func |><V>(_ items: [V], _ handler: (V) -> Bool) -> [V] {
  - Returns: filtered array
  */
 public func |><V>(_ items: [V], _ handler: @escaping (V) -> Bool?) -> [V] {
-    return items |> { handler($0).? }
+    return items |> handler.?
 }
 
 prefix operator **
@@ -208,5 +208,3 @@ postfix operator .!
 public postfix func .!<T, V>(_ handler: @escaping (T) -> (V?)) -> (T) -> (V) {
     return { ($0 | handler)! }
 }
-
-
