@@ -21,3 +21,13 @@ public func after(_ time: TimeInterval, in queue: DispatchQueue = .main, handler
         handler()
     }
 }
+
+infix operator >>
+
+func >>(_ queue: DispatchQueue,_ handler: @escaping () -> ()) {
+    queue.async(execute: handler)
+}
+
+func >>(_ time: TimeInterval, handler: @escaping () -> ()) {
+    after(time, handler: handler)
+}

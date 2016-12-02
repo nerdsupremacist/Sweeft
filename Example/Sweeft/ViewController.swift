@@ -26,6 +26,12 @@ class ViewController: UIViewController {
         
         print(notEven)
         
+        print(24.reversed)
+        
+        5.0 >>> {
+            print("Other Thread Called!")
+        }
+        
     }
 
     override func didReceiveMemoryWarning() {
