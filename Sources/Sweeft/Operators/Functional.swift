@@ -58,18 +58,6 @@ public prefix func .?<T, V>(_ handler: @escaping ((T) -> V?)) -> (T) -> Bool {
     return { .?($0 | handler) }
 }
 
-/**
- Defaultable Handler
- 
- - Parameters:
- - handler: Closure you want to evaluate
- 
- - Returns: a function that will return the handlers return value or the default value of the return type on nil
- */
-public postfix func .?<T, V: Defaultable>(_ handler: @escaping ((T) -> V?)) -> (T) -> V {
-    return { ($0 | handler).? }
-}
-
 infix operator =>
 
 /**
@@ -172,6 +160,30 @@ public postfix func **<T, V>(_ handler: @escaping (T) -> (V)) -> (T) -> () {
 }
 
 /**
+ Defaultable output Handler
+ 
+ - Parameters:
+ - handler: Closure you want to evaluate
+ 
+ - Returns: a function that will return the handlers return value or the default value of the return type on nil
+ */
+public postfix func .?<T, V: Defaultable>(_ handler: @escaping ((T) -> V?)) -> (T) -> V {
+    return { ($0 | handler).? }
+}
+
+/**
+ Defaultable input Handler
+ 
+ - Parameters:
+ - handler: Closure you want to evaluate
+ 
+ - Returns: a function that will feed the handler the input or the default of the type in case of nil
+ */
+public prefix func .?<T: Defaultable, V>(_ handler: @escaping (T) -> (V)) -> (T?) -> V {
+    return { $0.? | handler }
+}
+
+/**
  Optionalize
  
  - Parameters:
@@ -182,3 +194,19 @@ public postfix func **<T, V>(_ handler: @escaping (T) -> (V)) -> (T) -> () {
 public prefix func !<T, V>(_ handler: @escaping (T) -> (V)) -> (T?) -> (V?) {
     return { $0 | handler }
 }
+
+postfix operator .!
+
+/**
+ Force Unwrap function result
+ 
+ - Parameters:
+ - handler: function that return an optional
+ 
+ - Returns: function that will unwrap the result of the first function
+ */
+public postfix func .!<T, V>(_ handler: @escaping (T) -> (V?)) -> (T) -> (V) {
+    return { ($0 | handler)! }
+}
+
+
