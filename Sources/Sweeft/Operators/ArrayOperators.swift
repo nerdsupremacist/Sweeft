@@ -7,12 +7,42 @@
 
 import Foundation
 
+/**
+ Concretalize. Will remove all the optionals from an array.
+ 
+ - Parameters:
+ - items: array
+ 
+ - Returns: array without optionals
+ */
+public prefix func !<T>(_ items: [T?]) -> [T] {
+    return items ==> { $0 }
+}
+
+/**
+ Append.
+ 
+ - Parameters:
+ - a: array
+ - b: array
+ 
+ - Returns: array with all of the contents of both
+ */
 public func +<V>(_ a: [V], _ b: [V]) -> [V] {
     var a = a
     a.append(contentsOf: b)
     return a
 }
 
+/**
+ Append.
+ 
+ - Parameters:
+ - a: array
+ - b: value
+ 
+ - Returns: array with extra value b
+ */
 public func +<V>(_ a: [V], _ b: V?) -> [V] {
     guard let b = b else {
         return a
@@ -20,10 +50,28 @@ public func +<V>(_ a: [V], _ b: V?) -> [V] {
     return a + [b]
 }
 
+/**
+ Append.
+ 
+ - Parameters:
+ - a: array
+ - b: value
+ 
+ - Returns: array with extra value b
+ */
 public func +<V>(_ a: [V]?, _ b: V?) -> [V] {
     return (a ?? []) + b
 }
 
+/**
+ Append.
+ 
+ - Parameters:
+ - a: array
+ - b: array
+ 
+ - Returns: array with all of the contents of both
+ */
 public func +<V>(_ a: [V]?, _ b: [V]?) -> [V] {
     guard let a = a else {
         return b ?? []
@@ -58,8 +106,4 @@ public func +=<V>(_ array: inout [V]?, _ value: V?) {
  */
 public func +=<V>(_ a: inout [V]?, _ b: [V]?) {
     a = a + b
-}
-
-func test() {
-    var i = (0..<10).array
 }

@@ -22,9 +22,9 @@ class ViewController: UIViewController {
         
         print(res)
         
-        let notEven = !(array |> !{ $0 & 1 == 0 })
+        let even = !(array |> !{ $0 & 1 == 0 })
         
-        print(notEven)
+        print(even)
         
         print(24.reversed)
         
@@ -32,11 +32,6 @@ class ViewController: UIViewController {
             print("Other Thread Called!")
         }
         
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
 
 }

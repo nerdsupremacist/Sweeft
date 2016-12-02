@@ -43,6 +43,17 @@ public func <-<T>(_ items: inout [T], _ handler: (T) -> (T)) {
 }
 
 /**
+ Map assignment. Will assign the Result of map
+ 
+ - Parameters:
+ - items: array
+ - handler: mapping function
+ */
+public func <-<T>(_ items: inout [T], _ handler: (T, Int) -> (T)) {
+    items = items => handler
+}
+
+/**
  FlatMap assignment. Will assign the Result of flatMap
  
  - Parameters:
@@ -67,15 +78,14 @@ public func <|<T>(_ items: inout [T], _ handler: (T) -> Bool) {
 }
 
 /**
- Concretalize. Will remove all the optionals from an array.
+ Filter assignment. Will assign the Result of filter
  
  - Parameters:
  - items: array
- 
- - Returns: array without optionals
+ - handler: isIncluded function
  */
-public prefix func !<T>(_ items: [T?]) -> [T] {
-    return items ==> { $0 }
+public func <|<T>(_ items: inout [T], _ handler: (T, Int) -> Bool) {
+    items = items |> handler
 }
 
 infix operator <=>

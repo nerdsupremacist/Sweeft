@@ -74,6 +74,19 @@ public func =><T, V>(_ items: [T], _ handler: (T) -> (V)) -> [V] {
 }
 
 /**
+ Map With Index
+ 
+ - Parameters:
+ - items: array
+ - handler: mapping function
+ 
+ - Returns: result of mapping the array with the function
+ */
+public func =><T, V>(_ items: [T], _ handler: (T, Int) -> (V)) -> [V] {
+    return items.map(handler)
+}
+
+/**
  For each. Will call the handler with every element in the array
  
  - Parameters:
@@ -81,6 +94,17 @@ public func =><T, V>(_ items: [T], _ handler: (T) -> (V)) -> [V] {
  - handler: mapping function
  */
 public func =><T>(_ items: [T], _ handler: (T) -> ()) {
+    items.forEach(handler)
+}
+
+/**
+ For each with index. Will call the handler with every element in the array
+ 
+ - Parameters:
+ - items: array
+ - handler: mapping function
+ */
+public func =><T>(_ items: [T], _ handler: (T, Int) -> ()) {
     items.forEach(handler)
 }
 
@@ -115,6 +139,19 @@ public func |><V>(_ items: [V], _ handler: (V) -> Bool) -> [V] {
 }
 
 /**
+ Filter with index
+ 
+ - Parameters:
+ - items: array
+ - handler: includes function
+ 
+ - Returns: filtered array
+ */
+public func |><V>(_ items: [V], _ handler: (V, Int) -> Bool) -> [V] {
+    return items.filter(handler)
+}
+
+/**
  Filter
  
  - Parameters:
@@ -124,6 +161,19 @@ public func |><V>(_ items: [V], _ handler: (V) -> Bool) -> [V] {
  - Returns: filtered array
  */
 public func |><V>(_ items: [V], _ handler: @escaping (V) -> Bool?) -> [V] {
+    return items |> handler.?
+}
+
+/**
+ Filter with index
+ 
+ - Parameters:
+ - items: array
+ - handler: includes function
+ 
+ - Returns: filtered array
+ */
+public func |><V>(_ items: [V], _ handler: @escaping (V, Int) -> Bool?) -> [V] {
     return items |> handler.?
 }
 

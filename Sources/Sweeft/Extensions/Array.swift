@@ -9,6 +9,61 @@ import Foundation
 
 public extension Array {
     
+    // Array with Elements and indexes for better for loops.
+    var indexes: [(Element, Int)] {
+        if isEmpty {
+            return []
+        }
+        return (0..<count).map { (self[$0], $0) }
+    }
+    
+    /**
+     Map with index
+     
+     - Parameters:
+     - transform: tranform function with index
+     
+     - Returns: transformed array
+     */
+    func map<T>(_ transform: (Element, Int) -> T) -> [T] {
+        return indexes => transform
+    }
+    
+    /**
+     For each with index
+     
+     - Parameters:
+     - body: body function with index
+     */
+    func forEach(_ body: (Element, Int) -> Void) {
+        indexes => body
+    }
+    
+    /**
+     Filter with index
+     
+     - Parameters:
+     - isIncluded: isIncluded function with index
+     
+     - Returns: filtered array
+     */
+    func filter(_ isIncluded: (Element, Int) -> Bool) -> [Element] {
+        return (indexes |> isIncluded).map { $0.0 }
+    }
+    
+    /**
+     Reduce with index
+     
+     - Parameters:
+     - initialResult: Accumulator
+     - nextPartialResult: resulthandler with index
+     
+     - Returns: Result
+     */
+    func reduce<Result>(_ initialResult: Result, _ nextPartialResult: @escaping (Result, Element, Int) -> Result) -> Result {
+        return indexes.reduce(initialResult) { nextPartialResult($0, $1.0, $1.1) }
+    }
+    
     /**
      Will give you the first n Elements of an Array
      
@@ -90,7 +145,7 @@ public extension Array {
     
     /// Default Value
     static var defaultValue: [Element] {
-        return []
+        return [Element]()
     }
     
 }
