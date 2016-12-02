@@ -1,6 +1,5 @@
 //
 //  Int.swift
-//  Swiftoids
 //
 //  Created by Mathias Quintero on 11/20/16.
 //  Copyright © 2016 Mathias Quintero. All rights reserved.
@@ -23,7 +22,7 @@ public extension Int {
         return abs(self).description.isPalindrome
     }
     
-    /// Will return a reversed version of the intiger
+    /// Will return a reversed version of the integer
     var reversed: Int {
         return self | { $0.description.reversed } | Int.init.?
     }
