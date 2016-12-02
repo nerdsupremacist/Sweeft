@@ -23,6 +23,11 @@ public extension Int {
         return abs(self).description.isPalindrome
     }
     
+    /// Will return a reversed version of the intiger
+    var reversed: Int {
+        return self | { $0.description.reversed } | Int.init.?
+    }
+    
 }
 
 extension Int: Defaultable {

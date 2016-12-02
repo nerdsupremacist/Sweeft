@@ -12,14 +12,12 @@ public extension String {
     
     /// Will say if the String is a palindrome
     var isPalindrome: Bool {
-        if characters.count < 2 {
-            return true
-        }
-        if characters.first != characters.last {
-            return false
-        }
-        let range = index(after: startIndex)..<index(before: endIndex)
-        return substring(with: range).isPalindrome
+        return self.reversed == self
+    }
+    
+    /// Will return the string reversed
+    var reversed: String {
+        return String(characters.reversed())
     }
     
     /**

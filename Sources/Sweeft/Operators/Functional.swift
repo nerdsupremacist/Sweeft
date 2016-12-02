@@ -29,6 +29,17 @@ public func |<T, V>(_ value: T?, function: ((T) -> V)?) -> V? {
  - value: Item you want to pass
  - function: Function you want to pass it to
  */
+public func |<T, V>(_ value: T, function: ((T) -> V)) -> V {
+    return function(value)
+}
+
+/**
+ Pipe. Will pass the value to a function. Like in Bash
+ 
+ - Parameters:
+ - value: Item you want to pass
+ - function: Function you want to pass it to
+ */
 public func |<T, V>(_ value: T?, function: ((T) -> V)) -> V? {
     guard let value = value else {
         return nil
@@ -44,8 +55,20 @@ public func |<T, V>(_ value: T?, function: ((T) -> V)) -> V? {
  
  - Returns: a function that will return whether or not the handler evaluates an input to a value or nil
  */
-public prefix func .?<T,V>(_ handler: @escaping ((T) -> V?)) -> (T) -> Bool {
+public prefix func .?<T, V>(_ handler: @escaping ((T) -> V?)) -> (T) -> Bool {
     return { .?($0 | handler) }
+}
+
+/**
+ Defaultable Handler
+ 
+ - Parameters:
+ - handler: Closure you want to evaluate
+ 
+ - Returns: a function that will return the handlers return value or the default value of the return type on nil
+ */
+public postfix func .?<T, V: Defaultable>(_ handler: @escaping ((T) -> V?)) -> (T) -> V {
+    return { ($0 | handler).? }
 }
 
 infix operator =>

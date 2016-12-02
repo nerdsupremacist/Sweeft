@@ -22,12 +22,24 @@ public func after(_ time: TimeInterval, in queue: DispatchQueue = .main, handler
     }
 }
 
-infix operator >>
+infix operator >>>
 
-func >>(_ queue: DispatchQueue,_ handler: @escaping () -> ()) {
+public func >>>(_ queue: DispatchQueue,_ handler: @escaping () -> ()) {
     queue.async(execute: handler)
 }
 
-func >>(_ time: TimeInterval, handler: @escaping () -> ()) {
+public func >>>(_ time: Double, handler: @escaping () -> ()) {
     after(time, handler: handler)
+}
+
+public func >>><A, B, C>(_ funA: @escaping (A) -> (B), _ funB: @escaping (B) -> (C)) -> (A) -> (C) {
+    return { input in
+        input | funA | funB
+    }
+}
+
+public func >>><A, B, C>(_ funA: @escaping (A) -> (B), _ funB: @escaping (B) -> (C)) -> (A) -> () {
+    return { input in
+        input | funA | funB**
+    }
 }
