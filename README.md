@@ -37,14 +37,14 @@ Now those who know swift a bit better will tell me to write something more along
 
 ```Swift
 let even = array
-            .filter { ($0 ?? -1) & 1 == 0 }
             .flatMap { $0 }
+            .filter { $0 & 1 == 0 }
 ```
 
 But even that seems a bit too long. Here's that same code written using **Sweeft**:
 
 ```Swift
-let even = !(array |> !{ $0 & 1 == 0 })
+let even = !array |> { $0 & 1 == 0 }
 ```
 
 Now to be clear, the last two solutions are following the same principles.
