@@ -14,15 +14,16 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let array = [1, 2, 3, nil, 5, nil]
+        let array: [Int?]? = [1, 2, 3, nil, 5, nil]
         
-        let res = array
-            .filter { ($0 ?? -1) & 1 == 0 }
+        let res = (array ?? [])
             .flatMap { $0 }
+            .filter { $0 & 1 == 0 }
+        
         
         print(res)
         
-        let even = !(array |> !{ $0 & 1 == 0 })
+        let even = !array.? |> { $0 & 1 == 0 }
         
         print(even)
         

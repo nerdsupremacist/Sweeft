@@ -47,15 +47,15 @@ public func |<T, V>(_ value: T?, function: ((T) -> V)) -> V? {
 }
 
 /**
- Is nil Handler?
+ nil-check Handler?
  
  - Parameters:
  - handler: Closure you want to evaluate
  
  - Returns: a function that will return whether or not the handler evaluates an input to a value or nil
  */
-public prefix func .?<T, V>(_ handler: @escaping ((T) -> V?)) -> (T) -> Bool {
-    return { .?($0 | handler) }
+public prefix func ??<T, V>(_ handler: @escaping ((T) -> V?)) -> (T) -> Bool {
+    return { ??($0 | handler) }
 }
 
 infix operator =>
@@ -220,6 +220,8 @@ public postfix func **<T, V>(_ handler: @escaping (T) -> (V)) -> (T) -> () {
 public postfix func .?<T, V: Defaultable>(_ handler: @escaping ((T) -> V?)) -> (T) -> V {
     return { ($0 | handler).? }
 }
+
+prefix operator .?
 
 /**
  Defaultable input Handler

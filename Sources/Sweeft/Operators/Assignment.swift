@@ -127,7 +127,7 @@ public postfix func .?<V: Defaultable>(_ items: [V?]) -> [V] {
     return items => (.?)
 }
 
-prefix operator .?
+prefix operator ??
 
 /**
  nil-Check
@@ -137,6 +137,6 @@ prefix operator .?
  
  - Returns: Whether or not it's nil
  */
-public prefix func .?<V>(_ value: V?) -> Bool {
+public prefix func ??<V>(_ value: V?) -> Bool {
     return value != nil
 }

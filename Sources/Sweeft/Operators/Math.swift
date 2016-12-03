@@ -75,5 +75,5 @@ infix operator ~~
  - Returns: does the string match the pattern
  */
 public func ~~(left: String, right: String) -> Bool {
-    return .?(try? left.matches(pattern: right, options: []))
+    return ??(try? left.matches(pattern: right, options: []))
 }

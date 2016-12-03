@@ -141,10 +141,10 @@ public extension Array {
     
 }
 
-public extension Array {
+extension Array: Defaultable {
     
     /// Default Value
-    static var defaultValue: [Element] {
+    public static var defaultValue: [Element] {
         return [Element]()
     }
     
