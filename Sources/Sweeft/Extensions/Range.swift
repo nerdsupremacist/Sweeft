@@ -6,7 +6,7 @@
 //
 
 import Foundation
-public extension CountableRange {
+public extension CountableClosedRange {
     
     /// Will turn into an array
     var array: [Bound] {

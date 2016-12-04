@@ -82,7 +82,7 @@ public func +<V>(_ a: [V]?, _ b: [V]?) -> [V] {
     return a + b
 }
 
-infix operator +=
+infix operator +=: AssignmentPrecedence
 
 /**
  nil-proof Append. Will only append the value if it's not nil

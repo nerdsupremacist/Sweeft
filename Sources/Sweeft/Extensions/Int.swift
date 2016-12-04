@@ -11,6 +11,9 @@ public extension Int {
     
     /// Will say it is prime
     var isPrime: Bool {
+        if self < 2 {
+            return false
+        }
         let bound = Int(sqrt(Double(self))) + 1
         return (2...bound)
             .filter { self % $0 == 0 }

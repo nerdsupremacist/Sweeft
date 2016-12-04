@@ -7,7 +7,12 @@
 
 import Foundation
 
-infix operator **
+precedencegroup PowerPrecedence {
+    associativity: right
+    higherThan: MultiplicationPrecedence
+}
+
+infix operator **: PowerPrecedence
 
 /**
  Exponentiates
@@ -32,7 +37,6 @@ public func **(_ a: Double, _ b: Double) -> Double {
  - Returns: a to the b
  */
 public func **(_ a: Int, _ b: Int) -> Int {
-    let a = 5 % 2
     return Int(Double(a) ** Double(b))
 }
 
@@ -63,7 +67,7 @@ public prefix func |(_ value: Int) -> Int {
     return abs(value)
 }
 
-infix operator ~~
+infix operator ~~: ComparisonPrecedence
 
 /**
  Matches

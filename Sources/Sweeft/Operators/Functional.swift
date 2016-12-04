@@ -58,7 +58,7 @@ public prefix func ??<T, V>(_ handler: @escaping ((T) -> V?)) -> (T) -> Bool {
     return { ??($0 | handler) }
 }
 
-infix operator =>
+infix operator =>: AdditionPrecedence
 
 /**
  Map
@@ -108,7 +108,7 @@ public func =><T>(_ items: [T], _ handler: (T, Int) -> ()) {
     items.forEach(handler)
 }
 
-infix operator ==>
+infix operator ==>: AdditionPrecedence
 
 /**
  FlatMap
@@ -123,7 +123,7 @@ public func ==><T, V>(_ items: [T], _ handler: (T) -> (V?)) -> [V] {
     return items.flatMap(handler)
 }
 
-infix operator |>
+infix operator |>: AdditionPrecedence
 
 /**
  Filter

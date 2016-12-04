@@ -7,7 +7,7 @@
 
 import Foundation
 
-infix operator <-
+infix operator <-: AssignmentPrecedence
 
 /**
  nil-proof Assignment. Will only assign the value if the value is not nil
@@ -64,7 +64,7 @@ public func <-<T>(_ items: inout [T], _ handler: (T) -> (T?)) {
     items = items ==> handler
 }
 
-infix operator <|
+infix operator <|: AssignmentPrecedence
 
 /**
  Filter assignment. Will assign the Result of filter
@@ -88,7 +88,7 @@ public func <|<T>(_ items: inout [T], _ handler: (T, Int) -> Bool) {
     items = items |> handler
 }
 
-infix operator <=>
+infix operator <=>: AssignmentPrecedence
 
 /**
  Swap. Will swap the two elements

@@ -20,12 +20,19 @@ class ViewController: UIViewController {
             .flatMap { $0 }
             .filter { $0 & 1 == 0 }
         
-        
         print(res)
         
         let even = !array.? |> { $0 & 1 == 0 }
         
         print(even)
+        
+        let extra = (0...100).array => { $0 ** 2 } |> { ($0 + 1).isPrime || ($0 - 1).isPrime }
+        
+        print(extra)
+        
+        let palindromePrimes = (0...1000).array |> { $0.isPalindrome } |> { $0.isPrime }
+        
+        print(palindromePrimes)
         
         print(24.reversed)
         
