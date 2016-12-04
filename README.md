@@ -18,16 +18,18 @@ Sweeft allows you to make your code so much shorter.
 For instance: let's say you have an array with some integers and some nil values.
 
 ```Swift
-let array = [1, 2, 3, nil, 5, nil]
+let array: [Int?]? = [1, 2, 3, nil, 5, nil]
 ```
 
 And now you want to store all of the even numbers in a single array. Easy right:
 
 ```Swift
 var even = [Int]()
-for i in array {
-    if let i = i, i % 2 == 0 {
-        even.append(i)
+if let array = array {
+    for i in array {
+        if let i = i, i % 2 == 0 {
+            even.append(i)
+        }
     }
 }
 ```
@@ -36,7 +38,7 @@ Seems a bit too much.
 Now those who know swift a bit better will tell me to write something more along the lines of:
 
 ```Swift
-let even = array
+let even = (array ?? [])
             .flatMap { $0 }
             .filter { $0 & 1 == 0 }
 ```
@@ -44,7 +46,7 @@ let even = array
 But even that seems a bit too long. Here's that same code written using **Sweeft**:
 
 ```Swift
-let even = !array |> { $0 & 1 == 0 }
+let even = !array.? |> { $0 & 1 == 0 }
 ```
 
 Now to be clear, the last two solutions are following the same principles.
@@ -221,13 +223,13 @@ i.? // 0
 j.? // 2
 ```
 
-#### (.?) Check for nil
+#### (??) Check for nil
 
 Will check if a value is not nil
 
 
 ```Swift
-.?myVariable
+??myVariable
 ```
 
 is equivalent to:
