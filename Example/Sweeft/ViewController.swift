@@ -24,6 +24,10 @@ class ViewController: UIViewController {
         
         let even = !array.? |> { $0 & 1 == 0 }
         
+        array.? => { item, index in
+            // Do Stuff
+        }
+        
         print(even)
         
         let extra = (0...100).array => { $0 ** 2 } |> { ($0 + 1).isPrime || ($0 - 1).isPrime }

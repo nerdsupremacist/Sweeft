@@ -10,7 +10,7 @@ import Foundation
 public extension Array {
     
     // Array with Elements and indexes for better for loops.
-    var indexes: [(Element, Int)] {
+    var withIndex: [(Element, Int)] {
         if isEmpty {
             return []
         }
@@ -26,7 +26,7 @@ public extension Array {
      - Returns: transformed array
      */
     func map<T>(_ transform: (Element, Int) -> T) -> [T] {
-        return indexes => transform
+        return withIndex => transform
     }
     
     /**
@@ -36,7 +36,7 @@ public extension Array {
      - body: body function with index
      */
     func forEach(_ body: (Element, Int) -> Void) {
-        indexes => body
+        withIndex => body
     }
     
     /**
@@ -48,7 +48,7 @@ public extension Array {
      - Returns: filtered array
      */
     func filter(_ isIncluded: (Element, Int) -> Bool) -> [Element] {
-        return (indexes |> isIncluded).map { $0.0 }
+        return (withIndex |> isIncluded).map { $0.0 }
     }
     
     /**
@@ -61,7 +61,7 @@ public extension Array {
      - Returns: Result
      */
     func reduce<Result>(_ initialResult: Result, _ nextPartialResult: @escaping (Result, Element, Int) -> Result) -> Result {
-        return indexes.reduce(initialResult) { nextPartialResult($0, $1.0, $1.1) }
+        return withIndex.reduce(initialResult) { nextPartialResult($0, $1.0, $1.1) }
     }
     
     /**

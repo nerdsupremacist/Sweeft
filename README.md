@@ -11,7 +11,35 @@ So most of these regard possible problems and annoyances with functional program
 
 **Please** Contribute to make Swift a bit cooler looking... Post your ideas in the issues as enhancements
 
-## Why use Sweeft
+## Installing Sweeft
+
+Sweeft is available both as a Pod in Cocoapods and as a Dependency in the Swift Package Manager. So you can choose how you include Sweeft into your project.
+
+### Cocoapods
+
+Add 'Sweeft' to your Podfile:
+
+```ruby
+pod 'Sweeft'
+```
+
+### Swift Package Manager
+
+Add 'Sweeft' to your Package.swift:
+
+```Swift
+import PackageDescription
+
+let package = Package(
+    // ... your project details
+    dependencies: [
+        // As a required dependency
+        .Package(url: "ssh://git@github.com/mathiasquintero/Sweeft.git", majorVersion: 0)
+    ]
+)
+```
+
+## Why use Sweeft?
 
 Sweeft allows you to make your code so much shorter.
 
@@ -51,33 +79,78 @@ let even = !array.? |> { $0 & 1 == 0 }
 
 Now to be clear, the last two solutions are following the same principles.
 
-## Installing
+In this case first we are unwrapping the array with '.?'. Meaning that if it's nil we should get an empty array. Which in turn means: we unwrapped it safely.
 
-Sweeft is available both as a Pod in Cocoapods and as a Dependency in the Swift Package Manager. So you can choose how you include Sweeft into your project.
+Then we get rid of all the nil values from the array and cast it as a [Int] using the prefix '!'.
+Finally we just call filter. But since our fingers are to lazy we spelled it '|>' ;)
 
-### Cocoapods
+### Still not convinced?
 
-Add 'Sweeft' to your Podfile:
+Ok. Another example:
 
-```ruby
-pod 'Sweeft'
-```
+Say you're really curious and want to know all the numbers from 0 to 1000 that are both palindromes and primes. Exciting! I know.
 
-### Swift Package Manager
-
-Add 'Sweeft' to your Package.swift:
+Well easy:
 
 ```Swift
-import PackageDescription
-
-let package = Package(
-    // ... your project details
-    dependencies: [
-        // As a required dependency
-        .Package(url: "ssh://git@github.com/mathiasquintero/Sweeft.git", majorVersion: 0)
-    ]
-)
+let palindromePrimes = (0...1000).array |> { $0.isPalindrome } |> { $0.isPrime }
 ```
+
+First we turn a range into an array that we can filter by using the '.array' property.
+Then we filter out the non-palindromes.
+And then we filter out the non-primes.
+
+### Wow! You're a hard sell.
+
+Ok. If you still are not sure if you should use Sweeft, see this example.
+
+Say you're looping over an array:
+
+```Swift
+for item in array {
+    // Do Stuff
+}
+```
+
+And all of the sudden you notice that you're going to need the index of the item as well.
+So now you have to use a range:
+
+```Swift
+for index in 0..<array.count {
+    let item = array[index]
+    // Do Stuff
+}
+```
+
+But you still haven't accounted for the fact that this will crash if the array is empty:
+So you need:
+
+```Swift
+if !array.isEmpty {
+    for index in 0..<array.count {
+        let item = array[index]
+        // Do Stuff
+    }
+}
+```
+
+Ok... That's too much work for a loop. Instead you could just use '.withIndex' property of the array.
+
+```Swift
+for (item, index) in array.withIndex {
+    // Do Stuff
+}
+```
+
+Or even better. With the built in for-each operator:
+
+```Swift
+array => { item, index in
+    // Do Stuff
+}
+```
+
+I think we can all agree that's much cleaner looking.
 
 ## Usage
 
