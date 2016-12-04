@@ -65,6 +65,34 @@ public extension Array {
     }
     
     /**
+     Reduce with first item as partial result
+     - Parameters:
+     - nextPartialResult: resulthandler
+     
+     - Returns: Result
+     */
+    func reduce(_ nextPartialResult: @escaping (Element, Element) -> Element) -> Element? {
+        guard let first = first else {
+            return nil
+        }
+        return array(withLast: count - 1).reduce(first, nextPartialResult)
+    }
+    
+    /**
+     Reduce with first item as partial result and with index
+     - Parameters:
+     - nextPartialResult: resulthandler with index
+     
+     - Returns: Result
+     */
+    func reduce(_ nextPartialResult: @escaping (Element, Element, Int) -> Element) -> Element? {
+        guard let first = first else {
+            return nil
+        }
+        return array(withLast: count - 1).reduce(first, nextPartialResult)
+    }
+    
+    /**
      Will give you the first n Elements of an Array
      
      - Parameters:
@@ -75,6 +103,9 @@ public extension Array {
     func array(withFirst number: Int) -> [Element] {
         if number > count {
             return self
+        }
+        if number < 1 {
+            return []
         }
         return (0..<number).map { self[$0] }
     }

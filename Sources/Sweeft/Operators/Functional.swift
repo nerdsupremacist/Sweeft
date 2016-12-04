@@ -123,6 +123,32 @@ public func ==><T, V>(_ items: [T], _ handler: (T) -> (V?)) -> [V] {
     return items.flatMap(handler)
 }
 
+/**
+ Reduce
+ 
+ - Parameters:
+ - items: array
+ - handler: next partial result function
+ 
+ - Returns: result of reduce
+ */
+public func ==><T>(_ items: [T], _ handler: @escaping (T, T) -> (T)) -> T? {
+    return items.reduce(handler)
+}
+
+/**
+ Reduce with index
+ 
+ - Parameters:
+ - items: array
+ - handler: next partial result function with index
+ 
+ - Returns: result of reduce
+ */
+public func ==><T>(_ items: [T], _ handler: @escaping (T, T, Int) -> (T)) -> T? {
+    return items.reduce(handler)
+}
+
 infix operator |>: AdditionPrecedence
 
 /**
