@@ -7,6 +7,7 @@
 
 import Foundation
 
+
 /**
  Concretalize. Will remove all the optionals from an array.
  
@@ -15,7 +16,7 @@ import Foundation
  
  - Returns: array without optionals
  */
-public prefix func !<T>(_ items: [T?]) -> [T] {
+public prefix func !<T, C: Collection where C.Iterator.Element == T?>(_ items: C) -> [T] {
     return items ==> { $0 }
 }
 
@@ -106,4 +107,56 @@ public func +=<V>(_ array: inout [V]?, _ value: V?) {
  */
 public func +=<V>(_ a: inout [V]?, _ b: [V]?) {
     a = a + b
+}
+
+typealias SubscriptFunc<C, T,V> = (C) -> ((T) -> (V))
+
+/**
+ Safe Array index Access
+ 
+ - Parameters:
+ - array: array you want to access
+ - index: index you want to access
+ */
+public func |<T>(_ items: [T], _ index: Int) -> T? {
+    if index < items.count, 0 <= index {
+        return items[index]
+    }
+    return nil
+}
+
+/**
+ Safe Array index Access
+ 
+ - Parameters:
+ - array: array you want to access
+ - index: index you want to access
+ */
+public func |<T>(_ items: [T]?, _ index: Int) -> T? {
+    guard let items = items else {
+        return nil
+    }
+    return items | index
+}
+
+/**
+ Safe Dictionary value Access
+ 
+ - Parameters:
+ - dictionary: dictionary you want to access
+ - key: key of the dictionary you want to access
+ */
+public func |<K, V>(_ dictionary: [K:V], _ key: K) -> V? {
+    return dictionary[key]
+}
+
+/**
+ Safe Dictionary value Access
+ 
+ - Parameters:
+ - dictionary: dictionary you want to access
+ - key: key of the dictionary you want to access
+ */
+public func |<K, V>(_ dictionary: [K:V]?, _ key: K) -> V? {
+    return (dictionary.?)[key]
 }

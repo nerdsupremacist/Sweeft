@@ -14,7 +14,7 @@ public extension Array {
         if isEmpty {
             return []
         }
-        return (0..<count).map { (self[$0], $0) }
+        return (0..<count) => { (self[$0], $0) }
     }
     
     /**
@@ -93,6 +93,23 @@ public extension Array {
     }
     
     /**
+     Will turn any Array into a Dictionary with a handler
+     
+     - Parameters:
+     - byDividingWith: Mapping function that breaks every element into a key and a value with index
+     
+     - Returns: Resulting dictionary
+     */
+    func dictionary<K, V>(byDividingWith handler: @escaping (Element, Int) -> (K, V)) -> [K:V] {
+        return reduce([:]) { dict, item, index in
+            var dict = dict
+            let (key, value) = handler(item, index)
+            dict[key] = value
+            return dict
+        }
+    }
+    
+    /**
      Will give you the first n Elements of an Array
      
      - Parameters:
@@ -107,7 +124,7 @@ public extension Array {
         if number < 1 {
             return []
         }
-        return (0..<number).map { self[$0] }
+        return (0..<number) => { self[$0] }
     }
     
     /**
@@ -122,61 +139,13 @@ public extension Array {
         return self.reversed().array(withFirst: number).reversed()
     }
     
-    /**
-     Will sum all of the Elements of the array toghether
-     
-     - Parameters:
-     - mapper: Mapping function that returns the value for an Element
-     
-     - Returns: Result of sum
-     */
-    func sum(_ mapper: (Element) -> (Double)) -> Double {
-        return self.map(mapper).reduce(0, +)
-    }
-    
-    /**
-     Will sum all of the Elements of the array toghether
-     
-     - Parameters:
-     - mapper: Mapping function that returns the value for an Element
-     
-     - Returns: Result of sum
-     */
-    func sum(_ mapper: (Element) -> (Int)) -> Int {
-        return Int(sum(mapper))
-    }
-    
-    /**
-     Will multiply all of the Elements of the array toghether
-     
-     - Parameters:
-     - mapper: Mapping function that returns the value for an Element
-     
-     - Returns: Result of multiplication
-     */
-    func multiply(_ mapper: (Element) -> (Double)) -> Double {
-        return self.map(mapper).reduce(1, *)
-    }
-    
-    /**
-     Will multiply all of the Elements of the array toghether
-     
-     - Parameters:
-     - mapper: Mapping function that returns the value for an Element
-     
-     - Returns: Result of multiplication
-     */
-    func multiply(_ mapper: (Element) -> (Int)) -> Int {
-        return Int(multiply(mapper))
-    }
-    
 }
 
 extension Array: Defaultable {
     
     /// Default Value
     public static var defaultValue: [Element] {
-        return [Element]()
+        return []
     }
     
 }

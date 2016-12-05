@@ -93,11 +93,10 @@ Say you're really curious and want to know all the numbers from 0 to 1000 that a
 Well easy:
 
 ```Swift
-let palindromePrimes = (0...1000).array |> { $0.isPalindrome } |> { $0.isPrime }
+let palindromePrimes = (0...1000) |> { $0.isPalindrome } |> { $0.isPrime }
 ```
 
-First we turn a range into an array that we can filter by using the '.array' property.
-Then we filter out the non-palindromes.
+First we filter out the non-palindromes.
 And then we filter out the non-primes.
 
 ### Wow! You're a hard sell.

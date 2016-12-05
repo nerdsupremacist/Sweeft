@@ -30,11 +30,11 @@ class ViewController: UIViewController {
         
         print(even)
         
-        let extra = (0...100).array => { $0 ** 2 } |> { ($0 + 1).isPrime || ($0 - 1).isPrime }
+        let extra = (0...100) => { $0 ** 2 } |> { ($0 + 1).isPrime || ($0 - 1).isPrime }
         
         print(extra)
         
-        let palindromePrimes = (0...1000).array |> { $0.isPalindrome } |> { $0.isPrime }
+        let palindromePrimes = (0...1000) |> { $0.isPalindrome } |> { $0.isPrime }
         
         print(palindromePrimes)
         
@@ -43,6 +43,12 @@ class ViewController: UIViewController {
         print(sum.?)
         
         print(24.reversed)
+        
+        let dict = ["String": "Other String"]
+        
+        print(dict.flipped)
+        
+        print(79.primeFactors)
         
         5.0 >>> {
             print("Other Thread Called!")

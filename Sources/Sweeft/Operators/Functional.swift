@@ -64,12 +64,12 @@ infix operator =>: AdditionPrecedence
  Map
  
  - Parameters:
- - items: array
+ - items: collection
  - handler: mapping function
  
  - Returns: result of mapping the array with the function
  */
-public func =><T, V>(_ items: [T], _ handler: (T) -> (V)) -> [V] {
+public func =><C: Collection, V>(_ items: C, _ handler: (C.Iterator.Element) -> (V)) -> [V] {
     return items.map(handler)
 }
 
@@ -93,7 +93,7 @@ public func =><T, V>(_ items: [T], _ handler: (T, Int) -> (V)) -> [V] {
  - items: array
  - handler: mapping function
  */
-public func =><T>(_ items: [T], _ handler: (T) -> ()) {
+public func =><C: Collection>(_ items: [C.Iterator.Element], _ handler: (C.Iterator.Element) -> ()) {
     items.forEach(handler)
 }
 
@@ -114,12 +114,12 @@ infix operator ==>: AdditionPrecedence
  FlatMap
  
  - Parameters:
- - items: array
+ - items: collection
  - handler: mapping function
  
- - Returns: result of flatMapping the array with the function
+ - Returns: result of flatMapping the collection with the function
  */
-public func ==><T, V>(_ items: [T], _ handler: (T) -> (V?)) -> [V] {
+public func ==><C: Collection, V>(_ items: C, _ handler: (C.Iterator.Element) -> (V?)) -> [V] {
     return items.flatMap(handler)
 }
 
@@ -127,7 +127,7 @@ public func ==><T, V>(_ items: [T], _ handler: (T) -> (V?)) -> [V] {
  Reduce
  
  - Parameters:
- - items: array
+ - items: collection
  - handler: next partial result function
  
  - Returns: result of reduce
@@ -155,12 +155,12 @@ infix operator |>: AdditionPrecedence
  Filter
  
  - Parameters:
- - items: array
+ - items: collection
  - handler: includes function
  
  - Returns: filtered array
  */
-public func |><V>(_ items: [V], _ handler: (V) -> Bool) -> [V] {
+public func |><C: Collection>(_ items: C, _ handler: (C.Iterator.Element) -> Bool) -> [C.Iterator.Element] {
     return items.filter(handler)
 }
 
@@ -181,12 +181,12 @@ public func |><V>(_ items: [V], _ handler: (V, Int) -> Bool) -> [V] {
  Filter
  
  - Parameters:
- - items: array
+ - items: collection
  - handler: includes function
  
  - Returns: filtered array
  */
-public func |><V>(_ items: [V], _ handler: @escaping (V) -> Bool?) -> [V] {
+public func |><C: Collection>(_ items: C, _ handler: @escaping (C.Iterator.Element) -> Bool?) -> [C.Iterator.Element] {
     return items |> handler.?
 }
 
@@ -201,6 +201,32 @@ public func |><V>(_ items: [V], _ handler: @escaping (V) -> Bool?) -> [V] {
  */
 public func |><V>(_ items: [V], _ handler: @escaping (V, Int) -> Bool?) -> [V] {
     return items |> handler.?
+}
+
+/**
+ Dictionary
+ 
+ - Parameters:
+ - items: collection
+ - handler: dividing function
+ 
+ - Returns: dictionary
+ */
+public func >>=<C: Collection, K, V>(_ items: C, _ handler: (C.Iterator.Element) -> (K, V)) -> [K:V] {
+    return items.dictionary(byDividingWith: handler)
+}
+
+/**
+ Dictionary with index
+ 
+ - Parameters:
+ - items: array
+ - handler: dividing function with index
+ 
+ - Returns: dictionary
+ */
+public func >>=<T, K, V>(_ items: [T], _ handler: @escaping (T, Int) -> (K, V)) -> [K:V] {
+    return items.dictionary(byDividingWith: handler)
 }
 
 prefix operator **
