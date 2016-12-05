@@ -94,8 +94,8 @@ infix operator <=>: AssignmentPrecedence
  Swap. Will swap the two elements
  
  - Parameters:
- - a: first Element
- - b: second Element
+    - a: first Element
+    - b: second Element
  */
 public func <=><V>(_ a: inout V, _ b: inout V) {
     swap(&a, &b)
@@ -107,7 +107,7 @@ postfix operator .?
  Unwrap with default. Will safely unwrap the value and return the default value of the type when nil
  
  - Parameters:
- - value: Value
+    - value: Value
  
  - Returns: Value when not nil and type default when nil
  */
@@ -119,7 +119,7 @@ public postfix func .?<V: Defaultable>(_ value: V?) -> V {
  Unwrap array with default.
  
  - Parameters:
- - items: array
+    - items: array
  
  - Returns: array with all the elements unwrapped with default.
  */
@@ -133,7 +133,7 @@ prefix operator ??
  nil-Check
  
  - Parameters:
- - value: Value
+    - value: Value
  
  - Returns: Whether or not it's nil
  */

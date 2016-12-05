@@ -11,8 +11,8 @@ import Foundation
 /**
  Concretalize. Will remove all the optionals from an array.
  
- - Parameters:
- - items: array
+    - Parameters:
+    - items: array
  
  - Returns: array without optionals
  */
@@ -24,8 +24,8 @@ public prefix func !<T, C: Collection where C.Iterator.Element == T?>(_ items: C
  Append.
  
  - Parameters:
- - a: array
- - b: array
+    - a: array
+    - b: array
  
  - Returns: array with all of the contents of both
  */
@@ -39,8 +39,8 @@ public func +<V>(_ a: [V], _ b: [V]) -> [V] {
  Append.
  
  - Parameters:
- - a: array
- - b: value
+    - a: array
+    - b: value
  
  - Returns: array with extra value b
  */
@@ -55,8 +55,8 @@ public func +<V>(_ a: [V], _ b: V?) -> [V] {
  Append.
  
  - Parameters:
- - a: array
- - b: value
+    - a: array
+    - b: value
  
  - Returns: array with extra value b
  */
@@ -68,8 +68,8 @@ public func +<V>(_ a: [V]?, _ b: V?) -> [V] {
  Append.
  
  - Parameters:
- - a: array
- - b: array
+    - a: array
+    - b: array
  
  - Returns: array with all of the contents of both
  */
@@ -90,8 +90,8 @@ infix operator +=: AssignmentPrecedence
  If the array is nil it will be created.
  
  - Parameters:
- - array: variable you want to assign it to
- - value: value you want to assign
+    - array: variable you want to assign it to
+    - value: value you want to assign
  */
 public func +=<V>(_ array: inout [V]?, _ value: V?) {
     array = array + value
@@ -102,21 +102,20 @@ public func +=<V>(_ array: inout [V]?, _ value: V?) {
  If the array is nil it will be created.
  
  - Parameters:
- - array: variable you want to assign it to
- - value: value you want to assign
+    - array: variable you want to assign it to
+    - value: value you want to assign
  */
 public func +=<V>(_ a: inout [V]?, _ b: [V]?) {
     a = a + b
 }
 
-typealias SubscriptFunc<C, T,V> = (C) -> ((T) -> (V))
-
 /**
  Safe Array index Access
  
  - Parameters:
- - array: array you want to access
- - index: index you want to access
+    - array: array you want to access
+    - index: index you want to access
+ - Returns: Value at index
  */
 public func |<T>(_ items: [T], _ index: Int) -> T? {
     if index < items.count, 0 <= index {
@@ -129,8 +128,9 @@ public func |<T>(_ items: [T], _ index: Int) -> T? {
  Safe Array index Access
  
  - Parameters:
- - array: array you want to access
- - index: index you want to access
+    - array: array you want to access
+    - index: index you want to access
+ - Returns: Value at index
  */
 public func |<T>(_ items: [T]?, _ index: Int) -> T? {
     guard let items = items else {
@@ -143,8 +143,9 @@ public func |<T>(_ items: [T]?, _ index: Int) -> T? {
  Safe Dictionary value Access
  
  - Parameters:
- - dictionary: dictionary you want to access
- - key: key of the dictionary you want to access
+    - dictionary: dictionary you want to access
+    - key: key of the dictionary you want to access
+ - Returns: Value at key
  */
 public func |<K, V>(_ dictionary: [K:V], _ key: K) -> V? {
     return dictionary[key]
@@ -154,8 +155,9 @@ public func |<K, V>(_ dictionary: [K:V], _ key: K) -> V? {
  Safe Dictionary value Access
  
  - Parameters:
- - dictionary: dictionary you want to access
- - key: key of the dictionary you want to access
+    - dictionary: dictionary you want to access
+    - key: key of the dictionary you want to access
+ - Returns: Value at key
  */
 public func |<K, V>(_ dictionary: [K:V]?, _ key: K) -> V? {
     return (dictionary.?)[key]

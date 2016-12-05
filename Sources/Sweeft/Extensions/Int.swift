@@ -9,6 +9,7 @@ import Foundation
 
 public extension Int {
     
+    /// Will return all the prime factors of the number
     var primeFactors: [Int] {
         if self == 0 {
             return [self]

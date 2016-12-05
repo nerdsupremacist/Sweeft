@@ -18,8 +18,8 @@ infix operator **: PowerPrecedence
  Exponentiates
  
  - Parameters:
- - a: Base
- - b: Exponent
+    - a: Base
+    - b: Exponent
  
  - Returns: a to the b
  */
@@ -31,8 +31,8 @@ public func **(_ a: Double, _ b: Double) -> Double {
  Exponentiates
  
  - Parameters:
- - a: Base
- - b: Exponent
+    - a: Base
+    - b: Exponent
  
  - Returns: a to the b
  */
@@ -44,8 +44,8 @@ public func **(_ a: Int, _ b: Int) -> Int {
  Remainder
  
  - Parameters:
- - a: number
- - b: divider
+    - a: number
+    - b: divider
  
  - Returns: remainder of a after dividing by b
  */
@@ -59,7 +59,7 @@ prefix operator |
  Abs
  
  - Parameters:
- - value: Number
+    - value: Number
  
  - Returns: absolut value of the input
  */
@@ -73,8 +73,8 @@ infix operator ~~: ComparisonPrecedence
  Matches
  
  - Parameters:
- - left: String
- - right: Pattenr
+    - left: String
+    - right: Pattern
  
  - Returns: does the string match the pattern
  */

@@ -27,7 +27,7 @@ public extension Collection {
      Will turn any Collection into a Dictionary with a handler
      
      - Parameters:
-     - byDividingWith: Mapping function that breaks every element into a key and a value
+        - byDividingWith: Mapping function that breaks every element into a key and a value
      
      - Returns: Resulting dictionary
      */
@@ -44,7 +44,7 @@ public extension Collection {
      Will sum all of the Elements
      
      - Parameters:
-     - mapper: Mapping function that returns the value for an Element
+        - mapper: Mapping function that returns the value for an Element
      
      - Returns: Result of sum
      */
@@ -56,7 +56,7 @@ public extension Collection {
      Will sum all of the Elements
      
      - Parameters:
-     - mapper: Mapping function that returns the value for an Element
+        - mapper: Mapping function that returns the value for an Element
      
      - Returns: Result of sum
      */
@@ -68,7 +68,7 @@ public extension Collection {
      Will multiply all of the Elements
      
      - Parameters:
-     - mapper: Mapping function that returns the value for an Element
+        - mapper: Mapping function that returns the value for an Element
      
      - Returns: Result of multiplication
      */
@@ -80,7 +80,7 @@ public extension Collection {
      Will multiply all of the Elements
      
      - Parameters:
-     - mapper: Mapping function that returns the value for an Element
+        - mapper: Mapping function that returns the value for an Element
      
      - Returns: Result of multiplication
      */

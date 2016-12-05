@@ -9,7 +9,7 @@ import Foundation
 
 public extension Array {
     
-    // Array with Elements and indexes for better for loops.
+    /// Array with Elements and indexes for better for loops.
     var withIndex: [(Element, Int)] {
         if isEmpty {
             return []
@@ -21,7 +21,7 @@ public extension Array {
      Map with index
      
      - Parameters:
-     - transform: tranform function with index
+        - transform: tranform function with index
      
      - Returns: transformed array
      */
@@ -33,7 +33,7 @@ public extension Array {
      For each with index
      
      - Parameters:
-     - body: body function with index
+        - body: body function with index
      */
     func forEach(_ body: (Element, Int) -> Void) {
         withIndex => body
@@ -43,7 +43,7 @@ public extension Array {
      Filter with index
      
      - Parameters:
-     - isIncluded: isIncluded function with index
+        - isIncluded: isIncluded function with index
      
      - Returns: filtered array
      */
@@ -55,8 +55,8 @@ public extension Array {
      Reduce with index
      
      - Parameters:
-     - initialResult: Accumulator
-     - nextPartialResult: resulthandler with index
+        - initialResult: Accumulator
+        - nextPartialResult: resulthandler with index
      
      - Returns: Result
      */
@@ -67,7 +67,7 @@ public extension Array {
     /**
      Reduce with first item as partial result
      - Parameters:
-     - nextPartialResult: resulthandler
+        - nextPartialResult: resulthandler
      
      - Returns: Result
      */
@@ -81,7 +81,7 @@ public extension Array {
     /**
      Reduce with first item as partial result and with index
      - Parameters:
-     - nextPartialResult: resulthandler with index
+        - nextPartialResult: resulthandler with index
      
      - Returns: Result
      */
@@ -96,7 +96,7 @@ public extension Array {
      Will turn any Array into a Dictionary with a handler
      
      - Parameters:
-     - byDividingWith: Mapping function that breaks every element into a key and a value with index
+        - byDividingWith: Mapping function that breaks every element into a key and a value with index
      
      - Returns: Resulting dictionary
      */
@@ -113,7 +113,7 @@ public extension Array {
      Will give you the first n Elements of an Array
      
      - Parameters:
-     - withFirst number: Number of items you want
+        - withFirst number: Number of items you want
      
      - Returns: Array with the first n Elements
      */
@@ -131,7 +131,7 @@ public extension Array {
      Will give you the last n Elements of an Array
      
      - Parameters:
-     - withFirst number: Number of items you want
+        - withFirst number: Number of items you want
      
      - Returns: Array with the last n Elements
      */

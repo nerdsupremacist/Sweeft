@@ -13,8 +13,8 @@ infix operator >>>: FunctionArrowPrecedence
  Runs a closure in a specific queue
  
  - Parameters:
- - queue: Queue the code should run in.
- - handler: function you want to run later
+    - queue: Queue the code should run in.
+    - handler: function you want to run later
  */
 public func >>>(_ queue: DispatchQueue,_ handler: @escaping () -> ()) {
     queue.async(execute: handler)
@@ -24,8 +24,8 @@ public func >>>(_ queue: DispatchQueue,_ handler: @escaping () -> ()) {
  Runs a closure after a time interval
  
  - Parameters:
- - _ time: time interval
- - handler: function you want to run later
+    - time: time interval
+    - handler: function you want to run later
  */
 public func >>>(_ time: Double, handler: @escaping () -> ()) {
     after(time, handler: handler)
@@ -35,8 +35,8 @@ public func >>>(_ time: Double, handler: @escaping () -> ()) {
  Runs a closure after a time interval
  
  - Parameters:
- - _ condition: queue time interval
- - handler: function you want to run later
+    - conditions: queue time interval
+    - handler: function you want to run later
  */
 public func >>>(_ conditions: (DispatchQueue, Double), handler: @escaping () -> ()) {
     after(conditions.1, in: conditions.0, handler: handler)
@@ -46,8 +46,8 @@ public func >>>(_ conditions: (DispatchQueue, Double), handler: @escaping () -> 
  Runs a closure after a time interval
  
  - Parameters:
- - _ c: time interval and queue
- - handler: function you want to run later
+    - c: time interval and queue
+    - handler: function you want to run later
  */
 public func >>>(_ c: (Double, DispatchQueue), handler: @escaping () -> ()) {
     (c.1, c.0) >>> handler
@@ -57,8 +57,8 @@ public func >>>(_ c: (Double, DispatchQueue), handler: @escaping () -> ()) {
  Chain closures. Will Chain two closures and make the output of the first one the input to the second one.
  
  - Parameters:
- - _ funA: first function
- - _ funB: second function
+    - funA: first function
+    - funB: second function
  */
 public func >>><A, B, C>(_ funA: @escaping (A) -> (B), _ funB: @escaping (B) -> (C)) -> (A) -> (C) {
     return { input in
@@ -71,8 +71,8 @@ public func >>><A, B, C>(_ funA: @escaping (A) -> (B), _ funB: @escaping (B) -> 
  but ignore the output of the second one
  
  - Parameters:
- - _ funA: first function
- - _ funB: second function
+    - funA: first function
+    - funB: second function
  */
 public func >>><A, B, C>(_ funA: @escaping (A) -> (B), _ funB: @escaping (B) -> (C)) -> (A) -> () {
     return { input in

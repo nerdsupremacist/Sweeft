@@ -41,8 +41,8 @@ public extension String {
      Will say if a String matches a RegEx
      
      - Parameters:
-     - pattern: RegEx you want to match
-     - options: Extra options (Optional: Default is [])
+        - pattern: RegEx you want to match
+        - options: Extra options (Optional: Default is [])
      
      - Returns: Whether or not the string matches
      */

@@ -265,7 +265,7 @@ public postfix func **<T, V>(_ handler: @escaping (T) -> (V)) -> (T) -> () {
  Defaultable output Handler
  
  - Parameters:
- - handler: Closure you want to evaluate
+    - handler: Closure you want to evaluate
  
  - Returns: a function that will return the handlers return value or the default value of the return type on nil
  */
@@ -279,7 +279,7 @@ prefix operator .?
  Defaultable input Handler
  
  - Parameters:
- - handler: Closure you want to evaluate
+    - handler: Closure you want to evaluate
  
  - Returns: a function that will feed the handler the input or the default of the type in case of nil
  */
@@ -291,7 +291,7 @@ public prefix func .?<T: Defaultable, V>(_ handler: @escaping (T) -> (V)) -> (T?
  Optionalize
  
  - Parameters:
- - handler: function that requires non-optionals
+    - handler: function that requires non-optionals
  
  - Returns: function that can take an optioanl and will return nil in case the input is nil
  */
@@ -305,7 +305,7 @@ postfix operator .!
  Force Unwrap function result
  
  - Parameters:
- - handler: function that return an optional
+    - handler: function that return an optional
  
  - Returns: function that will unwrap the result of the first function
  */
