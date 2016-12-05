@@ -38,6 +38,10 @@ class ViewController: UIViewController {
         
         print(palindromePrimes)
         
+        let sum = !array.? ==> (+)
+        
+        print(sum.?)
+        
         print(24.reversed)
         
         5.0 >>> {
