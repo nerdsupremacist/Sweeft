@@ -50,6 +50,10 @@ class ViewController: UIViewController {
         
         print(79.primeFactors)
         
+        let item = dict.flipped.flipped | "String"
+        
+        print(item.?)
+        
         5.0 >>> {
             print("Other Thread Called!")
         }
