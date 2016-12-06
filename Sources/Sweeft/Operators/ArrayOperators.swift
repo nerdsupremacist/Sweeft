@@ -118,7 +118,10 @@ public func +=<V>(_ a: inout [V]?, _ b: [V]?) {
  - Returns: Value at index
  */
 public func |<T>(_ items: [T], _ index: Int) -> T? {
-    if index < items.count, 0 <= index {
+    if index < 0, abs(index) < items.count {
+        return items | (items.count + index)
+    }
+    if index < items.count, index >= 0 {
         return items[index]
     }
     return nil

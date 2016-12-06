@@ -54,6 +54,14 @@ class ViewController: UIViewController {
         
         print(item.?)
         
+        let arrayWithDuplicates = [1, 2, 1, 2, 3]
+        
+        let secondToLast = arrayWithDuplicates | -2
+        
+        print(secondToLast.?)
+        
+        print(arrayWithDuplicates.noDuplicates)
+        
         5.0 >>> {
             print("Other Thread Called!")
         }

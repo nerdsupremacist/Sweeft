@@ -141,7 +141,11 @@ public extension Array {
     
 }
 
-extension Array where Element: Hashable {
+public extension Array where Element: Hashable {
+    
+    var hasDuplicates: Bool {
+        return noDuplicates.count == count
+    }
     
     var noDuplicates: [Element] {
         return set.array
