@@ -11,14 +11,13 @@ public extension Int {
     
     /// Will return all the prime factors of the number
     var primeFactors: [Int] {
-        if self == 0 {
-            return [self]
-        }
         if self < 0 {
             return [-1] + (-self).primeFactors
+        } else if self <= 2 {
+            return [self]
         }
         let bound = Int(sqrt(Double(self))) + 1
-        guard let firstPrime = (2...bound).filter({ self % $0 == 0 }).first else {
+        guard let firstPrime = (2...bound) |> { self % $0 == 0 } | 0 else {
             return [self]
         }
         return [firstPrime] + (self / firstPrime).primeFactors
@@ -29,10 +28,7 @@ public extension Int {
         if self < 2 {
             return false
         }
-        let bound = Int(sqrt(Double(self))) + 1
-        return (2...bound)
-            .filter { self % $0 == 0 }
-            .isEmpty
+        return primeFactors.count == 1
     }
     
     /// Will say if the string representation is a palindrome. (Without signing)

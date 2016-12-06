@@ -141,6 +141,14 @@ public extension Array {
     
 }
 
+extension Array where Element: Hashable {
+    
+    var noDuplicates: [Element] {
+        return set.array
+    }
+    
+}
+
 extension Array: Defaultable {
     
     /// Default Value

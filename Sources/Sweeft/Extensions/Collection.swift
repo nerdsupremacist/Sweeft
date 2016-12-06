@@ -10,6 +10,7 @@ import Foundation
 
 public extension Collection where Iterator.Element: Hashable {
     
+    /// Will turn any Collection into a Set
     var set: Set<Iterator.Element> {
         return Set(array)
     }
