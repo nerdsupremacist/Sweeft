@@ -90,7 +90,32 @@ public extension Collection {
      - Returns: String result
      */
     func join(with string: String = ", ", by mapping: (Iterator.Element) -> (String) = { "\($0)" }) -> String {
-        return self => mapping ==> >{ "\($0)\(string)\($1)" }
+        let joined = self => mapping ==> { "\($0)\(string)\($1)" }
+        return joined.?
+    }
+    
+    /**
+     Will evaluate the concatenation of all the Elements into a single Bool
+     
+     - Parameters:
+        - conjunctUsing mapping: mapper that says if an Element should evaluate to true or false
+     
+     - Returns: result of concatenation
+     */
+    func and(conjunctUsing mapping: (Iterator.Element) -> Bool) -> Bool {
+        return self => mapping ==> true ** { $0 && $1 }
+    }
+    
+    /**
+     Will evaluate the disjunction of all the Elements into a single Bool
+     
+     - Parameters:
+     - conjunctUsing mapping: mapper that says if an Element should evaluate to true or false
+     
+     - Returns: result of disjunction
+     */
+    func or(disjunctUsing mapping: (Iterator.Element) -> Bool) -> Bool {
+        return self => mapping ==> true ** { $0 || $1 }
     }
     
 }

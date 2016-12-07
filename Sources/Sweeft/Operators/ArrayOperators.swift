@@ -165,3 +165,65 @@ public func |<K, V>(_ dictionary: [K:V], _ key: K) -> V? {
 public func |<K, V>(_ dictionary: [K:V]?, _ key: K) -> V? {
     return (dictionary.?)[key]
 }
+
+/**
+ Is subset
+ 
+ - Parameters:
+    - a: Set
+    - b: Set
+ - Returns: is a a subset of b
+ */
+public func <=<T: Hashable>(_ a: Set<T>, _ b: Set<T>) -> Bool {
+    return a.isSubset(of: b)
+}
+
+/**
+ Is superset
+ 
+ - Parameters:
+    - a: Set
+    - b: Set
+ - Returns: is a a superset of b
+ */
+public func >=<T: Hashable>(_ a: Set<T>, _ b: Set<T>) -> Bool {
+    return b <= a
+}
+
+/**
+ Is strict subset
+ 
+ - Parameters:
+    - a: Set
+    - b: Set
+ - Returns: is a a strict subset of b
+ */
+public func <<T: Hashable>(_ a: Set<T>, _ b: Set<T>) -> Bool {
+    return a <= b && a.count < b.count
+}
+
+/**
+ Is strict superset
+ 
+ - Parameters:
+    - a: Set
+    - b: Set
+ - Returns: is a a strict superset of b
+ */
+public func ><T: Hashable>(_ a: Set<T>, _ b: Set<T>) -> Bool {
+    return b < a
+}
+
+infix operator <>: ComparisonPrecedence
+
+/**
+ Is disjoint
+ 
+ - Parameters:
+    - a: Set
+    - b: Set
+ - Returns: are a and b disjoint
+ */
+public func <><T: Hashable>(_ a: Set<T>, _ b: Set<T>) -> Bool {
+    return a.isDisjoint(with: b)
+}

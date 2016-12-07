@@ -14,6 +14,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Here are a few examples of how to use Sweeft
+        
         let array: [Int?]? = [1, 2, 3, nil, 5, nil]
         
         let res = (array ?? [])
@@ -67,6 +69,10 @@ class ViewController: UIViewController {
         }
         
         let dates = Date.array(ofSize: 5)
+        
+        let seconds = dates.join { $0.string(with: "ss") }
+        
+        print(seconds)
         
         let hours = dates ==> { $0.string(with: "HH") } >>> { Int($0) }
         
