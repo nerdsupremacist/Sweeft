@@ -235,6 +235,26 @@ let sum = array.sum { $0 }
 let mult = array.multiply { $0 }
 ```
 
+#### (==>) Reduce with
+
+You could also use the standard reduce by specifying the initial result
+
+```Swift
+let joined = myStrings ==> "" ** { "\($0), \($1)" }
+```
+
+or if you feel like it, you can also flip the opperands:
+
+```Swift
+let joined = myStrings ==> { "\($0), \($1)" } ** ""
+```
+
+or since String conforms to 'Defaultable' and we know the default string is "", we can use the '>' operator to tell reduce to use the default:
+
+```Swift
+let joined = myStrings ==> >{ "\($0), \($1)" }
+```
+
 #### (|>) Filter with
 
 The same as above but with filter

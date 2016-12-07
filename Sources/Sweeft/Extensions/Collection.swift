@@ -80,6 +80,19 @@ public extension Collection {
         return Int(multiply(mapper))
     }
     
+    /**
+     Will join the elements as a single string
+     
+     - Parameters:
+        - with string: string that should go between the individual entries (Default: separating by comma)
+        - by mapping: mapping function that turns each Element into a string (Default: String description of Element)
+     
+     - Returns: String result
+     */
+    func join(with string: String = ", ", by mapping: (Iterator.Element) -> (String) = { "\($0)" }) -> String {
+        return self => mapping ==> >{ "\($0)\(string)\($1)" }
+    }
+    
 }
 
 public extension Collection where Iterator.Element: Hashable {
