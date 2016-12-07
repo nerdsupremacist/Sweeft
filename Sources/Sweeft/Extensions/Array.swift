@@ -10,7 +10,7 @@ import Foundation
 public extension Array {
     
     /// Array with Elements and indexes for better for loops.
-    var withIndex: [(Element, Int)] {
+    var withIndex: [(element: Element, index: Int)] {
         if isEmpty {
             return []
         }
@@ -48,7 +48,7 @@ public extension Array {
      - Returns: filtered array
      */
     func filter(_ isIncluded: (Element, Int) -> Bool) -> [Element] {
-        return (withIndex |> isIncluded).map { $0.0 }
+        return withIndex |> isIncluded => { $0.0 }
     }
     
     /**
@@ -61,7 +61,7 @@ public extension Array {
      - Returns: Result
      */
     func reduce<Result>(_ initialResult: Result, _ nextPartialResult: @escaping (Result, Element, Int) -> Result) -> Result {
-        return withIndex.reduce(initialResult) { nextPartialResult($0, $1.0, $1.1) }
+        return withIndex ==> initialResult ** { nextPartialResult($0, $1.0, $1.1) }
     }
     
     /**
@@ -75,7 +75,7 @@ public extension Array {
         guard let first = first else {
             return nil
         }
-        return array(withLast: count - 1).reduce(first, nextPartialResult)
+        return array(withLast: count - 1) ==> first ** nextPartialResult
     }
     
     /**
@@ -89,7 +89,7 @@ public extension Array {
         guard let first = first else {
             return nil
         }
-        return array(withLast: count - 1).reduce(first, nextPartialResult)
+        return array(withLast: count - 1) ==> first ** nextPartialResult
     }
     
     /**
@@ -101,7 +101,7 @@ public extension Array {
      - Returns: Resulting dictionary
      */
     func dictionary<K, V>(byDividingWith handler: @escaping (Element, Int) -> (K, V)) -> [K:V] {
-        return reduce([:]) { dict, item, index in
+        return self ==> >{ dict, item, index in
             var dict = dict
             let (key, value) = handler(item, index)
             dict[key] = value

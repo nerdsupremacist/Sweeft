@@ -212,7 +212,7 @@ public func |><V>(_ items: [V], _ handler: @escaping (V, Int) -> Bool?) -> [V] {
  
  - Returns: dictionary
  */
-public func >>=<C: Collection, K, V>(_ items: C, _ handler: (C.Iterator.Element) -> (K, V)) -> [K:V] {
+public func >>=<C: Collection, K, V>(_ items: C, _ handler: @escaping (C.Iterator.Element) -> (K, V)) -> [K:V] {
     return items.dictionary(byDividingWith: handler)
 }
 
