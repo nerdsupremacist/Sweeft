@@ -169,6 +169,26 @@ is the same as:
 function(value)
 ```
 
+#### (|) Safely Get Value
+
+If you want to access any value from an Array or a Dictionary:
+
+```Swift
+let first = array | 0
+let second = array | 1
+```
+
+Any it will return nil if there is nothing in that index. So it won't crash ;)
+
+You can also use negative numbers to go the other way around:
+
+```Swift
+let last = array | -1
+let secondToLast = array | -2
+```
+
+Awesome, right?
+
 #### (=>) Map with
 
 This will call map with the function to the right:
@@ -183,9 +203,37 @@ is the same as:
 array.map(function)
 ```
 
+#### (=>) For each
+
+If the closure returns void instead of a value, it will run it as a loop and not map:
+
+```Swift
+array => { item in
+    // Do Stuff
+}
+```
+
 #### (==>) FlatMap with
 
 The same as above but with flatMap.
+
+#### (==>) Simple Reduce with
+
+If you're doing reduce to the same type as your array has. You can reduce without specifying an initial result. Instead it will take the first item as an initial result:
+
+So if you want to sum all the items in an Array:
+
+```Swift
+let sum = array ==> (+)
+let mult = array ==> (*)
+```
+
+Or you could just use the standard:
+
+```Swift
+let sum = array.sum { $0 }
+let mult = array.multiply { $0 }
+```
 
 #### (|>) Filter with
 
@@ -269,6 +317,20 @@ is the same as:
 array = array.filter(handler)
 ```
 
+#### (+) Concatenate Arrays
+
+This way you can concatenate arrays quickly:
+
+```Swift
+let concat = firstArray + secondArray
+```
+
+Or even do:
+
+```Swift
+firstArray += secondArray
+```
+
 #### (!) Will remove all the optional values from an array
 
 ```Swift
@@ -295,6 +357,24 @@ i.? // 0
 j.? // 2
 ```
 
+It even works inside a Collection:
+
+```Swift
+let array = [1, 2, nil, 4]
+array.? // [1, 2, 0, 4]
+```
+
+Not to be confused with the default value of an array:
+
+```Swift
+let a: [Int?]? = nil
+let b: [Int?]? = [1, 2, nil, 4]
+
+a.? // []
+b.? // [1, 2, nil, 4]
+(b.?).? // [1, 2, 0, 4]
+```
+
 #### (??) Check for nil
 
 Will check if a value is not nil
@@ -310,3 +390,83 @@ is equivalent to:
 ```Swift
 myVariable != nil
 ```
+
+It can even be given to closures.
+
+This means:
+
+```Swift
+??{ (item: String) in
+    return item.date("HH:mm, dd:MM:yyyy")
+}
+```
+
+Is a closure of type ```(String) -> (Bool)``` Meaning if the date in the string is nil or not.
+
+#### (>>>) Run in Queue
+
+You you want to run a closure in a specific queue:
+
+```Swift
+queue >>> {
+    // Do Stuff.
+}
+```
+
+Or if you want to run it after a certain time interval in seconds. For example the following will run the closure after 5 seconds:
+
+```Swift
+5.0 >>> {
+    // Do Stuff
+}
+```
+
+And of course you can combine them:
+
+```Swift
+(queue, 5.0) >>> {
+    // Do Stuff
+}
+
+// Or
+
+(5.0, queue) >>> {
+    // Do Stuff
+}
+```
+
+#### (>>>) Chain Closures
+
+If you want to be more modular with your closures you can always chain them toghether and turn them into a bigger closure.
+
+For example: Let's say you have an array of dates. And you want an array of the hours of each.
+
+```Swift
+let hours = dates => { $0.string("hh") } >>> Int.init
+```
+
+Which is equivalent to saying:
+
+```Swift
+let hours = dates.map { date in
+    let string = date.string("hh")
+    return Int(string)
+}
+```
+
+The precedence works as follows:
+
+Chaining before mapping. So >>> will be evaluated before =>.
+
+Of course you don't need chaining in the previous example. You could use the pipe and will be even shorter:
+
+```Swift
+let hours = dates => { $0.string("hh") | Int.init }
+```
+
+But that's the cool thing about Sweeft. It gives you options ;)
+
+### Contribute
+
+Please contribute and help me make swift even better with more cool ways to simplify the swift syntax.
+Fork and star this repo and #MakeSwiftGreatAgain

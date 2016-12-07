@@ -7,7 +7,7 @@
 
 import Foundation
 
-infix operator >>>: FunctionArrowPrecedence
+infix operator >>>: MultiplicationPrecedence
 
 /**
  Runs a closure in a specific queue

@@ -123,7 +123,7 @@ public postfix func .?<V: Defaultable>(_ value: V?) -> V {
  
  - Returns: array with all the elements unwrapped with default.
  */
-public postfix func .?<C: Collection where C.Iterator.Element: Defaultable>(_ items: C) -> [C.Iterator.Element] {
+public postfix func .?<T: Defaultable, C: Collection where C.Iterator.Element == T?>(_ items: C) -> [T] {
     return items => (.?)
 }
 
