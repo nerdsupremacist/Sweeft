@@ -66,6 +66,12 @@ class ViewController: UIViewController {
             print("Other Thread Called!")
         }
         
+        let dates = Date.array(ofSize: 5)
+        
+        let hours = dates ==> { $0.string(with: "HH") } >>> { Int($0) }
+        
+        print(hours)
+        
     }
 
 }

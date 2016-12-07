@@ -65,17 +65,3 @@ public func >>><A, B, C>(_ funA: @escaping (A) -> (B), _ funB: @escaping (B) -> 
         input | funA | funB
     }
 }
-
-/**
- Chain closures. Will Chain two closures and make the output of the first one the input to the second one,
- but ignore the output of the second one
- 
- - Parameters:
-    - funA: first function
-    - funB: second function
- */
-public func >>><A, B, C>(_ funA: @escaping (A) -> (B), _ funB: @escaping (B) -> (C)) -> (A) -> () {
-    return { input in
-        input | funA | funB**
-    }
-}

@@ -13,3 +13,21 @@ public protocol Defaultable {
     /// Default Value for Type
     static var defaultValue: Self { get }
 }
+
+public extension Defaultable {
+    
+    /**
+     Will generate an array populated with default values
+     
+     - Parameters:
+        - size: size of the array. (Default: 0)
+     */
+    static func array(ofSize size: Int = 0) -> [Self] {
+        if size > 0 {
+            return (0..<size) => **{ defaultValue }
+        } else {
+            return []
+        }
+    }
+    
+}
