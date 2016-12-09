@@ -9,6 +9,39 @@
 import UIKit
 import Sweeft
 
+let someOptional: Int? = nil
+let someDefault = 0
+
+let answer = someOptional ?? someDefault
+
+let firstName: String? = "My Name"
+let lastName: String? = "My Lastname"
+
+let id: Int? = 123456789
+let favoriteNumber: Int? = 42
+let age: Int? = 20
+let meaningOfLife: Int? = 42
+
+struct Person {
+    let firstName: String
+    let lastName: String
+    let id: Int
+    let favoriteNumber: Int
+    let age: Int
+    let meaningOfLife: Int
+}
+
+
+
+func instantiate() {
+    let me = Person(firstName: firstName.?,
+                lastName: lastName.?,
+                id: id.?,
+                favoriteNumber: favoriteNumber.?,
+                age: age.?,
+                meaningOfLife: meaningOfLife ?? 42)
+}
+
 class ViewController: UIViewController {
 
     override func viewDidLoad() {

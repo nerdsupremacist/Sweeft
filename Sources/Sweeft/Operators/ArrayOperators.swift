@@ -17,7 +17,7 @@ import Foundation
  - Returns: array without optionals
  */
 public prefix func !<T, C: Collection where C.Iterator.Element == T?>(_ items: C) -> [T] {
-    return items ==> { $0 }
+    return items ==> id
 }
 
 /**
@@ -33,6 +33,42 @@ public func +<V>(_ a: [V], _ b: [V]) -> [V] {
     var a = a
     a.append(contentsOf: b)
     return a
+}
+
+/**
+ Concatenate Dictionaries
+ 
+ - Parameters:
+ - a: dictionary
+ - b: dictionary
+ 
+ - Returns: dictionary containing the contents of the two.
+ */
+public func +<K, V>(_ a: [K:V], _ b: [K:V]) -> [K:V] {
+    return b ==> a ** {
+        var dict = $0
+        dict[$1.key] = $1.value
+        return dict
+    }
+}
+
+/**
+ Concatenate Dictionaries
+ 
+ - Parameters:
+ - a: dictionary
+ - b: dictionary
+ 
+ - Returns: dictionary containing the contents of the two.
+ */
+public func +<K, V>(_ a: [K:V], _ b: [K:V?]) -> [K:V] {
+    return b ==> a ** {
+        var dict = $0
+        if let value = $1.value {
+            dict[$1.key] = value
+        }
+        return dict
+    }
 }
 
 /**
@@ -76,6 +112,25 @@ public func +<V>(_ a: [V]?, _ b: V?) -> [V] {
 public func +<V>(_ a: [V]?, _ b: [V]?) -> [V] {
     guard let a = a else {
         return b ?? []
+    }
+    guard let b = b else {
+        return a
+    }
+    return a + b
+}
+
+/**
+ Concatenate Dictionaries
+ 
+ - Parameters:
+ - a: dictionary
+ - b: dictionary
+ 
+ - Returns: dictionary containing the contents of the two.
+ */
+public func +<K, V>(_ a: [K:V]?, _ b: [K:V]?) -> [K:V]? {
+    guard let a = a else {
+        return [:]
     }
     guard let b = b else {
         return a

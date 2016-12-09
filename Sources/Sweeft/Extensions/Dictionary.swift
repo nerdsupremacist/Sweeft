@@ -12,7 +12,7 @@ public extension Dictionary where Value: Hashable {
     
     /// Returns a flipped mapping of the Dictionary.
     var flipped: [Value:Key] {
-        return dictionary { ($1, $0) }
+        return self >>= flipArguments
     }
     
 }

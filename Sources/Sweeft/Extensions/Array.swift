@@ -48,7 +48,7 @@ public extension Array {
      - Returns: filtered array
      */
     func filter(_ isIncluded: (Element, Int) -> Bool) -> [Element] {
-        return withIndex |> isIncluded => { $0.0 }
+        return withIndex |> isIncluded => firstArgument
     }
     
     /**
@@ -101,12 +101,7 @@ public extension Array {
      - Returns: Resulting dictionary
      */
     func dictionary<K, V>(byDividingWith handler: @escaping (Element, Int) -> (K, V)) -> [K:V] {
-        return self ==> >{ dict, item, index in
-            var dict = dict
-            let (key, value) = handler(item, index)
-            dict[key] = value
-            return dict
-        }
+        return withIndex.dictionary(byDividingWith: handler)
     }
     
     /**

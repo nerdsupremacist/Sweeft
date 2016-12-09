@@ -12,7 +12,7 @@ public extension Collection {
     
     /// Will Turn any Collection into an Array for easier handling
     var array: [Iterator.Element] {
-        return self => { $0 }
+        return self => id
     }
     
     /**
@@ -110,12 +110,42 @@ public extension Collection {
      Will evaluate the disjunction of all the Elements into a single Bool
      
      - Parameters:
-     - conjunctUsing mapping: mapper that says if an Element should evaluate to true or false
+        - disjunctUsing mapping: mapper that says if an Element should evaluate to true or false
      
      - Returns: result of disjunction
      */
     func or(disjunctUsing mapping: (Iterator.Element) -> Bool) -> Bool {
-        return self => mapping ==> true ** { $0 || $1 }
+        return !and { !mapping($0) }
+    }
+    
+    /**
+     Will find the minimal item in the collection by using a cost function
+     
+     - Parameters:
+        - mapping: Cost function
+     
+     - Returns: minimal element
+     */
+    func min(_ mapping: @escaping (Iterator.Element) -> (Double)) -> Iterator.Element? {
+        let array = self.array
+        return array ==> { prev, next in
+            if mapping(next) < mapping(prev) {
+                return next
+            }
+            return prev
+        }
+    }
+    
+    /**
+     Will find the maximal item in the collection by using a cost function
+     
+     - Parameters:
+        - mapping: Cost function
+     
+     - Returns: maximal element
+     */
+    func max(_ mapping: @escaping (Iterator.Element) -> (Double)) -> Iterator.Element? {
+        return min { -mapping($0) }
     }
     
 }
