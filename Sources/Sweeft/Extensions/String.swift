@@ -16,14 +16,14 @@ public extension String {
     
     /// Will return the string reversed
     var reversed: String {
-        return String(characters.reversed())
+        return String(<>characters)
     }
     
     /**
      Will try to decipher the Date coded into a string
      
      - Parameters:
-     - with format: format in which the date is coded (Optional: default is "dd:MM:yyyy hh:mm")
+        - with format: format in which the date is coded (Optional: default is "dd:MM:yyyy hh:mm")
      
      - Returns: Date object for the time
      */

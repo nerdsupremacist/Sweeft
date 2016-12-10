@@ -131,7 +131,7 @@ public extension Array {
      - Returns: Array with the last n Elements
      */
     func array(withLast number: Int) -> [Element] {
-        return self.reversed().array(withFirst: number).reversed()
+        return <>(<>self).array(withFirst: number)
     }
     
 }

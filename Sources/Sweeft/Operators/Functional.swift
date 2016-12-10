@@ -11,8 +11,8 @@ import Foundation
  Pipe. Will pass the value to a function. Like in Bash
  
  - Parameters:
- - value: Item you want to pass
- - function: Function you want to pass it to
+    - value: Item you want to pass
+    - function: Function you want to pass it to
  */
 public func |<T, V>(_ value: T?, function: ((T) -> V)?) -> V? {
     guard let value = value else {
@@ -25,8 +25,8 @@ public func |<T, V>(_ value: T?, function: ((T) -> V)?) -> V? {
  Pipe. Will pass the value to a function. Like in Bash
  
  - Parameters:
- - value: Item you want to pass
- - function: Function you want to pass it to
+    - value: Item you want to pass
+    - function: Function you want to pass it to
  */
 public func |<T, V>(_ value: T, function: ((T) -> V)) -> V {
     return function(value)
@@ -36,8 +36,8 @@ public func |<T, V>(_ value: T, function: ((T) -> V)) -> V {
  Pipe. Will pass the value to a function. Like in Bash
  
  - Parameters:
- - value: Item you want to pass
- - function: Function you want to pass it to
+    - value: Item you want to pass
+    - function: Function you want to pass it to
  */
 public func |<T, V>(_ value: T?, function: ((T) -> V)) -> V? {
     guard let value = value else {
@@ -50,7 +50,7 @@ public func |<T, V>(_ value: T?, function: ((T) -> V)) -> V? {
  nil-check Handler?
  
  - Parameters:
- - handler: Closure you want to evaluate
+    - handler: Closure you want to evaluate
  
  - Returns: a function that will return whether or not the handler evaluates an input to a value or nil
  */
@@ -64,48 +64,48 @@ infix operator =>: AdditionPrecedence
  Map
  
  - Parameters:
- - items: collection
- - handler: mapping function
+    - items: collection
+    - handler: mapping function
  
  - Returns: result of mapping the array with the function
  */
-public func =><C: Collection, V>(_ items: C, _ handler: (C.Iterator.Element) -> (V)) -> [V] {
-    return items.map(handler)
+public func =><C: Collection, V>(_ items: C?, _ handler: (C.Iterator.Element) -> (V)) -> [V] {
+    return (items?.map(handler)).?
 }
 
 /**
  Map With Index
  
  - Parameters:
- - items: array
- - handler: mapping function
+    - items: array
+    - handler: mapping function
  
  - Returns: result of mapping the array with the function
  */
-public func =><T, V>(_ items: [T], _ handler: (T, Int) -> (V)) -> [V] {
-    return items.map(handler)
+public func =><T, V>(_ items: [T]?, _ handler: (T, Int) -> (V)) -> [V] {
+    return (items?.map(handler)).?
 }
 
 /**
  For each. Will call the handler with every element in the array
  
  - Parameters:
- - items: array
- - handler: mapping function
+    - items: array
+    - handler: mapping function
  */
-public func =><C: Collection>(_ items: [C.Iterator.Element], _ handler: (C.Iterator.Element) -> ()) {
-    items.forEach(handler)
+public func =><C: Collection>(_ items: C?, _ handler: (C.Iterator.Element) -> ()) {
+    items?.forEach(handler)
 }
 
 /**
  For each with index. Will call the handler with every element in the array
  
  - Parameters:
- - items: array
- - handler: mapping function
+    - items: array
+    - handler: mapping function
  */
-public func =><T>(_ items: [T], _ handler: (T, Int) -> ()) {
-    items.forEach(handler)
+public func =><T>(_ items: [T]?, _ handler: (T, Int) -> ()) {
+    items?.forEach(handler)
 }
 
 infix operator ==>: AdditionPrecedence
@@ -114,39 +114,39 @@ infix operator ==>: AdditionPrecedence
  FlatMap
  
  - Parameters:
- - items: collection
- - handler: mapping function
+    - items: collection
+    - handler: mapping function
  
  - Returns: result of flatMapping the collection with the function
  */
-public func ==><C: Collection, V>(_ items: C, _ handler: (C.Iterator.Element) -> (V?)) -> [V] {
-    return items.flatMap(handler)
+public func ==><C: Collection, V>(_ items: C?, _ handler: (C.Iterator.Element) -> (V?)) -> [V] {
+    return (items?.flatMap(handler)).?
 }
 
 /**
  Reduce
  
  - Parameters:
- - items: collection
- - handler: next partial result function
+    - items: collection
+    - handler: next partial result function
  
  - Returns: result of reduce
  */
-public func ==><T>(_ items: [T], _ handler: @escaping (T, T) -> (T)) -> T? {
-    return items.reduce(handler)
+public func ==><T>(_ items: [T]?, _ handler: @escaping (T, T) -> (T)) -> T? {
+    return items?.reduce(handler)
 }
 
 /**
  Reduce with index
  
  - Parameters:
- - items: array
- - handler: next partial result function with index
+    - items: array
+    - handler: next partial result function with index
  
  - Returns: result of reduce
  */
-public func ==><T>(_ items: [T], _ handler: @escaping (T, T, Int) -> (T)) -> T? {
-    return items.reduce(handler)
+public func ==><T>(_ items: [T]?, _ handler: @escaping (T, T, Int) -> (T)) -> T? {
+    return items?.reduce(handler)
 }
 
 infix operator |>: AdditionPrecedence
@@ -155,38 +155,38 @@ infix operator |>: AdditionPrecedence
  Filter
  
  - Parameters:
- - items: collection
- - handler: includes function
+    - items: collection
+    - handler: includes function
  
  - Returns: filtered array
  */
-public func |><C: Collection>(_ items: C, _ handler: (C.Iterator.Element) -> Bool) -> [C.Iterator.Element] {
-    return items.filter(handler)
+public func |><C: Collection>(_ items: C?, _ handler: (C.Iterator.Element) -> Bool) -> [C.Iterator.Element] {
+    return (items?.filter(handler)).?
 }
 
 /**
  Filter with index
  
  - Parameters:
- - items: array
- - handler: includes function
+    - items: array
+    - handler: includes function
  
  - Returns: filtered array
  */
-public func |><V>(_ items: [V], _ handler: (V, Int) -> Bool) -> [V] {
-    return items.filter(handler)
+public func |><V>(_ items: [V]?, _ handler: (V, Int) -> Bool) -> [V] {
+    return (items?.filter(handler)).?
 }
 
 /**
  Filter
  
  - Parameters:
- - items: collection
- - handler: includes function
+    - items: collection
+    - handler: includes function
  
  - Returns: filtered array
  */
-public func |><C: Collection>(_ items: C, _ handler: @escaping (C.Iterator.Element) -> Bool?) -> [C.Iterator.Element] {
+public func |><C: Collection>(_ items: C?, _ handler: @escaping (C.Iterator.Element) -> Bool?) -> [C.Iterator.Element] {
     return items |> handler.?
 }
 
@@ -194,34 +194,62 @@ public func |><C: Collection>(_ items: C, _ handler: @escaping (C.Iterator.Eleme
  Filter with index
  
  - Parameters:
- - items: array
- - handler: includes function
+    - items: array
+    - handler: includes function
  
  - Returns: filtered array
  */
-public func |><V>(_ items: [V], _ handler: @escaping (V, Int) -> Bool?) -> [V] {
+public func |><V>(_ items: [V]?, _ handler: @escaping (V, Int) -> Bool?) -> [V] {
     return items |> handler.?
+}
+
+infix operator !|>: AdditionPrecedence
+
+/**
+ Anti-Filter
+ 
+ - Parameters:
+    - items: collection
+    - handler: includes function
+ 
+ - Returns: filtered array
+ */
+public func !|><C: Collection>(_ items: C?, _ handler: (C.Iterator.Element) -> Bool) -> [C.Iterator.Element] {
+    return items |> { !handler($0) }
+}
+
+/**
+ Anti-Filter with index
+ 
+ - Parameters:
+    - items: array
+    - handler: includes function
+ 
+ - Returns: filtered array
+ */
+public func !|><V>(_ items: [V]?, _ handler: (V, Int) -> Bool) -> [V] {
+    return items |> { !handler($0, $1) }
 }
 
 /**
  Dictionary
  
  - Parameters:
- - items: collection
- - handler: dividing function
+    - items: collection
+    - handler: dividing function
  
  - Returns: dictionary
  */
-public func >>=<C: Collection, K, V>(_ items: C, _ handler: @escaping (C.Iterator.Element) -> (K, V)) -> [K:V] {
-    return items.dictionary(byDividingWith: handler)
+public func >>=<C: Collection, K, V>(_ items: C?, _ handler: @escaping (C.Iterator.Element) -> (K, V)) -> [K:V] {
+    return (items?.dictionary(byDividingWith: handler)).?
 }
 
 /**
  Dictionary with index
  
  - Parameters:
- - items: array
- - handler: dividing function with index
+    - items: array
+    - handler: dividing function with index
  
  - Returns: dictionary
  */
@@ -235,7 +263,7 @@ prefix operator **
  Ignore input
  
  - Parameters:
- - handler: function without input
+    - handler: function without input
  
  - Returns: function that can take an input and drop it to call the handler.
  */
@@ -251,7 +279,7 @@ postfix operator **
  Ignore ouput
  
  - Parameters:
- - handler: function with output
+    - handler: function with output
  
  - Returns: function that will evaluate the handler but won't return its value
  */
@@ -311,4 +339,30 @@ postfix operator .!
  */
 public postfix func .!<T, V>(_ handler: @escaping (T) -> (V?)) -> (T) -> (V) {
     return { ($0 | handler)! }
+}
+
+/**
+ Or For Handlers
+ 
+ - Parameters:
+    - handlerOne: function that returns a boolean
+    - handlerTwo: function that returns a boolen
+ 
+ - Returns: function that will apply logical or to both results
+ */
+public func ||<K>(_ handlerOne: @escaping (K) -> Bool, _ handlerTwo: @escaping (K) -> Bool) -> (K) -> Bool {
+    return { handlerOne($0) || handlerTwo($0) }
+}
+
+/**
+ And For Handlers
+ 
+ - Parameters:
+ - handlerOne: function that returns a boolean
+ - handlerTwo: function that returns a boolen
+ 
+ - Returns: function that will apply logical and to both results
+ */
+public func &&<K>(_ handlerOne: @escaping (K) -> Bool, _ handlerTwo: @escaping (K) -> Bool) -> (K) -> Bool {
+    return { handlerOne($0) && handlerTwo($0) }
 }

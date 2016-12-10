@@ -9,39 +9,6 @@
 import UIKit
 import Sweeft
 
-let someOptional: Int? = nil
-let someDefault = 0
-
-let answer = someOptional ?? someDefault
-
-let firstName: String? = "My Name"
-let lastName: String? = "My Lastname"
-
-let id: Int? = 123456789
-let favoriteNumber: Int? = 42
-let age: Int? = 20
-let meaningOfLife: Int? = 42
-
-struct Person {
-    let firstName: String
-    let lastName: String
-    let id: Int
-    let favoriteNumber: Int
-    let age: Int
-    let meaningOfLife: Int
-}
-
-
-
-func instantiate() {
-    let me = Person(firstName: firstName.?,
-                lastName: lastName.?,
-                id: id.?,
-                favoriteNumber: favoriteNumber.?,
-                age: age.?,
-                meaningOfLife: meaningOfLife ?? 42)
-}
-
 class ViewController: UIViewController {
 
     override func viewDidLoad() {
@@ -57,9 +24,9 @@ class ViewController: UIViewController {
         
         print(res)
         
-        let even = !array.? |> { $0 & 1 == 0 }
+        let even = !array |> { $0 & 1 == 0 }
         
-        array.? => { item, index in
+        array => { item, index in
             // Do Stuff
         }
         
@@ -73,7 +40,7 @@ class ViewController: UIViewController {
         
         print(palindromePrimes)
         
-        let sum = !array.? ==> (+)
+        let sum = !array ==> (+)
         
         print(sum.?)
         
@@ -89,7 +56,7 @@ class ViewController: UIViewController {
         
         print(item.?)
         
-        let arrayWithDuplicates = [1, 2, 1, 2, 3]
+        let arrayWithDuplicates = [1, 2, 1, 5, 3]
         
         let secondToLast = arrayWithDuplicates | -2
         
@@ -110,6 +77,14 @@ class ViewController: UIViewController {
         let hours = dates ==> { $0.string(with: "HH") } >>> { Int($0) }
         
         print(hours)
+        
+        dates => { item in
+            print(item.string(with: "dd hh:mm a"))
+        }
+        
+        let valueOfString = dict.match(containing: "str").?
+        
+        print(valueOfString)
         
     }
 

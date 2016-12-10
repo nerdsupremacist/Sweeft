@@ -16,7 +16,7 @@ import Foundation
  
  - Returns: array without optionals
  */
-public prefix func !<T, C: Collection where C.Iterator.Element == T?>(_ items: C) -> [T] {
+public prefix func !<T, C: Collection where C.Iterator.Element == T?>(_ items: C?) -> [T] {
     return items ==> id
 }
 
@@ -281,4 +281,17 @@ infix operator <>: ComparisonPrecedence
  */
 public func <><T: Hashable>(_ a: Set<T>, _ b: Set<T>) -> Bool {
     return a.isDisjoint(with: b)
+}
+
+prefix operator <>
+
+/**
+ Reverse Collection
+ 
+ - Parameters:
+    - items: Collection
+ - Returns: Array containing the elements of C in reversed order
+ */
+public prefix func <><C: Collection>(_ items: C) -> [C.Iterator.Element] {
+    return items.reversed()
 }
