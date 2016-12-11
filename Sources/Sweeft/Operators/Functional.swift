@@ -358,8 +358,8 @@ public func ||<K>(_ handlerOne: @escaping (K) -> Bool, _ handlerTwo: @escaping (
  And For Handlers
  
  - Parameters:
- - handlerOne: function that returns a boolean
- - handlerTwo: function that returns a boolen
+    - handlerOne: function that returns a boolean
+    - handlerTwo: function that returns a boolen
  
  - Returns: function that will apply logical and to both results
  */

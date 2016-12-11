@@ -13,8 +13,8 @@ infix operator <-: AssignmentPrecedence
  nil-proof Assignment. Will only assign the value if the value is not nil
  
  - Parameters:
- - variable: variable you want to assign it to
- - value: value you want to assign
+    - variable: variable you want to assign it to
+    - value: value you want to assign
  */
 public func <-<V>(_ variable: inout V?, _ value: V?) {
     variable = value ?? variable
@@ -24,8 +24,8 @@ public func <-<V>(_ variable: inout V?, _ value: V?) {
  nil-proof Assignment. Will only assign the value if the value is not nil
  
  - Parameters:
- - variable: variable you want to assign it to
- - value: value you want to assign
+    - variable: variable you want to assign it to
+    - value: value you want to assign
  */
 public func <-<V>(_ variable: inout V, _ value: V?) {
     variable = value ?? variable
@@ -35,8 +35,8 @@ public func <-<V>(_ variable: inout V, _ value: V?) {
  Map assignment. Will assign the Result of map
  
  - Parameters:
- - items: array
- - handler: mapping function
+    - items: array
+    - handler: mapping function
  */
 public func <-<T>(_ items: inout [T], _ handler: (T) -> (T)) {
     items = items => handler
@@ -46,8 +46,8 @@ public func <-<T>(_ items: inout [T], _ handler: (T) -> (T)) {
  Map assignment. Will assign the Result of map
  
  - Parameters:
- - items: array
- - handler: mapping function
+    - items: array
+    - handler: mapping function
  */
 public func <-<T>(_ items: inout [T], _ handler: (T, Int) -> (T)) {
     items = items => handler
@@ -57,8 +57,8 @@ public func <-<T>(_ items: inout [T], _ handler: (T, Int) -> (T)) {
  FlatMap assignment. Will assign the Result of flatMap
  
  - Parameters:
- - items: array
- - handler: flatMapping function
+    - items: array
+    - handler: flatMapping function
  */
 public func <-<T>(_ items: inout [T], _ handler: (T) -> (T?)) {
     items = items ==> handler
@@ -70,8 +70,8 @@ infix operator <|: AssignmentPrecedence
  Filter assignment. Will assign the Result of filter
  
  - Parameters:
- - items: array
- - handler: isIncluded function
+    - items: array
+    - handler: isIncluded function
  */
 public func <|<T>(_ items: inout [T], _ handler: (T) -> Bool) {
     items = items |> handler
@@ -81,8 +81,8 @@ public func <|<T>(_ items: inout [T], _ handler: (T) -> Bool) {
  Filter assignment. Will assign the Result of filter
  
  - Parameters:
- - items: array
- - handler: isIncluded function
+    - items: array
+    - handler: isIncluded function
  */
 public func <|<T>(_ items: inout [T], _ handler: (T, Int) -> Bool) {
     items = items |> handler

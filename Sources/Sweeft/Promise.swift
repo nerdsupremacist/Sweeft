@@ -7,11 +7,15 @@
 
 import Foundation
 
+/// Promise Structs to prevent you from nesting callbacks over and over again
 public struct Promise<T, E: Error> {
     
+    /// Type of the success
     typealias SuccessHandler = (T) -> ()
+    /// Type of the success
     typealias ErrorHandler = (E) -> ()
     
+    /// All the handlers
     private var successHandlers = [SuccessHandler]()
     private var errorHandlers = [ErrorHandler]()
     

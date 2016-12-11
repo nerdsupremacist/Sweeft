@@ -138,10 +138,12 @@ public extension Array {
 
 public extension Array where Element: Hashable {
     
+    /// Checks if it has duplicates
     var hasDuplicates: Bool {
         return noDuplicates.count != count
     }
     
+    /// Array without the duplicates
     var noDuplicates: [Element] {
         return set.array
     }

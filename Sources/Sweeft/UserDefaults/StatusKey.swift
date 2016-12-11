@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// Key usable to store a status
 public protocol StatusKey {
     var rawValue: String { get }
 }

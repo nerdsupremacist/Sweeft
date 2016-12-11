@@ -12,7 +12,7 @@ import Foundation
  Concretalize. Will remove all the optionals from an array.
  
     - Parameters:
-    - items: array
+        - items: array
  
  - Returns: array without optionals
  */
@@ -39,8 +39,8 @@ public func +<V>(_ a: [V], _ b: [V]) -> [V] {
  Concatenate Dictionaries
  
  - Parameters:
- - a: dictionary
- - b: dictionary
+    - a: dictionary
+    - b: dictionary
  
  - Returns: dictionary containing the contents of the two.
  */
@@ -56,8 +56,8 @@ public func +<K, V>(_ a: [K:V], _ b: [K:V]) -> [K:V] {
  Concatenate Dictionaries
  
  - Parameters:
- - a: dictionary
- - b: dictionary
+    - a: dictionary
+    - b: dictionary
  
  - Returns: dictionary containing the contents of the two.
  */
@@ -123,8 +123,8 @@ public func +<V>(_ a: [V]?, _ b: [V]?) -> [V] {
  Concatenate Dictionaries
  
  - Parameters:
- - a: dictionary
- - b: dictionary
+    - a: dictionary
+    - b: dictionary
  
  - Returns: dictionary containing the contents of the two.
  */
