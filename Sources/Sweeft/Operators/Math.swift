@@ -82,3 +82,16 @@ infix operator ~~: ComparisonPrecedence
 public func ~~(left: String, right: String) -> Bool {
     return ??(try? left.matches(pattern: right, options: []))
 }
+
+/**
+ Get difference between two dates
+ 
+ - Parameters:
+    - left: firstDate
+    - right: secondDate
+ 
+ - Returns: DateDifference instance
+ */
+public func -(_ left: Date, _ right: Date) -> DateDifference {
+    return DateDifference(first: left, second: right)
+}

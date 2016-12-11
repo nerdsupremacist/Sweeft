@@ -27,7 +27,7 @@ public extension String {
      
      - Returns: Date object for the time
      */
-    func date(using format: String) -> Date? {
+    func date(using format: String = "dd.MM.yyyy hh:mm") -> Date? {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = format
         return dateFormatter.date(from: self)

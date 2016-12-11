@@ -70,22 +70,22 @@ class ViewController: UIViewController {
         
         let dates = Date.array(ofSize: 5)
         
-        let seconds = dates.join { $0.string(with: "ss") }
+        let seconds = dates.join { $0.string(using: "ss") }
         
         print(seconds)
         
-        let hours = dates ==> { $0.string(with: "HH") } >>> { Int($0) }
+        let hours = dates ==> { $0.string(using: "HH") } >>> { Int($0) }
         
         print(hours)
         
         dates => { item in
-            print(item.string(with: "dd hh:mm a"))
+            print(item.string(using: "dd hh:mm a"))
         }
         
         let valueOfString = dict.match(containing: "str").?
         
         print(valueOfString)
-        
+
     }
 
 }
