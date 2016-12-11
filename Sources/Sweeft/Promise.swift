@@ -8,7 +8,7 @@
 import Foundation
 
 /// Promise Structs to prevent you from nesting callbacks over and over again
-public struct Promise<T, E: Error> {
+public class Promise<T, E: Error> {
     
     /// Type of the success
     typealias SuccessHandler = (T) -> ()
@@ -16,19 +16,26 @@ public struct Promise<T, E: Error> {
     typealias ErrorHandler = (E) -> ()
     
     /// All the handlers
-    private var successHandlers = [SuccessHandler]()
-    private var errorHandlers = [ErrorHandler]()
+    var successHandlers = [SuccessHandler]()
+    var errorHandlers = [ErrorHandler]()
     
-    /// Add a success handler
-    @discardableResult mutating func onSuccess(call handler: @escaping SuccessHandler) -> Promise {
-        successHandlers.append(handler)
-        return self
+    /// Initializer
+    public init() {}
+    
+    /**
+     Add success handler
+     
+     - Parameter handler: function that should be called
+     
+     - Returns: argOne
+     */
+    @discardableResult public func onSuccess<O>(call handler: @escaping (T) -> (O)) -> PromiseSuccessHandler<O, T, E> {
+        return PromiseSuccessHandler<O, T, E>(promise: self, handler: handler)
     }
     
     /// Add an error Handler
-    @discardableResult mutating func onError(call handler: @escaping ErrorHandler) -> Promise {
-        errorHandlers.append(handler)
-        return self
+    @discardableResult public func onError<O>(call handler: @escaping (E) -> (O)) -> PromiseErrorHandler<O, T, E> {
+        return PromiseErrorHandler<O, T, E>(promise: self, handler: handler)
     }
     
     /// Call this when the promise is fulfilled

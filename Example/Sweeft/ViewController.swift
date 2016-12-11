@@ -29,6 +29,36 @@ class ViewController: UIViewController {
         
         Demo.demo()
         
+        fibonacci(50)
+            .onSuccess {
+                return Double($0) ** 0.5
+            }
+            .then {
+                print($0)
+                print("Item arrived")
+                return $0 ** 2
+            }
+            .then {
+                print($0)
+            }
+        
+    }
+    
+    func fibonacci(_ n: Int, _ a: Int, _ b: Int) -> Int {
+        if n == 0 {
+            return a
+        }
+        return fibonacci(n - 1, a + b, a)
+    }
+    
+    func fibonacci(_ input: Int) -> Promise<Int, NoError> {
+        let promise = Promise<Int, NoError>()
+        let queue = DispatchQueue(label: "fibonacciQueue")
+        (queue, 5) >>> {
+            let result = self.fibonacci(input, 1, 0)
+            promise.success(with: result)
+        }
+        return promise
     }
 
 }
