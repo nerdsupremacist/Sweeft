@@ -528,7 +528,7 @@ TimesOpened.value = times + 1
 
 Sometimes you may want to store more complex information than just stock types that are usually supported in user defaults.
 
-For that there's the ObjectStatus. First off, your Data has to conform to the protocol 'StatusSerializable'. Meaning it can be serialized and deserialized into a ```Swift [String:Any] ```.
+For that there's the ObjectStatus. First off, your Data has to conform to the protocol 'StatusSerializable'. Meaning it can be serialized and deserialized into a ```[String:Any]```.
 
 For example:
 
