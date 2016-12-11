@@ -20,10 +20,10 @@ extension StatusFetcher {
     
     var value: Value {
         get {
-            return UserDefaults.standard.object(forKey: key.rawValue) as? Value ?? defaultValue
+            return UserDefaults.standard.object(forKey: key.userDefaultsKey) as? Value ?? defaultValue
         }
         set {
-            UserDefaults.standard.set(newValue, forKey: key.rawValue)
+            UserDefaults.standard.set(newValue, forKey: key.userDefaultsKey)
         }
     }
     

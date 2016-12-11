@@ -28,4 +28,8 @@ public extension ObjectStatus {
         }
     }
     
+    static func reset() {
+        value = defaultValue
+    }
+    
 }

@@ -28,4 +28,8 @@ public extension Status {
         }
     }
     
+    static func reset() {
+        value = defaultValue
+    }
+    
 }

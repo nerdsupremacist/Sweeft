@@ -11,3 +11,11 @@ import Foundation
 public protocol StatusKey {
     var rawValue: String { get }
 }
+
+extension StatusKey {
+    
+    var userDefaultsKey: String {
+        return String(describing: Self.self) + "." + rawValue
+    }
+    
+}
