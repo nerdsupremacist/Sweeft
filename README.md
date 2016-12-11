@@ -486,7 +486,79 @@ let hours = dates => { $0.string("hh") | Int.init }
 
 But that's the cool thing about Sweeft. It gives you options ;)
 
-### Contribute
+### User Defaults
+
+Storing data to UserDefaults can be lead to issues. Mainly because of the fact that UserDefaults uses strings as keys, which make it easy to make mistakes. Furthermore the code to read something from user defaults requires you to cast the value to the type that you want. Which is unnecesarily complicated.
+
+Which is why Sweeft has a Status API. Meaning that anything that has to be stored into UserDefaults has to be it's own Status Struct.
+
+#### Status
+
+For example if you want to store the amount of times in which your app was opened:
+
+We start by creating the keys for your app.
+
+Simply create an enum for them that inherits from StatusKey:
+
+```Swift
+enum AppDefaults: String, StatusKey {
+    case timesOpened
+    /// More Cases here...
+}
+```
+
+And now we create the Status:
+
+```Swift
+struct TimesOpened: Status {
+    static let key: AppDefaults = .timesOpened
+    static let defaultValue: Int = 0
+}
+```
+
+To access it you can simply call it from your code:
+
+```Swift
+let times = TimesOpened.value
+// Do Something with it...
+TimesOpened.value = times + 1
+```
+
+#### ObjectStatus
+
+Sometimes you may want to store more complex information than just stock types that are usually supported in user defaults.
+
+For that there's the ObjectStatus. First off, your Data has to conform to the protocol 'StatusSerializable'. Meaning it can be serialized and deserialized into a ```Swift [String:Any] ```.
+
+For example:
+
+```Swift
+extension MyData: StatusSerializable {
+
+    var serialized: [String:Any] {
+        return [
+            // Store your data
+        ]
+    }
+
+    init?(from status: [String:Any]) {
+        // Read data from the dictionary and set everything up
+        // This init is allowed to fail ;)
+    }
+
+}
+```
+
+And then create your ObjectStatus:
+
+```Swift
+struct MyDataStatus: ObjectStatus {
+    static let key: AppDefaults = .myDataKey // Create a Key for this too
+    static let defaultValue: MyData = MyData() // Hand some default value here
+}
+```
+
+## Contributing
 
 Please contribute and help me make swift even better with more cool ways to simplify the swift syntax.
 Fork and star this repo and #MakeSwiftGreatAgain
