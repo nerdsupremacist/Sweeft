@@ -24,9 +24,8 @@ public func **<P: ReducingParameters>(_ nextPartialResult: P.NextPartialResultHa
 /**
  Creates a Reducing Parameter
  
- - Parameters:
-    - initialResult: initial result for reduce
-    - nextPartialResult: nextPartialResult Handler for reduce
+ - Parameter initialResult: initial result for reduce
+ - Parameter nextPartialResult: nextPartialResult Handler for reduce
  
  - Returns: Reducing Parameter
  */
@@ -37,9 +36,8 @@ public func **<P: ReducingParameters>(_ initialResult: P.Result, _ nextPartialRe
 /**
  Reduce
  
- - Parameters:
-    - items: collection
-    - reducingParameters: Reducing Parameters
+ - Parameter items: collection
+ - Parameter reducingParameters: Reducing Parameters
  
  - Returns: Result of reduce
  */
@@ -50,9 +48,8 @@ public func ==><C: Collection, R>(_ items: C, _ reducingParameters: RegularReduc
 /**
  Reduce with index
  
- - Parameters:
-    - items: collection
-    - reducingParameters: Reducing Parameters with index
+ - Parameter items: collection
+ - Parameter reducingParameters: Reducing Parameters with index
  
  - Returns: Result of reduce
  */
@@ -65,8 +62,7 @@ prefix operator >
 /**
  Default Reducing Parameters. Creates them with the default value for the type of the result
  
- - Parameters:
-    - nextPartialResult: nextPartialResult Handler for reduce
+ - Parameter nextPartialResult: nextPartialResult Handler for reduce
  
  - Returns: Result of reduce
  */

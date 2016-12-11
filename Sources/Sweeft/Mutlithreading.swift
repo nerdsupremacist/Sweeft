@@ -10,10 +10,9 @@ import Foundation
 /**
  Runs a closure after a time interval
  
- - Parameters:
-    - time: time interval
-    - in queue: Queue the code should run in. (Optional. Main is the default)
-    - handler: function you want to run later
+ - Parameter time: time interval
+ - Parameter queue: Queue the code should run in. (Optional. Main is the default)
+ - Parameter handler: function you want to run later
  */
 public func after(_ time: TimeInterval = 0.0, in queue: DispatchQueue = .main, handler: @escaping () -> ()) {
     queue.asyncAfter(deadline: .now() + time) {

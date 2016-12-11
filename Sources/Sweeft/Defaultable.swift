@@ -19,8 +19,7 @@ public extension Defaultable {
     /**
      Will generate an array populated with default values
      
-     - Parameters:
-        - size: size of the array. (Default: 0)
+     - Parameter size: size of the array. (Default: 0)
      */
     static func array(ofSize size: Int = 0) -> [Self] {
         if size > 0 {

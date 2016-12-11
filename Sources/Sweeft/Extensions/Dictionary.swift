@@ -13,8 +13,7 @@ public extension Dictionary {
     /**
      Will find a match for in the dictionary by key
      
-     - Parameters:
-        - handler: function that will determine by the key if it's the desired item
+     - Parameter handler: function that will determine by the key if it's the desired item
      
      - Returns: value found
      */
@@ -36,8 +35,7 @@ public extension Dictionary where Key: CustomStringConvertible {
      Will find a match for in the dictionary by key, checking if 
      the description of the key contains the query
      
-     - Parameters:
-        - handler: query we're looking for in the key
+     - Parameter handler: query we're looking for in the key
      
      - Returns: value found
      */

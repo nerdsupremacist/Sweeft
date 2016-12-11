@@ -17,9 +17,8 @@ infix operator **: PowerPrecedence
 /**
  Exponentiates
  
- - Parameters:
-    - a: Base
-    - b: Exponent
+ - Parameter a: Base
+ - Parameter b: Exponent
  
  - Returns: a to the b
  */
@@ -30,9 +29,8 @@ public func **(_ a: Double, _ b: Double) -> Double {
 /**
  Exponentiates
  
- - Parameters:
-    - a: Base
-    - b: Exponent
+ - Parameter a: Base
+ - Parameter b: Exponent
  
  - Returns: a to the b
  */
@@ -43,9 +41,8 @@ public func **(_ a: Int, _ b: Int) -> Int {
 /**
  Remainder
  
- - Parameters:
-    - a: number
-    - b: divider
+ - Parameter a: number
+ - Parameter b: divider
  
  - Returns: remainder of a after dividing by b
  */
@@ -58,8 +55,7 @@ prefix operator |
 /**
  Abs
  
- - Parameters:
-    - value: Number
+ - Parameter value: Number
  
  - Returns: absolut value of the input
  */
@@ -73,9 +69,8 @@ infix operator ~~: ComparisonPrecedence
 /**
  Matches
  
- - Parameters:
-    - left: String
-    - right: Pattern
+ - Parameter eft: String
+ - Parameter ight: Pattern
  
  - Returns: does the string match the pattern
  */
@@ -86,9 +81,8 @@ public func ~~(left: String, right: String) -> Bool {
 /**
  Get difference between two dates
  
- - Parameters:
-    - left: firstDate
-    - right: secondDate
+ - Parameter left: firstDate
+ - Parameter right: secondDate
  
  - Returns: DateDifference instance
  */

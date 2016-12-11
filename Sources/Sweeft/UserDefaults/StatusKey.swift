@@ -10,6 +10,7 @@ import Foundation
 
 /// Key usable to store a status
 public protocol StatusKey {
+    /// Raw value string for the key
     var rawValue: String { get }
 }
 

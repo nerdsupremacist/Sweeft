@@ -22,8 +22,7 @@ public extension String {
     /**
      Will try to decipher the Date coded into a string
      
-     - Parameters:
-        - with format: format in which the date is coded (Optional: default is "dd:MM:yyyy hh:mm")
+     - Parameter format: format in which the date is coded (Optional: default is "dd:MM:yyyy hh:mm")
      
      - Returns: Date object for the time
      */
@@ -40,9 +39,8 @@ public extension String {
     /**
      Will say if a String matches a RegEx
      
-     - Parameters:
-        - pattern: RegEx you want to match
-        - options: Extra options (Optional: Default is [])
+     - Parameter pattern: RegEx you want to match
+     - Parameter options: Extra options (Optional: Default is [])
      
      - Returns: Whether or not the string matches
      */

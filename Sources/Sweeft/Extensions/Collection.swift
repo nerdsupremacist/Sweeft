@@ -18,8 +18,7 @@ public extension Collection {
     /**
      Will turn any Collection into a Dictionary with a handler
      
-     - Parameters:
-        - byDividingWith: Mapping function that breaks every element into a key and a value
+     - Parameter byDividingWith: Mapping function that breaks every element into a key and a value
      
      - Returns: Resulting dictionary
      */
@@ -35,8 +34,7 @@ public extension Collection {
     /**
      Will sum all of the Elements
      
-     - Parameters:
-        - mapper: Mapping function that returns the value for an Element
+     - Parameter mapper: Mapping function that returns the value for an Element
      
      - Returns: Result of sum
      */
@@ -47,8 +45,7 @@ public extension Collection {
     /**
      Will sum all of the Elements
      
-     - Parameters:
-        - mapper: Mapping function that returns the value for an Element
+     - Parameter mapper: Mapping function that returns the value for an Element
      
      - Returns: Result of sum
      */
@@ -59,8 +56,7 @@ public extension Collection {
     /**
      Will multiply all of the Elements
      
-     - Parameters:
-        - mapper: Mapping function that returns the value for an Element
+     - Parameter mapper: Mapping function that returns the value for an Element
      
      - Returns: Result of multiplication
      */
@@ -71,8 +67,7 @@ public extension Collection {
     /**
      Will multiply all of the Elements
      
-     - Parameters:
-        - mapper: Mapping function that returns the value for an Element
+     - Parameter mapper: Mapping function that returns the value for an Element
      
      - Returns: Result of multiplication
      */
@@ -83,9 +78,8 @@ public extension Collection {
     /**
      Will join the elements as a single string
      
-     - Parameters:
-        - with string: string that should go between the individual entries (Default: separating by comma)
-        - by mapping: mapping function that turns each Element into a string (Default: String description of Element)
+     - Parameter with string: string that should go between the individual entries (Default: separating by comma)
+     - Parameter by mapping: mapping function that turns each Element into a string (Default: String description of Element)
      
      - Returns: String result
      */
@@ -97,8 +91,7 @@ public extension Collection {
     /**
      Will evaluate the concatenation of all the Elements into a single Bool
      
-     - Parameters:
-        - conjunctUsing mapping: mapper that says if an Element should evaluate to true or false
+     - Parameter mapping: mapper that says if an Element should evaluate to true or false
      
      - Returns: result of concatenation
      */
@@ -109,8 +102,7 @@ public extension Collection {
     /**
      Will evaluate the disjunction of all the Elements into a single Bool
      
-     - Parameters:
-        - disjunctUsing mapping: mapper that says if an Element should evaluate to true or false
+     - Parameter mapping: mapper that says if an Element should evaluate to true or false
      
      - Returns: result of disjunction
      */
@@ -121,8 +113,7 @@ public extension Collection {
     /**
      Will find the minimal item in the collection by using a cost function
      
-     - Parameters:
-        - mapping: Cost function
+     - Parameter mapping: Cost function
      
      - Returns: minimal element
      */
@@ -139,8 +130,7 @@ public extension Collection {
     /**
      Will find the maximal item in the collection by using a cost function
      
-     - Parameters:
-        - mapping: Cost function
+     - Parameter mapping: Cost function
      
      - Returns: maximal element
      */
