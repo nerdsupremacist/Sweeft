@@ -16,14 +16,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
-        // Small example of how you may keep track of when the user logs in using Status
-        
-        let last = LastDateOpened.value
-        
-        print("Last date the app was opened: \(last.string())")
-        
-        LastDateOpened.value = Date()
-        
         // Override point for customization after application launch.
         return true
     }

@@ -11,8 +11,20 @@ import Sweeft
 
 class ViewController: UIViewController {
 
+    @IBOutlet weak var dateLabel: UILabel!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        if let date = LastDateOpened.value {
+            let represantation = date.string(using: "dd/MM/yyyy hh:mm:ss a")
+            dateLabel.text = "You're back!!!\nLast time you opened this app was on:\n\(represantation)"
+        } else {
+            dateLabel.text = "Oh! This is the first time you're using this app!\nAwesome!"
+        }
+        LastDateOpened.value = Date()
+    }
+    
+    func demo() {
         
         // Here are a few examples of how to use Sweeft
         
@@ -85,7 +97,6 @@ class ViewController: UIViewController {
         let valueOfString = dict.match(containing: "str").?
         
         print(valueOfString)
-
     }
 
 }

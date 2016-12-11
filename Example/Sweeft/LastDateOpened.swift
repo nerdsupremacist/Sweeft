@@ -14,5 +14,5 @@ enum AppDefaults: String, StatusKey {
 
 struct LastDateOpened: Status {
     static let key: AppDefaults = .lastDate
-    static let defaultValue: Date = Date()
+    static let defaultValue: Date? = nil
 }
