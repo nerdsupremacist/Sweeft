@@ -91,6 +91,12 @@ enum Demo {
         let valueOfString = dict.match(containing: "str").?
         
         print(valueOfString)
+        
+        42 => {
+            $0 + 1
+        } >>> {
+            print("Looping for the \($0). time")
+        }
     }
     
 }

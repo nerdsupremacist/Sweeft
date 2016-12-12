@@ -42,6 +42,7 @@ public extension String {
         return URL(string: urlEncoded)
     }
     
+    /// Data resulting by encoding using utf8
     var data: Data? {
         return data(using: .utf8)
     }

@@ -11,10 +11,7 @@ public extension Array {
     
     /// Array with Elements and indexes for better for loops.
     var withIndex: [(element: Element, index: Int)] {
-        if isEmpty {
-            return []
-        }
-        return (0..<count) => { (self[$0], $0) }
+        return count.range => { (self[$0], $0) }
     }
     
     /**
@@ -110,10 +107,7 @@ public extension Array {
         if number > count {
             return self
         }
-        if number < 1 {
-            return []
-        }
-        return (0..<number) => { self[$0] }
+        return number.range => { self[$0] }
     }
     
     /**

@@ -23,6 +23,14 @@ public extension Int {
         return [firstPrime] + (self / firstPrime).primeFactors
     }
     
+    /// Creates a range from 0 till n - 1
+    var range: CountableRange<Int>? {
+        if self < 1 {
+            return nil
+        }
+        return (0..<self)
+    }
+    
     /// Determines if the value is even
     var isEven: Bool {
         return self & 1 == 0
@@ -54,6 +62,16 @@ public extension Int {
     /// Will return a reversed version of the integer
     var reversed: Int {
         return self | { $0.description.reversed } | Int.init.?
+    }
+    
+    /// Loop n times
+    func times<V>(do handler: @escaping () -> (V)) {
+        range => handler**
+    }
+    
+    /// Loop n times
+    func times<V>(do handler: @escaping (Int) -> (V)) {
+        range => handler**
     }
     
 }

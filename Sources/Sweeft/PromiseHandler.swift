@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// Enum For Representing an Empty Error Domain
 public enum NoError: Error {}
 
 /// Structure that allows us to nest callbacks more nicely

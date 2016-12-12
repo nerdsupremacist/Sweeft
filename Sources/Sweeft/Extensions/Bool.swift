@@ -9,6 +9,7 @@ import Foundation
 
 public extension Bool {
     
+    /// Will toggle the value of self
     @discardableResult mutating func toggle() -> Bool {
         self = !self
         return self

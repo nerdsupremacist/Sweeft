@@ -86,6 +86,29 @@ public func =><T, V>(_ items: [T]?, _ handler: (T, Int) -> (V)) -> [V] {
     return (items?.map(handler)).?
 }
 
+
+/**
+ For each from number
+ 
+ - Parameter number: number of times the loop should run
+ - Parameter handler: loop code
+ 
+ */
+public func =><V>(_ number: Int?, _ handler: @escaping () -> (V)) {
+    number?.times(do: handler)
+}
+
+/**
+ For each from number
+ 
+ - Parameter number: number of times the loop should run
+ - Parameter handler: loop code
+ 
+ */
+public func =><V>(_ number: Int?, _ handler: @escaping (Int) -> (V)) {
+    number?.times(do: handler)
+}
+
 /**
  For each. Will call the handler with every element in the array
  
@@ -106,6 +129,17 @@ public func =><C: Collection>(_ items: C?, _ handler: (C.Iterator.Element) -> ()
  */
 public func =><T>(_ items: [T]?, _ handler: (T, Int) -> ()) {
     items?.forEach(handler)
+}
+
+/**
+ Empty for each
+ 
+ - Parameter items: array
+ - Parameter handler: call that should be called
+ 
+ */
+public func =><C: Collection>(_ items: C?, _ handler: @escaping () -> ()) {
+    items?.forEach(**handler)
 }
 
 infix operator ==>: AdditionPrecedence
