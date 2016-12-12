@@ -12,11 +12,11 @@ public extension Date {
     /**
      Will turn a Date into a readable format
      
-     - Parameter format: format in which you want the date (Optional: default is "dd:MM:yyyy hh:mm")
+     - Parameter format: format in which you want the date (Optional: default is "dd.MM.yyyy hh:mm:ss a")
      
      - Returns: String representation of the date
      */
-    func string(using format: String = "dd.MM.yyyy hh:mm") -> String {
+    func string(using format: String = "dd.MM.yyyy hh:mm:ss a") -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = format
         return dateFormatter.string(from: self)

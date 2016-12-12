@@ -15,6 +15,11 @@ public extension Collection {
         return self => id
     }
     
+    /// Return a random item in the collection
+    var random: Iterator.Element? {
+        return array | Int(arc4random()) % array.count
+    }
+    
     /**
      Will turn any Collection into a Dictionary with a handler
      

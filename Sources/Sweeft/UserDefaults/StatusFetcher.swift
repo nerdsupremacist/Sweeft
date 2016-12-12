@@ -30,17 +30,17 @@ extension StatusFetcher {
 }
 
 struct SimpleStatus<K: StatusKey, V>: StatusFetcher {
-    typealias Key = K
-    typealias Value = V
-    
     let key: K
     let defaultValue: V
 }
 
-struct DictionaryStatus<V: StatusKey>: StatusFetcher {
-    typealias Key = V
-    typealias Value = [String:Any]
+extension SimpleStatus where V: Defaultable {
     
-    let key: V
-    let defaultValue = [String:Any]()
+    init(key: K) {
+        self.key = key
+        self.defaultValue = V.defaultValue
+    }
+    
 }
+
+typealias DictionaryStatus<V: StatusKey> = SimpleStatus<V, [String:Any]>

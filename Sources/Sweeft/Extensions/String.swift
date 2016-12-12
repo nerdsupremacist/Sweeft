@@ -19,14 +19,41 @@ public extension String {
         return String(<>characters)
     }
     
+    /// Returns the decoded representation of the string
+    var base64Decoded: String? {
+        guard let data = Data(base64Encoded: self) else {
+            return nil
+        }
+        return data.string
+    }
+    
+    /// Returns the base 64 encoded representation of the string
+    var base64Encoded: String? {
+        return data?.base64EncodedString()
+    }
+    
+    /// Encodes the string by escaping unallowed characters
+    var urlEncoded: String {
+        return self.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed) ?? self
+    }
+    
+    /// Turns any string into a url
+    var url: URL? {
+        return URL(string: urlEncoded)
+    }
+    
+    var data: Data? {
+        return data(using: .utf8)
+    }
+    
     /**
      Will try to decipher the Date coded into a string
      
-     - Parameter format: format in which the date is coded (Optional: default is "dd:MM:yyyy hh:mm")
+     - Parameter format: format in which the date is coded (Optional: default is "dd.MM.yyyy hh:mm:ss a")
      
      - Returns: Date object for the time
      */
-    func date(using format: String = "dd.MM.yyyy hh:mm") -> Date? {
+    func date(using format: String = "dd.MM.yyyy hh:mm:ss a") -> Date? {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = format
         return dateFormatter.date(from: self)

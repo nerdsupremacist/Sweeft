@@ -7,6 +7,15 @@
 
 import Foundation
 
+public extension Bool {
+    
+    @discardableResult mutating func toggle() -> Bool {
+        self = !self
+        return self
+    }
+    
+}
+
 extension Bool: Defaultable {
     
     /// Default Value

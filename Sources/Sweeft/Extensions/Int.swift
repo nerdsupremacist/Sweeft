@@ -23,6 +23,21 @@ public extension Int {
         return [firstPrime] + (self / firstPrime).primeFactors
     }
     
+    /// Determines if the value is even
+    var isEven: Bool {
+        return self & 1 == 0
+    }
+    
+    /// Determines if the value is odd
+    var isOdd: Bool {
+        return !isEven
+    }
+    
+    /// Gives an Array of the digits in the number
+    var digits: [Int] {
+        return self.description.characters => { String($0) } ==> { Int($0) }
+    }
+    
     /// Will say it is prime
     var isPrime: Bool {
         if self < 2 {

@@ -285,3 +285,25 @@ prefix operator <>
 public prefix func <><C: Collection>(_ items: C) -> [C.Iterator.Element] {
     return items.reversed()
 }
+
+/**
+ Reverse String
+ 
+ - Parameter string: String
+ 
+ - Returns: Reversed String
+ */
+public prefix func <>(_ string: String) -> String {
+    return string.reversed
+}
+
+/**
+ Reverse String
+ 
+ - Parameter string: String
+ 
+ - Returns: Reversed String
+ */
+public prefix func <>(_ number: Int) -> Int {
+    return number.reversed
+}

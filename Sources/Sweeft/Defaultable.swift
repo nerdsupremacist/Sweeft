@@ -16,6 +16,11 @@ public protocol Defaultable {
 
 public extension Defaultable {
     
+    /// Will return an empty array
+    static var array: [Self] {
+        return array()
+    }
+    
     /**
      Will generate an array populated with default values
      
