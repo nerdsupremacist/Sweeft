@@ -259,6 +259,41 @@ let joined = myStrings ==> >{ "\($0), \($1)" }
 
 The same as above but with filter
 
+#### (>>=) Turn into Dictionary
+
+Will turn any Collection into a dictionary by dividing each element into a key and a value:
+
+```Swift
+array >>= { item in
+    // generate key and value from item
+
+    return (key, item)
+}
+```
+
+##### With indexes:
+
+When handling an array you can call the above functions with a closure that also accepts the index of the item:
+
+For example:
+
+```Swift
+array => { item, index in
+    // Map
+    return ...
+}
+
+array ==> initial ** { result, item, index in
+    // Reduce
+    return ...
+}
+
+array >>= { item, index in
+    // Turn into dictionary
+    return (..., ...)
+}
+```
+
 #### ( ** ) Drop input/output from function
 
 Will cast a function to allow any input and drop it.
