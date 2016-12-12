@@ -257,9 +257,7 @@ prefix operator **
  - Returns: function that can take an input and drop it to call the handler.
  */
 public prefix func **<T, V>(_ handler: @escaping () -> (V)) -> (T) -> (V) {
-    return { _ in
-        return handler()
-    }
+    return dropArguments >>> handler
 }
 
 postfix operator **
@@ -272,9 +270,7 @@ postfix operator **
  - Returns: function that will evaluate the handler but won't return its value
  */
 public postfix func **<T, V>(_ handler: @escaping (T) -> (V)) -> (T) -> () {
-    return { input in
-        _ = handler(input)
-    }
+    return handler >>> dropArguments
 }
 
 /**
@@ -347,4 +343,32 @@ public func ||<K>(_ handlerOne: @escaping (K) -> Bool, _ handlerTwo: @escaping (
  */
 public func &&<K>(_ handlerOne: @escaping (K) -> Bool, _ handlerTwo: @escaping (K) -> Bool) -> (K) -> Bool {
     return { handlerOne($0) && handlerTwo($0) }
+}
+
+infix operator &&>
+
+/**
+ Will evaluate the concatenation of all the Elements in a Collection into a single Bool
+ 
+ - Parameter items: Collection
+ - Parameter handler: mapper that says if an Element should evaluate to true or false
+ 
+ - Returns: result of concatenation
+ */
+public func &&><C: Collection>(_ items: C?, _ handler: (C.Iterator.Element) -> Bool) -> Bool {
+    return (items?.and(conjunctUsing: handler)) ?? true
+}
+
+infix operator ||>
+
+/**
+ Will evaluate the disjunct of all the Elements in a Collection into a single Bool
+ 
+ - Parameter items: Collection
+ - Parameter handler: mapper that says if an Element should evaluate to true or false
+ 
+ - Returns: result of disjunction
+ */
+public func ||><C: Collection>(_ items: C?, _ handler: (C.Iterator.Element) -> Bool) -> Bool {
+    return (items?.or(disjunctUsing: handler)).?
 }

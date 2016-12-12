@@ -8,9 +8,7 @@
 
 import Foundation
 
-public enum NoError: Error {
-    
-}
+public enum NoError: Error {}
 
 /// Structure that allows us to nest callbacks more nicely
 public struct PromiseSuccessHandler<R, T, E: Error> {

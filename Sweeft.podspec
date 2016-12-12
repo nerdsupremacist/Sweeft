@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'Sweeft'
-  s.version          = '0.2.4'
+  s.version          = '0.2.5'
   s.summary          = 'Swift but a bit Sweeter - More Syntactic Sugar for Swift'
 
   s.description      = "A collection of different operators and extensions that make writing in Swift a bit sweeter."
@@ -22,6 +22,6 @@ Pod::Spec.new do |s|
   # }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
-  s.frameworks = ['Foundation', 'UIKit']
+  s.frameworks = 'Foundation'
   # s.dependency 'AFNetworking', '~> 2.3'
 end

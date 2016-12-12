@@ -6,16 +6,12 @@
 //
 //
 
-import UIKit
+import Foundation
 
 public extension Data {
     
     var string: String? {
         return String(data: self, encoding: .utf8)
-    }
-    
-    var image: UIImage? {
-        return UIImage(data: self)
     }
     
 }

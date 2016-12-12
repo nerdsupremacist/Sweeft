@@ -15,7 +15,7 @@ import Foundation
  
  - Returns: value
  */
-func id<T>(_ value: T) -> T {
+public func id<T>(_ value: T) -> T {
     return value
 }
 
@@ -28,7 +28,7 @@ func id<T>(_ value: T) -> T {
  
  - Returns: argOne
  */
-func firstArgument<T, V>(_ argOne: T, _ argTwo: V) -> T {
+public func firstArgument<T, V>(_ argOne: T, _ argTwo: V) -> T {
     return argOne
 }
 
@@ -41,7 +41,7 @@ func firstArgument<T, V>(_ argOne: T, _ argTwo: V) -> T {
  
  - Returns: argTwo
  */
-func lastArgument<T, V>(_ argOne: T, _ argTwo: V) -> V {
+public func lastArgument<T, V>(_ argOne: T, _ argTwo: V) -> V {
     return argTwo
 }
 
@@ -55,9 +55,16 @@ func lastArgument<T, V>(_ argOne: T, _ argTwo: V) -> V {
  
  - Returns: argTwo
  */
-func middleArgument<T, V, Z>(_ argOne: T, _ argTwo: V, _ argThree: Z) -> V {
+public func middleArgument<T, V, Z>(_ argOne: T, _ argTwo: V, _ argThree: Z) -> V {
     return argTwo
 }
+
+/**
+ Will drop any arguments given to it. Who knows? Might be useful.
+ 
+ - Parameter value: value
+ */
+public func dropArguments<V>(_ input: V) {  }
 
 /**
  Fill filp the order of the arguments
@@ -67,6 +74,6 @@ func middleArgument<T, V, Z>(_ argOne: T, _ argTwo: V, _ argThree: Z) -> V {
  
  - Returns: argTwo, argOne
  */
-func flipArguments<T, V>(_ argOne: T, _ argTwo: V) -> (V, T) {
+public func flipArguments<T, V>(_ argOne: T, _ argTwo: V) -> (V, T) {
     return (argTwo, argOne)
 }

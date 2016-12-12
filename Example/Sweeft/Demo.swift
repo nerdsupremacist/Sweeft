@@ -38,6 +38,14 @@ enum Demo {
         
         print(palindromePrimes)
         
+        let areTherePrimes = !array ||> { $0.isPrime }
+        
+        print(areTherePrimes)
+        
+        let areAllPrimes = !array &&> { $0.isPrime }
+        
+        print(areAllPrimes)
+        
         let sum = !array ==> (+)
         
         print(sum.?)
