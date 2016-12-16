@@ -188,15 +188,15 @@ public func |<T>(_ items: [T]?, _ index: Int) -> T? {
 }
 
 /**
- Safe Dictionary value Access
+ Safe Array index Access from collection
  
- - Parameter dictionary: dictionary you want to access
- - Parameter key: key of the dictionary you want to access
+ - Parameter array: array you want to access
+ - Parameter indexes: collection of indexes you want to access
  
- - Returns: Value at key
+ - Returns: Value at index
  */
-public func |<K, V>(_ dictionary: [K:V], _ key: K) -> V? {
-    return dictionary[key]
+public func |<T, C: Collection where C.Iterator.Element == Int>(_ items: [T]?, _ indexes: C?) -> [T] {
+    return !(indexes => { items | $0 })
 }
 
 /**
@@ -209,6 +209,18 @@ public func |<K, V>(_ dictionary: [K:V], _ key: K) -> V? {
  */
 public func |<K, V>(_ dictionary: [K:V]?, _ key: K) -> V? {
     return (dictionary.?)[key]
+}
+
+/**
+ Safe Dictionary value Access by collection
+ 
+ - Parameter dictionary: dictionary you want to access
+ - Parameter keys: collection of keys you want to access
+ 
+ - Returns: Value at key
+ */
+public func |<V, C: Collection>(_ dictionary: [C.Iterator.Element:V]?, _ keys: C?) -> [V] {
+    return !(keys => { dictionary | $0 })
 }
 
 /**
@@ -306,4 +318,40 @@ public prefix func <>(_ string: String) -> String {
  */
 public prefix func <>(_ number: Int) -> Int {
     return number.reversed
+}
+
+/**
+ Intersection
+ 
+ - Parameter a: First collection
+ - Parameter b: Second collection
+ 
+ - Returns: Intersection of the 2 collections
+ */
+public func -<C: Collection where C.Iterator.Element: Hashable>(_ a: C?, _ b: C?) -> Set<C.Iterator.Element> {
+    return (b?.set | a?.set.subtracting).?
+}
+
+/**
+ Intersection
+ 
+ - Parameter a: First collection
+ - Parameter b: Second collection
+ 
+ - Returns: Intersection of the 2 collections
+ */
+public func &&<C: Collection where C.Iterator.Element: Hashable>(_ a: C?, _ b: C?) -> Set<C.Iterator.Element> {
+    return (b?.set | a?.set.intersection).?
+}
+
+/**
+ Union
+ 
+ - Parameter a: First collection
+ - Parameter b: Second collection
+ 
+ - Returns: Union of the 2 collections
+ */
+public func ||<C: Collection where C.Iterator.Element: Hashable>(_ a: C?, _ b: C?) -> Set<C.Iterator.Element> {
+    return (b?.set | a?.set.union).?
 }

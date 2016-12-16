@@ -10,6 +10,35 @@ import Sweeft
 
 enum Demo {
     
+    struct User {
+        let name: String
+        let id: String
+    }
+    
+    static func inc(_ n: Int) -> Int {
+        return n + 1
+    }
+    
+    static func other() {
+        
+        let users = [User]()
+        
+        let dict = users >>= { user in
+            return (user.id, user)
+        }
+        
+        print(dict)
+        
+        42 => inc >>> { n in
+            print("Looping for the \(n). time")
+        }
+        
+        let array = (0..<100).array | (50..<1000)
+        
+        print(array)
+        
+    }
+    
     static func demo() {
         
         // Here are a few examples of how to use Sweeft

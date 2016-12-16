@@ -27,8 +27,6 @@ class ViewController: UIViewController {
         dateLabel.text = message
         LastDateOpened.value = Date()
         
-        Demo.demo()
-        
         fibonacci(50)
             .onSuccess {
                 return Double($0) ** 0.5

@@ -66,7 +66,7 @@ public extension Int {
     
     /// Loop n times
     func times<V>(do handler: @escaping () -> (V)) {
-        range => handler**
+        range?.forEach(**handler**)
     }
     
     /// Loop n times

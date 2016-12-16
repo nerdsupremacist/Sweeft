@@ -138,9 +138,9 @@ public func =><T>(_ items: [T]?, _ handler: (T, Int) -> ()) {
  - Parameter handler: call that should be called
  
  */
-public func =><C: Collection>(_ items: C?, _ handler: @escaping () -> ()) {
-    items?.forEach(**handler)
-}
+//public func =><C: Collection>(_ items: C?, _ handler: @escaping () -> ()) {
+//    items?.forEach(**handler)
+//}
 
 infix operator ==>: AdditionPrecedence
 
