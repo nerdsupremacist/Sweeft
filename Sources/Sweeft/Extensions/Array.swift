@@ -121,6 +121,32 @@ public extension Array {
         return <>(<>self).array(withFirst: number)
     }
     
+    /**
+     Will shift the index of an item to another inced
+     
+     - Parameter source: index of the item you want to move
+     - Parameter destination: index where you want it to be at
+     */
+    mutating func move(itemAt source: Int, to destination: Int) {
+        let element = self[source]
+        remove(at: source)
+        insert(element, at: destination)
+    }
+    
+    /**
+     Will shift the index of an item to another inced
+     
+     - Parameter source: index of the item you want to move
+     - Parameter destination: index where you want it to be at
+     
+     - Returns: Resulting array
+     */
+    func moving(itemAt source: Int, to destination: Int) -> [Element] {
+        var copy = self
+        copy.move(itemAt: source, to: destination)
+        return copy
+    }
+    
 }
 
 public extension Array where Element: Hashable {
