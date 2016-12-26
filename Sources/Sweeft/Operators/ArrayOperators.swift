@@ -200,6 +200,18 @@ public func |<T, C: Collection where C.Iterator.Element == Int>(_ items: [T]?, _
 }
 
 /**
+ Exclude from Array
+ 
+ - Parameter array: array you want to access
+ - Parameter indexes: collection of indexes you want to exclude from the array
+ 
+ - Returns: Value at index
+ */
+public func ||<T, C: Collection where C.Iterator.Element == Int>(_ items: [T]?, _ indexes: C?) -> [T] {
+    return (items?.withIndex >>= flipArguments) || indexes
+}
+
+/**
  Safe Dictionary value Access
  
  - Parameter dictionary: dictionary you want to access
@@ -221,6 +233,19 @@ public func |<K, V>(_ dictionary: [K:V]?, _ key: K) -> V? {
  */
 public func |<V, C: Collection>(_ dictionary: [C.Iterator.Element:V]?, _ keys: C?) -> [V] {
     return !(keys => { dictionary | $0 })
+}
+
+/**
+ Exclude from dictionary
+ 
+ - Parameter dictionary: dictionary you want to access
+ - Parameter keys: collection of keys you want to exclude
+ 
+ - Returns: Value at key
+ */
+public func ||<V, C: Collection>(_ dictionary: [C.Iterator.Element:V]?, _ keys: C?) -> [V] {
+    let realKeys = dictionary?.keys => id
+    return dictionary | (realKeys - (keys => id))
 }
 
 /**
@@ -294,8 +319,8 @@ prefix operator <>
  
  - Returns: Array containing the elements of C in reversed order
  */
-public prefix func <><C: Collection>(_ items: C) -> [C.Iterator.Element] {
-    return items.reversed()
+public prefix func <><C: Collection>(_ items: C?) -> [C.Iterator.Element] {
+    return (items?.reversed()).?
 }
 
 /**

@@ -77,3 +77,11 @@ public func dropArguments<V>(_ input: V) {  }
 public func flipArguments<T, V>(_ argOne: T, _ argTwo: V) -> (V, T) {
     return (argTwo, argOne)
 }
+
+public func inc(_ number: Int) -> Int {
+    return number + 1
+}
+
+public func negative(_ number: Int) -> Int {
+    return -number
+}
