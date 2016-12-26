@@ -36,6 +36,14 @@ public extension Int {
         return (0..<self)
     }
     
+    /// Creates a range from 0 till n-1 or from n+1 till 0 depending on wheter self is positive or not.
+    var anyRange: [Int] {
+        guard let range = self.range else {
+            return <>((-self).range) => negative
+        }
+        return range.array
+    }
+    
     /// Determines if the value is even
     var isEven: Bool {
         return self & 1 == 0
