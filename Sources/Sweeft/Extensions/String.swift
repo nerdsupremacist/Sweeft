@@ -11,7 +11,7 @@ public extension String {
     
     /// Will say if the String is a palindrome
     var isPalindrome: Bool {
-        return self.reversed == self
+        return <>self == self
     }
     
     /// Will return the string reversed
