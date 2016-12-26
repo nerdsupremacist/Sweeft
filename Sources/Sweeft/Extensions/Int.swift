@@ -23,6 +23,11 @@ public extension Int {
         return [firstPrime] + (self / firstPrime).primeFactors
     }
     
+    /// Returns the factorial of self
+    var factorial: Int {
+        return range => inc ==> 1 ** (*)
+    }
+    
     /// Creates a range from 0 till n - 1
     var range: CountableRange<Int>? {
         if self < 1 {
