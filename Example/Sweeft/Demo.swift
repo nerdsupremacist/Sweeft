@@ -37,6 +37,10 @@ enum Demo {
         
         print(array)
         
+        let n = -20
+        
+        print(n.anyRange)
+        
     }
     
     static func demo() {
@@ -126,6 +130,10 @@ enum Demo {
         } >>> {
             print("Looping for the \($0). time")
         }
+        
+        print(0.factorial)
+        
+        print(10.factorial)
     }
     
 }
