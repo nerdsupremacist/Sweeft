@@ -37,6 +37,22 @@ public extension Collection {
     }
     
     /**
+     Will turn any Collection into a Dictionary with a handler
+     
+     - Parameter byDividingWith: Mapping function that breaks every element into a key and a value
+     
+     - Returns: Resulting dictionary
+     */
+    func dictionaryWithoutOptionals<K, V>(byDividingWith handler: @escaping (Iterator.Element) -> (K, V?)) -> [K:V] {
+        return self ==> >{ dict, item in
+            var dict = dict
+            let (key, value) = handler(item)
+            dict[key] <- value
+            return dict
+        }
+    }
+    
+    /**
      Will sum all of the Elements
      
      - Parameter mapper: Mapping function that returns the value for an Element
@@ -150,6 +166,14 @@ public extension Collection where Iterator.Element: Hashable {
     /// Will turn any Collection into a Set
     var set: Set<Iterator.Element> {
         return Set(array)
+    }
+    
+}
+
+extension Collection where Iterator.Element: Serializable {
+    
+    public var json: JSON {
+        return .array(self => { $0.json })
     }
     
 }

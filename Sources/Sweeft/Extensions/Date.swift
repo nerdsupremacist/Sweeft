@@ -100,3 +100,12 @@ public struct DateDifference {
     
     
 }
+
+extension Date: Serializable {
+    
+    /// JSON Value
+    public var json: JSON {
+        return .string(string())
+    }
+    
+}

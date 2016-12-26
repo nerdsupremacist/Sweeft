@@ -85,3 +85,12 @@ extension String: Defaultable {
     public static let defaultValue = ""
     
 }
+
+extension String: Serializable {
+    
+    /// JSON Value
+    public var json: JSON {
+        return .string(self)
+    }
+    
+}

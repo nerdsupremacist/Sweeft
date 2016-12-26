@@ -82,3 +82,12 @@ extension Int: Defaultable {
     public static let defaultValue = 0
     
 }
+
+extension Int: Serializable {
+    
+    /// JSON Value
+    public var json: JSON {
+        return .double(Double(self))
+    }
+    
+}
