@@ -52,3 +52,32 @@ extension Deserializable {
 public protocol Serializable {
     var json: JSON { get }
 }
+
+extension Serializable {
+    
+    public func send<T: API>(using api: T,
+                            method: HTTPMethod,
+                            at endpoint: T.Endpoint,
+                            arguments: [String:CustomStringConvertible] = [:],
+                            headers: [String:CustomStringConvertible] = [:]) -> Promise<JSON, APIError> {
+        
+        return api.doJSONRequest(with: method, to: endpoint, arguments: arguments, headers: headers, body: json)
+    }
+    
+    public func put<T: API>(using api: T,
+                            at endpoint: T.Endpoint,
+                            arguments: [String:CustomStringConvertible] = [:],
+                            headers: [String:CustomStringConvertible] = [:]) -> Promise<JSON, APIError> {
+        
+        return send(using: api, method: .put, at: endpoint, arguments: arguments, headers: headers)
+    }
+    
+    public func post<T: API>(using api: T,
+                    at endpoint: T.Endpoint,
+                    arguments: [String:CustomStringConvertible] = [:],
+                    headers: [String:CustomStringConvertible] = [:]) -> Promise<JSON, APIError> {
+        
+        return send(using: api, method: .post, at: endpoint, arguments: arguments, headers: headers)
+    }
+    
+}
