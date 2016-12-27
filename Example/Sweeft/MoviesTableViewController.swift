@@ -27,6 +27,7 @@ class MoviesTableViewController: UITableViewController {
             self.movies = movies.sorted {
                 return $0.vote >= $1.vote
             }
+            movies >>> **self.tableView.reloadData
         }
         .onError { error in
             print(error)

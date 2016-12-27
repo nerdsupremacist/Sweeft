@@ -9,13 +9,15 @@
 import UIKit
 import Sweeft
 
-final class Movie {
+final class Movie: Observable {
     
     let title: String
     let vote: Double
     let id: Int
     let overview: String
     var poster: UIImage?
+    
+    var listeners = [Listener]()
     
     init(title: String, vote: Double, id: Int, overview: String, poster: UIImage? = nil) {
         self.title = title
@@ -39,8 +41,9 @@ extension Movie: Deserializable {
         }
         self.init(title: title, vote: vote, id: id, overview: overview)
         if let path = json["poster_path"].string {
-            MovieImageAPI.shared.doDataRequest(with: .get, to: .small, arguments: ["path": path]).onSuccess { data in
+            MovieImageAPI.shared.doDataRequest(to: .large, arguments: ["path": path]).onSuccess { data in
                 self.poster <- UIImage(data: data)
+                self.hasChanged()
             }
         }
     }
