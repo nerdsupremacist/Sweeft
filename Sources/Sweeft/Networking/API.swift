@@ -44,9 +44,11 @@ public extension API {
                        to endpoint: Endpoint,
                        arguments: [String:CustomStringConvertible] = [:],
                        headers: [String:CustomStringConvertible] = [:],
-                       body: Data? = nil) -> Promise<Data, NoError> {
+                       body: Data? = nil,
+                       acceptableStatusCodes: [Int] = [200],
+                       completionQueue: DispatchQueue = .main) -> Promise<Data, APIError> {
         
-        let promise = Promise<Data, NoError>()
+        let promise = Promise<Data, APIError>(completionQueue: completionQueue)
         
         let requestString = arguments ==> endpoint.rawValue ** { string, argument in
             return string.replacingOccurrences(of: "{\(argument.key)}", with: argument.value.description)
@@ -62,9 +64,19 @@ public extension API {
         
         let session = URLSession.shared
         let task = session.dataTask(with: request) { (data, response, error) in
-            if let data = data,
-                error == nil {
+            if let error = error {
+                promise.error(with: .unknown(error: error))
+                return
+            }
+            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 200
+            guard acceptableStatusCodes.contains(statusCode) else {
+                promise.error(with: .invalidStatus(code: statusCode, data: data))
+                return
+            }
+            if let data = data {
                 promise.success(with: data)
+            } else if let error = error {
+                promise.error(with: .noData)
             }
         }
         task.resume()
@@ -76,12 +88,16 @@ public extension API {
                        to endpoint: Endpoint,
                        arguments: [String:CustomStringConvertible] = [:],
                        headers: [String:CustomStringConvertible] = [:],
-                       body: JSON? = nil) -> Promise<JSON, NoError> {
+                       body: JSON? = nil,
+                       acceptableStatusCodes: [Int] = [200],
+                       completionQueue: DispatchQueue = .main) -> Promise<JSON, APIError> {
         
-        let promise = Promise<JSON, NoError>()
-        doDataRequest(with: method, to: endpoint, arguments: arguments, headers: headers, body: body?.data)
+        let promise = Promise<JSON, APIError>(completionQueue: completionQueue)
+        doDataRequest(with: method, to: endpoint, arguments: arguments,
+                      headers: headers, body: body?.data, acceptableStatusCodes: acceptableStatusCodes)
             .onSuccess { data in
                 guard let json = JSON(data: data) else {
+                    promise.error(with: .invalidJSON)
                     return
                 }
                 promise.success(with: json)
@@ -95,12 +111,16 @@ public extension API {
                          arguments: [String:CustomStringConvertible] = [:],
                          headers: [String:CustomStringConvertible] = [:],
                          body: JSON? = nil,
-                         at path: [String] = []) -> Promise<T, NoError> {
+                         acceptableStatusCodes: [Int] = [200],
+                         completionQueue: DispatchQueue = .main,
+                         at path: [String] = []) -> Promise<T, APIError> {
         
-        let promise = Promise<T, NoError>()
-        doJSONRequest(with: method, to: endpoint, arguments: arguments, headers: headers, body: body)
+        let promise = Promise<T, APIError>(completionQueue: completionQueue)
+        doJSONRequest(with: method, to: endpoint, arguments: arguments,
+                      headers: headers, body: body, acceptableStatusCodes: acceptableStatusCodes)
             .onSuccess { json in
                 guard let item: T = json.get(in: path) else {
+                    promise.error(with: .mappingError(json: json))
                     return
                 }
                 promise.success(with: item)
@@ -115,9 +135,12 @@ public extension API {
                          arguments: [String:CustomStringConvertible] = [:],
                          headers: [String:CustomStringConvertible] = [:],
                          body: JSON? = nil,
-                         at path: String...) -> Promise<T, NoError> {
+                         acceptableStatusCodes: [Int] = [200],
+                         completionQueue: DispatchQueue = .main,
+                         at path: String...) -> Promise<T, APIError> {
         
-        return doObjectRequest(with: method, to: endpoint, arguments: arguments, headers: headers, body: body, at: path)
+        return doObjectRequest(with: method, to: endpoint, arguments: arguments,
+                               headers: headers, body: body, acceptableStatusCodes: acceptableStatusCodes, at: path)
     }
     
     
@@ -126,14 +149,18 @@ public extension API {
                           arguments: [String:CustomStringConvertible] = [:],
                           headers: [String:CustomStringConvertible] = [:],
                           body: JSON? = nil,
+                          acceptableStatusCodes: [Int] = [200],
+                          completionQueue: DispatchQueue = .main,
                           at path: [String] = [],
-                          with internalPath: [String] = []) -> Promise<[T], NoError> {
+                          with internalPath: [String] = []) -> Promise<[T], APIError> {
         
         
-        let promise = Promise<[T], NoError>()
-        doJSONRequest(with: method, to: endpoint, arguments: arguments, headers: headers, body: body)
+        let promise = Promise<[T], APIError>(completionQueue: completionQueue)
+        doJSONRequest(with: method, to: endpoint, arguments: arguments,
+                      headers: headers, body: body, acceptableStatusCodes: acceptableStatusCodes)
             .onSuccess { json in
                 guard let items: [T] = json.getAll(in: path, for: internalPath) else {
+                    promise.error(with: .mappingError(json: json))
                     return
                 }
                 promise.success(with: items)

@@ -31,7 +31,7 @@ extension Deserializable {
                            at endpoint: T.Endpoint,
                            arguments: [String:CustomStringConvertible] = [:],
                            headers: [String:CustomStringConvertible] = [:],
-                           for path: String...) -> Promise<Self, NoError> {
+                           for path: String...) -> Promise<Self, APIError> {
         
         return api.doObjectRequest(with: method, to: endpoint, arguments: arguments, headers: headers, body: nil, at: path)
     }
@@ -42,7 +42,7 @@ extension Deserializable {
                               arguments: [String:CustomStringConvertible] = [:],
                               headers: [String:CustomStringConvertible] = [:],
                               for path: String...,
-                              using internalPath: [String] = []) -> Promise<[Self], NoError> {
+                              using internalPath: [String] = []) -> Promise<[Self], APIError> {
         
         return api.doObjectsRequest(with: method, to: endpoint, arguments: arguments, headers: headers, body: nil, at: path)
     }

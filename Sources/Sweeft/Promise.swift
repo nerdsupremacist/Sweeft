@@ -18,9 +18,12 @@ public class Promise<T, E: Error> {
     /// All the handlers
     var successHandlers = [SuccessHandler]()
     var errorHandlers = [ErrorHandler]()
+    let completionQueue: DispatchQueue
     
     /// Initializer
-    public init() {}
+    public init(completionQueue: DispatchQueue = .main) {
+        self.completionQueue = completionQueue
+    }
     
     /**
      Add success handler
@@ -40,12 +43,16 @@ public class Promise<T, E: Error> {
     
     /// Call this when the promise is fulfilled
     public func success(with value: T) {
-        successHandlers => { value | $0 }
+        completionQueue >>> {
+            self.successHandlers => { value | $0 }
+        }
     }
     
     /// Call this when the promise has an error
     public func error(with value: E) {
-        errorHandlers => { value | $0 }
+        completionQueue >>> {
+            self.errorHandlers => { value | $0 }
+        }
     }
     
 }

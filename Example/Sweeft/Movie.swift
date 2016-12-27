@@ -49,7 +49,7 @@ extension Movie: Deserializable {
 
 extension Movie {
     
-    func getSimilar(using api: MoviesAPI) -> Promise<[Movie], NoError> {
+    func getSimilar(using api: MoviesAPI) -> Promise<[Movie], APIError> {
         return Movie.getAll(using: api, at: .similar, arguments: ["id": id], for: "results")
     }
     
