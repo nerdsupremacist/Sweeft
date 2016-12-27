@@ -40,7 +40,7 @@ public extension API {
 
 public extension API {
     
-    public func doDataRequest(with method: HTTPMethod,
+    public func doDataRequest(with method: HTTPMethod = .get,
                        to endpoint: Endpoint,
                        arguments: [String:CustomStringConvertible] = [:],
                        headers: [String:CustomStringConvertible] = [:],
@@ -84,7 +84,7 @@ public extension API {
         return promise
     }
     
-    public func doJSONRequest(with method: HTTPMethod,
+    public func doJSONRequest(with method: HTTPMethod = .get,
                        to endpoint: Endpoint,
                        arguments: [String:CustomStringConvertible] = [:],
                        headers: [String:CustomStringConvertible] = [:],
@@ -106,7 +106,7 @@ public extension API {
         return promise
     }
     
-    public func doObjectRequest<T: Deserializable>(with method: HTTPMethod,
+    public func doObjectRequest<T: Deserializable>(with method: HTTPMethod = .get,
                          to endpoint: Endpoint,
                          arguments: [String:CustomStringConvertible] = [:],
                          headers: [String:CustomStringConvertible] = [:],
@@ -130,7 +130,7 @@ public extension API {
         return promise
     }
     
-    public func doObjectRequest<T: Deserializable>(with method: HTTPMethod,
+    public func doObjectRequest<T: Deserializable>(with method: HTTPMethod = .get,
                          to endpoint: Endpoint,
                          arguments: [String:CustomStringConvertible] = [:],
                          headers: [String:CustomStringConvertible] = [:],
@@ -144,7 +144,7 @@ public extension API {
     }
     
     
-    public func doObjectsRequest<T: Deserializable>(with method: HTTPMethod,
+    public func doObjectsRequest<T: Deserializable>(with method: HTTPMethod = .get,
                           to endpoint: Endpoint,
                           arguments: [String:CustomStringConvertible] = [:],
                           headers: [String:CustomStringConvertible] = [:],
