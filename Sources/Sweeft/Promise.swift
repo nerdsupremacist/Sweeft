@@ -30,7 +30,7 @@ public class Promise<T, E: Error> {
      
      - Parameter handler: function that should be called
      
-     - Returns: argOne
+     - Returns: PromiseHandler Object
      */
     @discardableResult public func onSuccess<O>(call handler: @escaping (T) -> (O)) -> PromiseSuccessHandler<O, T, E> {
         return PromiseSuccessHandler<O, T, E>(promise: self, handler: handler)
