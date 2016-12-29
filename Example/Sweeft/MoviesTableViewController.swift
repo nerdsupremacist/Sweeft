@@ -24,9 +24,7 @@ class MoviesTableViewController: UITableViewController {
     override func viewDidLoad() {
         let api = MoviesAPI.shared
         Movie.getAll(using: api, at: .nowPlaying, for: "results").onSuccess { movies in
-            self.movies = movies.sorted {
-                return $0.vote >= $1.vote
-            }
+            self.movies = movies
             movies >>> **self.tableView.reloadData
         }
         .onError { error in
@@ -48,6 +46,12 @@ class MoviesTableViewController: UITableViewController {
             cell.movie = movies | indexPath.row
         }
         return cell
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let mvc = segue.destination as? DetailMovieTableViewController {
+            mvc.movie = movies | (tableView.indexPathForSelectedRow?.row).?
+        }
     }
     
 }
