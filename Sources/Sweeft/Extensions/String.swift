@@ -42,11 +42,6 @@ public extension String {
         return URL(string: urlEncoded)
     }
     
-    /// Data resulting by encoding using utf8
-    var data: Data? {
-        return data(using: .utf8)
-    }
-    
     /**
      Will try to decipher the Date coded into a string
      
@@ -83,6 +78,22 @@ extension String: Defaultable {
 
     /// Default Value
     public static let defaultValue = ""
+    
+}
+
+extension String: DataRepresentable {
+    
+    public init?(data: Data) {
+        guard let string = data.string else {
+            return nil
+        }
+        self = string
+    }
+    
+    /// Data resulting by encoding using utf8
+    public var data: Data? {
+        return data(using: .utf8)
+    }
     
 }
 

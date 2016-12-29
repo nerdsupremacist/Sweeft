@@ -25,3 +25,19 @@ extension Data: Defaultable {
     }
     
 }
+
+extension Data: DataRepresentable {
+    
+    public init?(data: Data) {
+        self = data
+    }
+    
+}
+
+extension Data: DataSerializable {
+    
+    public var data: Data? {
+        return self
+    }
+    
+}

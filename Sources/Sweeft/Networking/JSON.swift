@@ -118,11 +118,6 @@ extension JSON {
         }
     }
     
-    public var data: Data? {
-        let object = self.object
-        return try? JSONSerialization.data(withJSONObject: object, options: .prettyPrinted)
-    }
-    
 }
 
 extension JSON {
@@ -182,7 +177,7 @@ extension JSON {
         return nil
     }
     
-    public init?(data: Data, options: JSONSerialization.ReadingOptions = .allowFragments) {
+    public init?(data: Data, options: JSONSerialization.ReadingOptions) {
         guard let data = try? JSONSerialization.jsonObject(with: data, options: options) else {
             return nil
         }
@@ -190,6 +185,24 @@ extension JSON {
     }
     
 }
+
+extension JSON: DataRepresentable {
+    
+    public init?(data: Data) {
+        self.init(data: data, options: .allowFragments)
+    }
+    
+}
+
+extension JSON: DataSerializable {
+    
+    public var data: Data? {
+        let object = self.object
+        return try? JSONSerialization.data(withJSONObject: object, options: .prettyPrinted)
+    }
+    
+}
+
 extension JSON: Serializable {
     
     public var json: JSON {
