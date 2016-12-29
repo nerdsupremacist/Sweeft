@@ -74,12 +74,12 @@ public extension Int {
     
     /// Will return a reversed version of the integer
     var reversed: Int {
-        return self | { $0.description.reversed } | Int.init.?
+        return self | { $0.description.reversed } >>> Int.init.?
     }
     
     /// Loop n times
     func times<V>(do handler: @escaping () -> (V)) {
-        range?.forEach(**handler**)
+        range => **handler**
     }
     
     /// Loop n times
