@@ -70,7 +70,7 @@ infix operator =>: AdditionPrecedence
  
  - Returns: result of mapping the array with the function
  */
-public func =><C: Collection, V>(_ items: C?, _ handler: (C.Iterator.Element) -> (V)) -> [V] {
+@discardableResult public func =><C: Collection, V>(_ items: C?, _ handler: (C.Iterator.Element) -> (V)) -> [V] {
     return (items?.map(handler)).?
 }
 
@@ -82,7 +82,7 @@ public func =><C: Collection, V>(_ items: C?, _ handler: (C.Iterator.Element) ->
  
  - Returns: result of mapping the array with the function
  */
-public func =><T, V>(_ items: [T]?, _ handler: (T, Int) -> (V)) -> [V] {
+@discardableResult public func =><T, V>(_ items: [T]?, _ handler: (T, Int) -> (V)) -> [V] {
     return (items?.map(handler)).?
 }
 
@@ -108,39 +108,6 @@ public func =><V>(_ number: Int?, _ handler: @escaping () -> (V)) {
 public func =><V>(_ number: Int?, _ handler: @escaping (Int) -> (V)) {
     number?.times(do: handler)
 }
-
-/**
- For each. Will call the handler with every element in the array
- 
- - Parameter items: array
- - Parameter handler: mapping function
- 
- */
-public func =><C: Collection>(_ items: C?, _ handler: (C.Iterator.Element) -> ()) {
-    items?.forEach(handler)
-}
-
-/**
- For each with index. Will call the handler with every element in the array
- 
- - Parameter items: array
- - Parameter handler: mapping function
- 
- */
-public func =><T>(_ items: [T]?, _ handler: (T, Int) -> ()) {
-    items?.forEach(handler)
-}
-
-/**
- Empty for each
- 
- - Parameter items: array
- - Parameter handler: call that should be called
- 
- */
-//public func =><C: Collection>(_ items: C?, _ handler: @escaping () -> ()) {
-//    items?.forEach(**handler)
-//}
 
 infix operator ==>: AdditionPrecedence
 

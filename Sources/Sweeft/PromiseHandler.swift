@@ -48,8 +48,7 @@ public extension PromiseSuccessHandler where R: PromiseBody {
     public var resultingPromise: Promise<R.Result, R.ErrorType> {
         let promise = Promise<R.Result, R.ErrorType>()
         then { (p) in
-            p.onSuccess(call: promise.success)
-            p.onError(call: promise.error)
+            p.onSuccess(call: promise.success).onError(call: promise.error)
         }
         return promise
     }

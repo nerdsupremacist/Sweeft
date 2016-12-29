@@ -23,7 +23,7 @@ public struct Binding<T: Observable, O> {
 
 extension Binding {
     
-    init<C: ObservableContainer where C.ObservableItem == T>(container: C, mapping: @escaping (T) -> (O)) {
+    init<C: ObservableContainer>(container: C, mapping: @escaping (T) -> (O)) where C.ObservableItem == T {
         self.init(value: container.observable, mapping: mapping)
     }
     
@@ -56,11 +56,11 @@ public func >>><C: ObservableContainer>(_ value: C?, _ handler: @escaping (C.Obs
     value ** id >>> handler
 }
 
-public func >>><C: Collection where C.Iterator.Element: Observable>(_ items: C, _ handler: @escaping (C.Iterator.Element) -> ()) {
+public func >>><C: Collection>(_ items: C, _ handler: @escaping (C.Iterator.Element) -> ()) where C.Iterator.Element: Observable {
     items => { $0 >>> handler }
 }
 
-public func >>><C: Collection where C.Iterator.Element: ObservableContainer>(_ items: C, _ handler: @escaping (C.Iterator.Element.ObservableItem) -> ()) {
+public func >>><C: Collection>(_ items: C, _ handler: @escaping (C.Iterator.Element.ObservableItem) -> ()) where C.Iterator.Element: ObservableContainer {
     items => { $0 >>> handler }
 }
 

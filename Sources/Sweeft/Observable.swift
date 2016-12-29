@@ -22,7 +22,7 @@ public extension Observable {
     typealias ListeningHandler = (Self) -> ()
     typealias Listener = (handler: ListeningHandler, queue: DispatchQueue)
     
-    public mutating func onChange(do handler: @escaping (Self) -> (), completionQueue: DispatchQueue = .main) {
+    public mutating func onChange(in completionQueue: DispatchQueue = .main, do handler: @escaping (Self) -> ()) {
         // Add listener somehow
         listeners.append((handler, completionQueue))
     }

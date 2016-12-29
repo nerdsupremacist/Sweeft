@@ -74,7 +74,7 @@ public extension Int {
     
     /// Will return a reversed version of the integer
     var reversed: Int {
-        return self | { $0.description.reversed } >>> Int.init.?
+        return self | { Int($0.description.reversed).? }
     }
     
     /// Loop n times

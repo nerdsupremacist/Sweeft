@@ -15,7 +15,7 @@ import Foundation
  
  - Returns: array without optionals
  */
-public prefix func !<T, C: Collection where C.Iterator.Element == T?>(_ items: C?) -> [T] {
+public prefix func !<T, C: Collection>(_ items: C?) -> [T] where C.Iterator.Element == T? {
     return items ==> id
 }
 
@@ -195,7 +195,7 @@ public func |<T>(_ items: [T]?, _ index: Int) -> T? {
  
  - Returns: Value at index
  */
-public func |<T, C: Collection where C.Iterator.Element == Int>(_ items: [T]?, _ indexes: C?) -> [T] {
+public func |<T, C: Collection>(_ items: [T]?, _ indexes: C?) -> [T] where C.Iterator.Element == Int {
     return !(indexes => { items | $0 })
 }
 
@@ -207,7 +207,7 @@ public func |<T, C: Collection where C.Iterator.Element == Int>(_ items: [T]?, _
  
  - Returns: Value at index
  */
-public func ||<T, C: Collection where C.Iterator.Element == Int>(_ items: [T]?, _ indexes: C?) -> [T] {
+public func ||<T, C: Collection>(_ items: [T]?, _ indexes: C?) -> [T] where C.Iterator.Element == Int {
     return (items?.withIndex >>= flipArguments) || indexes
 }
 
@@ -353,7 +353,7 @@ public prefix func <>(_ number: Int) -> Int {
  
  - Returns: Intersection of the 2 collections
  */
-public func -<C: Collection where C.Iterator.Element: Hashable>(_ a: C?, _ b: C?) -> Set<C.Iterator.Element> {
+public func -<C: Collection>(_ a: C?, _ b: C?) -> Set<C.Iterator.Element> where C.Iterator.Element: Hashable {
     return (b?.set | a?.set.subtracting).?
 }
 
@@ -365,7 +365,7 @@ public func -<C: Collection where C.Iterator.Element: Hashable>(_ a: C?, _ b: C?
  
  - Returns: Intersection of the 2 collections
  */
-public func &&<C: Collection where C.Iterator.Element: Hashable>(_ a: C?, _ b: C?) -> Set<C.Iterator.Element> {
+public func &&<C: Collection>(_ a: C?, _ b: C?) -> Set<C.Iterator.Element> where C.Iterator.Element: Hashable {
     return (b?.set | a?.set.intersection).?
 }
 
@@ -377,6 +377,6 @@ public func &&<C: Collection where C.Iterator.Element: Hashable>(_ a: C?, _ b: C
  
  - Returns: Union of the 2 collections
  */
-public func ||<C: Collection where C.Iterator.Element: Hashable>(_ a: C?, _ b: C?) -> Set<C.Iterator.Element> {
+public func ||<C: Collection>(_ a: C?, _ b: C?) -> Set<C.Iterator.Element> where C.Iterator.Element: Hashable {
     return (b?.set | a?.set.union).?
 }
