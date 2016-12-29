@@ -11,7 +11,7 @@ import Foundation
 public extension URL {
     
     func appendingQuery(key: String, value: String) -> URL {
-        var string = self.absoluteString + (??query ? "&" : "?") + "\(key)=\(value)"
+        let string = self.absoluteString + (??query ? "&" : "?") + "\(key)=\(value)"
         return URL(string: string)!
     }
     
