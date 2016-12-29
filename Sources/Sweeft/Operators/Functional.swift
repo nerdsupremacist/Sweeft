@@ -281,6 +281,20 @@ public func >>=<T, K, V>(_ items: [T], _ handler: @escaping (T, Int) -> (K, V)) 
     return items.dictionary(byDividingWith: handler)
 }
 
+/**
+ Bind with input
+ 
+ - Parameter handler: function that you want to call
+ - Parameter input: input that you want to give to your function
+ 
+ - Returns: function that when called will use input given
+ */
+public func **<V, T, O>(_ handler: @escaping (T) -> O, _ input: T) -> (V) -> O {
+    return **{
+        handler(input)
+    }
+}
+
 prefix operator **
 
 /**
