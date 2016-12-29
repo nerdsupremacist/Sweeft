@@ -7,8 +7,15 @@
 
 import Foundation
 
+public protocol PromiseBody {
+    associatedtype Result
+    associatedtype ErrorType: Error
+    func onSuccess<O>(call handler: @escaping (Result) -> (O)) -> PromiseSuccessHandler<O, Result, ErrorType>
+    func onError<O>(call handler: @escaping (ErrorType) -> (O)) -> PromiseErrorHandler<O, Result, ErrorType>
+}
+
 /// Promise Structs to prevent you from nesting callbacks over and over again
-public class Promise<T, E: Error> {
+public class Promise<T, E: Error>: PromiseBody {
     
     /// Type of the success
     typealias SuccessHandler = (T) -> ()
@@ -53,6 +60,24 @@ public class Promise<T, E: Error> {
         completionQueue >>> {
             self.errorHandlers => { value | $0 }
         }
+    }
+    
+    /// Will create a Promise that is based on this promise but maps the result
+    public func nested<V>(_ mapper: @escaping (T) -> V) -> Promise<V, E> {
+        let promise = Promise<V, E>(completionQueue: completionQueue)
+        onSuccess(call: mapper >>> promise.success)
+        onError(call: promise.error)
+        return promise
+    }
+    
+    /// Will create a Promise that is based on this promise but maps the result
+    public func nested<V>(_ mapper: @escaping (T, Promise<V, E>) -> ()) -> Promise<V, E> {
+        let promise = Promise<V, E>(completionQueue: completionQueue)
+        onSuccess {
+            mapper($0, promise)
+        }
+        onError(call: promise.error)
+        return promise
     }
     
 }
