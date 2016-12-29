@@ -8,6 +8,11 @@
 
 import Foundation
 
+public protocol ObservableContainer {
+    associatedtype ObservableItem: Observable
+    var observable: ObservableItem { get }
+}
+
 public protocol Observable {
     var listeners: [Listener] { get set }
 }
