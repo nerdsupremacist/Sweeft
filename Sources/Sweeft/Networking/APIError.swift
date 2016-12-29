@@ -12,7 +12,7 @@ public enum APIError: Error {
     case noData
     case timeout
     case invalidStatus(code: Int, data: Data?)
-    case invalidJSON
+    case invalidData
     case mappingError(json: JSON)
     case unknown(error: Error)
 }

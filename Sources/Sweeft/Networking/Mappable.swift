@@ -31,9 +31,10 @@ extension Deserializable {
                            at endpoint: T.Endpoint,
                            arguments: [String:CustomStringConvertible] = [:],
                            headers: [String:CustomStringConvertible] = [:],
-                           for path: String...) -> Promise<Self, APIError> {
+                           auth: Auth = NoAuth.standard,
+                           for path: String...) -> Response<Self> {
         
-        return api.doObjectRequest(with: method, to: endpoint, arguments: arguments, headers: headers, body: nil, at: path)
+        return api.doObjectRequest(with: method, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: nil, at: path)
     }
     
     public static func getAll<T: API>(using api: T,
@@ -41,10 +42,11 @@ extension Deserializable {
                               at endpoint: T.Endpoint,
                               arguments: [String:CustomStringConvertible] = [:],
                               headers: [String:CustomStringConvertible] = [:],
+                              auth: Auth = NoAuth.standard,
                               for path: String...,
-                              using internalPath: [String] = []) -> Promise<[Self], APIError> {
+                              using internalPath: [String] = []) -> Response<[Self]> {
         
-        return api.doObjectsRequest(with: method, to: endpoint, arguments: arguments, headers: headers, body: nil, at: path)
+        return api.doObjectsRequest(with: method, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: nil, at: path)
     }
     
 }
@@ -59,25 +61,28 @@ extension Serializable {
                             method: HTTPMethod,
                             at endpoint: T.Endpoint,
                             arguments: [String:CustomStringConvertible] = [:],
-                            headers: [String:CustomStringConvertible] = [:]) -> Promise<JSON, APIError> {
+                            headers: [String:CustomStringConvertible] = [:],
+                            auth: Auth = NoAuth.standard) -> Response<JSON> {
         
-        return api.doJSONRequest(with: method, to: endpoint, arguments: arguments, headers: headers, body: json)
+        return api.doJSONRequest(with: method, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: json)
     }
     
     public func put<T: API>(using api: T,
                             at endpoint: T.Endpoint,
                             arguments: [String:CustomStringConvertible] = [:],
-                            headers: [String:CustomStringConvertible] = [:]) -> Promise<JSON, APIError> {
+                            headers: [String:CustomStringConvertible] = [:],
+                            auth: Auth = NoAuth.standard) -> Response<JSON> {
         
-        return send(using: api, method: .put, at: endpoint, arguments: arguments, headers: headers)
+        return send(using: api, method: .put, at: endpoint, arguments: arguments, headers: headers, auth: auth)
     }
     
     public func post<T: API>(using api: T,
                     at endpoint: T.Endpoint,
                     arguments: [String:CustomStringConvertible] = [:],
-                    headers: [String:CustomStringConvertible] = [:]) -> Promise<JSON, APIError> {
+                    headers: [String:CustomStringConvertible] = [:],
+                    auth: Auth = NoAuth.standard) -> Response<JSON> {
         
-        return send(using: api, method: .post, at: endpoint, arguments: arguments, headers: headers)
+        return send(using: api, method: .post, at: endpoint, arguments: arguments, headers: headers, auth: auth)
     }
     
 }

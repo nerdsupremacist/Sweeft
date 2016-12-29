@@ -8,6 +8,8 @@
 
 import Foundation
 
+public typealias Response<T> = Promise<T, APIError>
+
 public enum HTTPMethod: String {
     case get = "GET"
     case put = "PUT"
@@ -44,9 +46,10 @@ public extension API {
                        to endpoint: Endpoint,
                        arguments: [String:CustomStringConvertible] = [:],
                        headers: [String:CustomStringConvertible] = [:],
+                       auth: Auth = NoAuth.standard,
                        body: Data? = nil,
                        acceptableStatusCodes: [Int] = [200],
-                       completionQueue: DispatchQueue = .main) -> Promise<Data, APIError> {
+                       completionQueue: DispatchQueue = .main) -> Response<Data> {
         
         let promise = Promise<Data, APIError>(completionQueue: completionQueue)
         
@@ -62,10 +65,20 @@ public extension API {
         request.httpMethod = method.rawValue
         request.httpBody = body
         
+        (baseHeaders + headers >>= { ($0, $1.description) }) => {
+            request.addValue($1, forHTTPHeaderField: $0)
+        }
+        
+        auth.apply(to: &request)
+        
         let session = URLSession.shared
         let task = session.dataTask(with: request) { (data, response, error) in
             if let error = error {
-                promise.error(with: .unknown(error: error))
+                if let error = error as? URLError, error.code == .timedOut {
+                    promise.error(with: .timeout)
+                } else {
+                    promise.error(with: .unknown(error: error))
+                }
                 return
             }
             let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 200
@@ -75,7 +88,7 @@ public extension API {
             }
             if let data = data {
                 promise.success(with: data)
-            } else if let error = error {
+            } else {
                 promise.error(with: .noData)
             }
         }
@@ -84,63 +97,72 @@ public extension API {
         return promise
     }
     
+    public func doRepresentedRequest<T: DataRepresentable>(with method: HTTPMethod = .get,
+                                     to endpoint: Endpoint,
+                                     arguments: [String:CustomStringConvertible] = [:],
+                                     headers: [String:CustomStringConvertible] = [:],
+                                     auth: Auth = NoAuth.standard,
+                                     body: DataSerializable? = nil,
+                                     acceptableStatusCodes: [Int] = [200],
+                                     completionQueue: DispatchQueue = .main) -> Response<T> {
+        
+        
+        return doDataRequest(with: method, to: endpoint, arguments: arguments,
+                      headers: headers, auth: auth, body: body?.data, acceptableStatusCodes: acceptableStatusCodes)
+                .nested { data, promise in
+                    guard let underlyingData = T(data: data) else {
+                        promise.error(with: .invalidData)
+                        return
+                    }
+                    promise.success(with: underlyingData)
+                }
+    }
+    
     public func doJSONRequest(with method: HTTPMethod = .get,
                        to endpoint: Endpoint,
                        arguments: [String:CustomStringConvertible] = [:],
                        headers: [String:CustomStringConvertible] = [:],
+                       auth: Auth = NoAuth.standard,
                        body: JSON? = nil,
                        acceptableStatusCodes: [Int] = [200],
-                       completionQueue: DispatchQueue = .main) -> Promise<JSON, APIError> {
+                       completionQueue: DispatchQueue = .main) -> Response<JSON> {
         
-        let promise = Promise<JSON, APIError>(completionQueue: completionQueue)
-        doDataRequest(with: method, to: endpoint, arguments: arguments,
-                      headers: headers, body: body?.data, acceptableStatusCodes: acceptableStatusCodes)
-            .onSuccess { data in
-                guard let json = JSON(data: data) else {
-                    promise.error(with: .invalidJSON)
-                    return
-                }
-                promise.success(with: json)
-            }
-            .onError(call: promise.error)
-        return promise
+        return doRepresentedRequest(with: method, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
     }
     
     public func doObjectRequest<T: Deserializable>(with method: HTTPMethod = .get,
                          to endpoint: Endpoint,
                          arguments: [String:CustomStringConvertible] = [:],
                          headers: [String:CustomStringConvertible] = [:],
+                         auth: Auth = NoAuth.standard,
                          body: JSON? = nil,
                          acceptableStatusCodes: [Int] = [200],
                          completionQueue: DispatchQueue = .main,
-                         at path: [String] = []) -> Promise<T, APIError> {
+                         at path: [String] = []) -> Response<T> {
         
-        let promise = Promise<T, APIError>(completionQueue: completionQueue)
-        doJSONRequest(with: method, to: endpoint, arguments: arguments,
-                      headers: headers, body: body, acceptableStatusCodes: acceptableStatusCodes)
-            .onSuccess { json in
+        return doJSONRequest(with: method, to: endpoint, arguments: arguments,
+                      headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes)
+            .nested { json, promise in
                 guard let item: T = json.get(in: path) else {
                     promise.error(with: .mappingError(json: json))
                     return
                 }
                 promise.success(with: item)
             }
-            .onError(call: promise.error)
-        
-        return promise
     }
     
     public func doObjectRequest<T: Deserializable>(with method: HTTPMethod = .get,
                          to endpoint: Endpoint,
                          arguments: [String:CustomStringConvertible] = [:],
                          headers: [String:CustomStringConvertible] = [:],
+                         auth: Auth = NoAuth.standard,
                          body: JSON? = nil,
                          acceptableStatusCodes: [Int] = [200],
                          completionQueue: DispatchQueue = .main,
-                         at path: String...) -> Promise<T, APIError> {
+                         at path: String...) -> Response<T> {
         
         return doObjectRequest(with: method, to: endpoint, arguments: arguments,
-                               headers: headers, body: body, acceptableStatusCodes: acceptableStatusCodes, at: path)
+                               headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, at: path)
     }
     
     
@@ -148,27 +170,99 @@ public extension API {
                           to endpoint: Endpoint,
                           arguments: [String:CustomStringConvertible] = [:],
                           headers: [String:CustomStringConvertible] = [:],
+                          auth: Auth = NoAuth.standard,
                           body: JSON? = nil,
                           acceptableStatusCodes: [Int] = [200],
                           completionQueue: DispatchQueue = .main,
                           at path: [String] = [],
-                          with internalPath: [String] = []) -> Promise<[T], APIError> {
+                          with internalPath: [String] = []) -> Response<[T]> {
         
         
-        let promise = Promise<[T], APIError>(completionQueue: completionQueue)
-        doJSONRequest(with: method, to: endpoint, arguments: arguments,
-                      headers: headers, body: body, acceptableStatusCodes: acceptableStatusCodes)
-            .onSuccess { json in
+        return doJSONRequest(with: method, to: endpoint, arguments: arguments,
+                      headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes)
+            .nested { json, promise in
                 guard let items: [T] = json.getAll(in: path, for: internalPath) else {
                     promise.error(with: .mappingError(json: json))
                     return
                 }
                 promise.success(with: items)
             }
-            .onError(call: promise.error)
+    }
+    
+    public func doBulkObjectRequest<T: Deserializable>(with method: HTTPMethod = .get,
+                                    to endpoints: [Endpoint],
+                                    arguments: [[String:CustomStringConvertible]],
+                                    headers: [String:CustomStringConvertible] = [:],
+                                    auth: Auth = NoAuth.standard,
+                                    bodies: [JSON?] = [],
+                                    acceptableStatusCodes: [Int] = [200],
+                                    completionQueue: DispatchQueue = .main,
+                                    at path: [String] = []) -> Response<[T]> {
         
-        return promise
+        return BulkPromise(promises: endpoints => { endpoint, index in
+            let arguments = arguments | index
+            let body = bodies | index ?? nil
+            return self.doObjectRequest(with: method, to: endpoint, arguments: arguments.?, headers: headers, auth: auth, body: body,
+                                        acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue, at: path)
+        }, completionQueue: completionQueue)
+    }
+
+    public func doBulkObjectRequest<T: Deserializable>(with method: HTTPMethod = .get,
+                              to endpoint: Endpoint,
+                              arguments: [[String:CustomStringConvertible]],
+                              headers: [String:CustomStringConvertible] = [:],
+                              auth: Auth = NoAuth.standard,
+                              bodies: [JSON?] = [],
+                              acceptableStatusCodes: [Int] = [200],
+                              completionQueue: DispatchQueue = .main,
+                              at path: [String] = []) -> Response<[T]> {
         
+        let endpoints = arguments.count.range => **{ endpoint }
+        return doBulkObjectRequest(with: method, to: endpoints, arguments: arguments, headers: headers, auth: auth, bodies: bodies, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue, at: path)
+    }
+    
+    public func get(_ endpoint: Endpoint,
+                    arguments: [String:CustomStringConvertible] = [:],
+                    headers: [String:CustomStringConvertible] = [:],
+                    auth: Auth = NoAuth.standard,
+                    body: JSON? = nil,
+                    acceptableStatusCodes: [Int] = [200],
+                    completionQueue: DispatchQueue = .main) -> Response<JSON> {
+        
+        return doJSONRequest(with: .get, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
+    }
+    
+    public func delete(_ endpoint: Endpoint,
+                    arguments: [String:CustomStringConvertible] = [:],
+                    headers: [String:CustomStringConvertible] = [:],
+                    auth: Auth = NoAuth.standard,
+                    body: JSON? = nil,
+                    acceptableStatusCodes: [Int] = [200],
+                    completionQueue: DispatchQueue = .main) -> Response<JSON> {
+        
+        return doJSONRequest(with: .delete, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
+    }
+    
+    public func post(_ body: JSON? = nil,
+                     to endpoint: Endpoint,
+                     arguments: [String:CustomStringConvertible] = [:],
+                     headers: [String:CustomStringConvertible] = [:],
+                     auth: Auth = NoAuth.standard,
+                     acceptableStatusCodes: [Int] = [200],
+                     completionQueue: DispatchQueue = .main) -> Response<JSON> {
+        
+        return doJSONRequest(with: .post, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
+    }
+    
+    public func put(_ body: JSON? = nil,
+                     at endpoint: Endpoint,
+                     arguments: [String:CustomStringConvertible] = [:],
+                     headers: [String:CustomStringConvertible] = [:],
+                     auth: Auth = NoAuth.standard,
+                     acceptableStatusCodes: [Int] = [200],
+                     completionQueue: DispatchQueue = .main) -> Response<JSON> {
+        
+        return doJSONRequest(with: .put, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
     }
     
 }
