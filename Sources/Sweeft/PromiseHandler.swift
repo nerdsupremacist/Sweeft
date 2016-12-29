@@ -43,6 +43,19 @@ public struct PromiseSuccessHandler<R, T, E: Error> {
     
 }
 
+public extension PromiseSuccessHandler where R: PromiseBody {
+    
+    public var resultingPromise: Promise<R.Result, R.ErrorType> {
+        let promise = Promise<R.Result, R.ErrorType>()
+        then { (p) in
+            p.onSuccess(call: promise.success)
+            p.onError(call: promise.error)
+        }
+        return promise
+    }
+    
+}
+
 /// Structure that allows us to nest callbacks more nicely
 public struct PromiseErrorHandler<R, T, E: Error> {
     
