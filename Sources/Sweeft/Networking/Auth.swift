@@ -23,8 +23,15 @@ public struct NoAuth: Auth {
 }
 
 public struct BasicAuth {
+    
     let username: String
     let password: String
+    
+    public init(username: String, password: String) {
+        self.username = username
+        self.password = password
+    }
+    
 }
 
 extension BasicAuth: Auth {
@@ -32,7 +39,7 @@ extension BasicAuth: Auth {
     public func apply(to request: inout URLRequest) {
         let string = ("\(username):\(password)".base64Encoded).?
         let auth = "Basic \(string)"
-        request.addValue("Authorization", forHTTPHeaderField: auth)
+        request.addValue(auth, forHTTPHeaderField: "Authorization")
     }
     
 }
