@@ -189,9 +189,31 @@ public extension API {
             }
     }
     
+    public func doFlatBulkObjectRequest<T: Deserializable>(with method: HTTPMethod = .get,
+                                    to endpoints: [Endpoint],
+                                    arguments: [[String:CustomStringConvertible]] = [],
+                                    headers: [String:CustomStringConvertible] = [:],
+                                    auth: Auth = NoAuth.standard,
+                                    bodies: [JSON?] = [],
+                                    acceptableStatusCodes: [Int] = [200],
+                                    completionQueue: DispatchQueue = .main,
+                                    at path: [String] = [],
+                                    with internalPath: [String] = []) -> Response<[T]> {
+        
+        return BulkPromise<[T], APIError>(promises: endpoints => { endpoint, index in
+            let arguments = arguments | index
+            let body = bodies | index ?? nil
+            return self.doObjectsRequest(with: method, to: endpoint, arguments: arguments.?,
+                                         headers: headers, auth: auth, body: body,
+                                         acceptableStatusCodes: acceptableStatusCodes,
+                                         completionQueue: completionQueue, at: path, with: internalPath)
+            
+        }, completionQueue: completionQueue).flattened
+    }
+    
     public func doBulkObjectRequest<T: Deserializable>(with method: HTTPMethod = .get,
                                     to endpoints: [Endpoint],
-                                    arguments: [[String:CustomStringConvertible]],
+                                    arguments: [[String:CustomStringConvertible]] = [],
                                     headers: [String:CustomStringConvertible] = [:],
                                     auth: Auth = NoAuth.standard,
                                     bodies: [JSON?] = [],
@@ -202,20 +224,23 @@ public extension API {
         return BulkPromise(promises: endpoints => { endpoint, index in
             let arguments = arguments | index
             let body = bodies | index ?? nil
-            return self.doObjectRequest(with: method, to: endpoint, arguments: arguments.?, headers: headers, auth: auth, body: body,
-                                        acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue, at: path)
+            return self.doObjectRequest(with: method, to: endpoint, arguments: arguments.?,
+                                        headers: headers, auth: auth, body: body,
+                                        acceptableStatusCodes: acceptableStatusCodes,
+                                        completionQueue: completionQueue, at: path)
+            
         }, completionQueue: completionQueue)
     }
 
     public func doBulkObjectRequest<T: Deserializable>(with method: HTTPMethod = .get,
                               to endpoint: Endpoint,
-                              arguments: [[String:CustomStringConvertible]],
+                              arguments: [[String:CustomStringConvertible]] = [],
                               headers: [String:CustomStringConvertible] = [:],
                               auth: Auth = NoAuth.standard,
                               bodies: [JSON?] = [],
                               acceptableStatusCodes: [Int] = [200],
                               completionQueue: DispatchQueue = .main,
-                              at path: [String] = []) -> Response<[T]> {
+                              at path: String...) -> Response<[T]> {
         
         let endpoints = arguments.count.range => **{ endpoint }
         return doBulkObjectRequest(with: method, to: endpoints, arguments: arguments, headers: headers, auth: auth, bodies: bodies, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue, at: path)
