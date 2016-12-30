@@ -262,6 +262,18 @@ public func **<V, T, O>(_ handler: @escaping (T) -> O, _ input: T) -> (V) -> O {
     }
 }
 
+/**
+ Bind with input for later
+ 
+ - Parameter handler: function that when given to the value will return the function to be handed the input to
+ - Parameter input: input that you want to give to your function
+ 
+ - Returns: function that when called with the value will apply the function with the input
+ */
+public func **<V, T, O>(_ handler: @escaping (V) -> ((T) -> O), _ input: T) -> (V) -> O {
+    return { handler($0)(input) }
+}
+
 prefix operator **
 
 /**
