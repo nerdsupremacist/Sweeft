@@ -36,16 +36,28 @@ final class Movie: Observable {
     
 }
 
+extension Movie: Hashable {
+    
+    var hashValue: Int {
+        return id
+    }
+    
+}
+
+func ==(_ lhs: Movie, _ rhs: Movie) -> Bool {
+    return lhs.id == rhs.id
+}
+
 extension Movie: Deserializable {
     
     convenience init?(from json: JSON) {
         guard let title = json["title"].string,
             let vote = json["vote_average"].double,
+            let overview = json["overview"].string,
             let id = json["id"].int else {
                 
                 return nil
         }
-        let overview = json["overview"].string ?? "No Description Available"
         self.init(title: title, vote: vote, id: id, overview: overview)
         json["poster_path"].string | fetchImage
     }
@@ -72,6 +84,13 @@ extension Movie {
     
     static func movies(with ids: [Int], using api: MoviesAPI = .shared) -> Response<[Movie]> {
         return api.doBulkObjectRequest(to: .movie, arguments: ids => { ["id": $0] })
+    }
+    
+    static func important(using api: MoviesAPI = .shared) -> Response<[Movie]> {
+        return api.doFlatBulkObjectRequest(to: [.nowPlaying, .upcoming, .popular],
+                                           at: ["results"])
+            .nested { $0 |> { $0.vote >= 5.0 } }
+            .nested { $0.noDuplicates }
     }
     
 }
