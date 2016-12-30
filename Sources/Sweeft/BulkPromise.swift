@@ -37,12 +37,9 @@ public class BulkPromise<T, O: Error>: Promise<[T], O> {
 extension BulkPromise where T: Collection {
     
     var flattened: Promise<[T.Iterator.Element], O> {
-        let promise = Promise<[T.Iterator.Element], O>()
-        self.onSuccess { result in
-            promise.success(with: result.flatMap(id))
+        return nested { result in
+            return result.flatMap(id)
         }
-        self.onError(call: promise.error)
-        return promise
     }
     
 }
