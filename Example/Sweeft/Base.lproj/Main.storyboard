@@ -49,7 +49,7 @@
             </objects>
             <point key="canvasLocation" x="1076" y="138.98050974512745"/>
         </scene>
-        <!--In Theatres-->
+        <!--Featured-->
         <scene sceneID="Gmg-eW-Wqv">
             <objects>
                 <tableViewController id="eu9-gR-Dqn" customClass="MoviesTableViewController" customModule="Sweeft_Example" customModuleProvider="target" sceneMemberID="viewController">
@@ -91,7 +91,7 @@
                             <outlet property="delegate" destination="eu9-gR-Dqn" id="WDv-jn-kav"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="In Theatres" id="Yvi-K1-hsU"/>
+                    <navigationItem key="navigationItem" title="Featured" id="Yvi-K1-hsU"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="I2B-PC-SI8" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -272,6 +272,6 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="rR0-5Z-GeX"/>
+        <segue reference="Eid-IZ-Heq"/>
     </inferredMetricsTieBreakers>
 </document>
