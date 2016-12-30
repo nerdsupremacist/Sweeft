@@ -7,6 +7,28 @@
 
 import Foundation
 
+public enum Weekday: Int {
+    case sunday, monday, tuesday, wednesday, thursday, friday, saturday
+}
+
+extension Weekday: Defaultable {
+    
+    /// Default Value
+    public static var defaultValue: Weekday = .sunday
+    
+}
+
+public enum Month: Int {
+    case january, february, march, april, may, june, july, august, september, october, november, december
+}
+
+extension Month: Defaultable {
+    
+    /// Default Value
+    public static var defaultValue: Month = .january
+    
+}
+
 public extension Date {
     
     /**
@@ -20,6 +42,52 @@ public extension Date {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = format
         return dateFormatter.string(from: self)
+    }
+    
+    private func getValue(for unit: Calendar.Component) -> Int {
+        let calendar = Calendar(identifier: .gregorian)
+        let value = calendar.dateComponents([unit], from: self).value(for: unit)
+        return value.?
+    }
+    
+    var nanosecond: Int {
+        return getValue(for: .nanosecond)
+    }
+    
+    var second: Int {
+        return getValue(for: .second)
+    }
+    
+    var minute: Int {
+        return getValue(for: .minute)
+    }
+    
+    var hour: Int {
+        return getValue(for: .hour)
+    }
+    
+    var day: Int {
+        return getValue(for: .day)
+    }
+    
+    var weekday: Weekday {
+        return Weekday.init(rawValue: getValue(for: .weekday) - 1).?
+    }
+    
+    var week: Int {
+        return getValue(for: .weekOfYear)
+    }
+    
+    var weekOfMonth: Int {
+        return getValue(for: .weekOfMonth)
+    }
+    
+    var month: Month {
+        return Month.init(rawValue: getValue(for: .month) - 1).?
+    }
+    
+    var year: Int {
+        return getValue(for: .year)
     }
     
 }
