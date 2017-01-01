@@ -62,21 +62,31 @@ public class Promise<T, E: Error>: PromiseBody {
         }
     }
     
+    /// Will nest a promise inside another one
+    public func nest<V>(to promise: Promise<V, E>, using mapper: @escaping (T) -> (V)) {
+        onSuccess(call: mapper >>> promise.success)
+        onError(call: promise.error)
+    }
+    
+    /// Will nest a promise inside another one
+    public func nest<V>(to promise: Promise<V, E>, using mapper: @escaping (T, Promise<V, E>) -> ()) {
+        onSuccess {
+            mapper($0, promise)
+        }
+        onError(call: promise.error)
+    }
+    
     /// Will create a Promise that is based on this promise but maps the result
     public func nested<V>(_ mapper: @escaping (T) -> V) -> Promise<V, E> {
         let promise = Promise<V, E>(completionQueue: completionQueue)
-        onSuccess(call: mapper >>> promise.success)
-        onError(call: promise.error)
+        nest(to: promise, using: mapper)
         return promise
     }
     
     /// Will create a Promise that is based on this promise but maps the result
     public func nested<V>(_ mapper: @escaping (T, Promise<V, E>) -> ()) -> Promise<V, E> {
         let promise = Promise<V, E>(completionQueue: completionQueue)
-        onSuccess {
-            mapper($0, promise)
-        }
-        onError(call: promise.error)
+        nest(to: promise, using: mapper)
         return promise
     }
     

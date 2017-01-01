@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// A promise that represent a collection of other promises and waits for them all to be finished
 public class BulkPromise<T, O: Error>: Promise<[T], O> {
     
     let promises: [Promise<T, O>]
@@ -24,11 +25,9 @@ public class BulkPromise<T, O: Error>: Promise<[T], O> {
         results = []
         super.init(completionQueue: completionQueue)
         self.promises => { promise, index in
-            promise
-                .onSuccess {
-                    self.results.append((index, $0))
-                }
-                .onError(call: self.error)
+            promise.nest(to: self) { result, _ in
+                self.results.append((index, result))
+            }
         }
     }
     
