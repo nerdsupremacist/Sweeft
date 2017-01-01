@@ -143,13 +143,12 @@ extension JSON {
         return get()
     }
     
-    public var date: Date? {
-        let description: String? = get()
-        return description?.date()
-    }
-    
     public var dict: [String:JSON]? {
         return get()
+    }
+    
+    public func date(using format: String = "dd.MM.yyyy hh:mm:ss a") -> Date? {
+        return string?.date(using: format)
     }
     
 }
