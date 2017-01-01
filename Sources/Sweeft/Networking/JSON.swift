@@ -19,7 +19,11 @@ public enum JSON {
     case null
     
     public subscript(key: String) -> JSON {
-        return dict?[key] ?? .null
+        return dict | key ?? .null
+    }
+    
+    public subscript(index: Int) -> JSON {
+        return array | index ?? .null
     }
     
 }
