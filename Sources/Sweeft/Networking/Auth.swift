@@ -8,12 +8,15 @@
 
 import Foundation
 
+/// Authentication protocol
 public protocol Auth {
     func apply(to request: inout URLRequest)
 }
 
+/// Object that doesn't do anything to authenticate the user
 public struct NoAuth: Auth {
     
+    /// Shared instance
     static let standard = NoAuth()
     
     public func apply(to request: inout URLRequest) {
@@ -22,10 +25,11 @@ public struct NoAuth: Auth {
     
 }
 
+/// Basic Http Auth
 public struct BasicAuth {
     
-    let username: String
-    let password: String
+    fileprivate let username: String
+    fileprivate let password: String
     
     public init(username: String, password: String) {
         self.username = username
@@ -36,6 +40,7 @@ public struct BasicAuth {
 
 extension BasicAuth: Auth {
     
+    /// Adds authorization header
     public func apply(to request: inout URLRequest) {
         let string = ("\(username):\(password)".base64Encoded).?
         let auth = "Basic \(string)"
