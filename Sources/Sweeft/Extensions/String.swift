@@ -84,10 +84,7 @@ extension String: Defaultable {
 extension String: DataRepresentable {
     
     public init?(data: Data) {
-        guard let string = data.string else {
-            return nil
-        }
-        self = string
+        self.init(data: data, encoding: .utf8)
     }
     
     /// Data resulting by encoding using utf8

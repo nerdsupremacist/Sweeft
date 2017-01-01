@@ -9,10 +9,20 @@
 import Foundation
 
 public extension Data {
+
+    /// Will get any structure representable as data using type inference
+    private func get<T: DataRepresentable>() -> T? {
+        return T(data: self)
+    }
     
     /// String using the utf8 encoding format
     var string: String? {
-        return String(data: self, encoding: .utf8)
+        return get()
+    }
+    
+    /// JSON object contained in the data
+    var json: JSON? {
+        return get()
     }
     
 }
