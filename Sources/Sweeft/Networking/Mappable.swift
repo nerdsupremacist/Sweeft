@@ -15,7 +15,7 @@ public protocol Deserializable {
 extension Deserializable {
     
     public static func initializer(for path: [String]) -> (JSON) -> Self? {
-        return { $0.get(in: path) }
+        return JSON.get ** path
     }
     
     public static func initializer(for path: String...) -> (JSON) -> Self? {
