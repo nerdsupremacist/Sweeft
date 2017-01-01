@@ -256,9 +256,9 @@ public func >>=<T, K, V>(_ items: [T], _ handler: @escaping (T, Int) -> (K, V)) 
  
  - Returns: function that when called will use input given
  */
-public func **<V, T, O>(_ handler: @escaping (T) -> O, _ input: T) -> (V) -> O {
-    return **{
-        handler(input)
+public func **<V, T, O>(_ handler: @escaping (T, V) -> O, _ input: T) -> (V) -> O {
+    return {
+        handler(input, $0)
     }
 }
 
