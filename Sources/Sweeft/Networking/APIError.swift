@@ -8,11 +8,12 @@
 
 import Foundation
 
+/// Errors that might happen in an API Call
 public enum APIError: Error {
-    case noData
-    case timeout
-    case invalidStatus(code: Int, data: Data?)
-    case invalidData
-    case mappingError(json: JSON)
-    case unknown(error: Error)
+    case noData /// There's no underlying data
+    case timeout /// Connection has timed out
+    case invalidStatus(code: Int, data: Data?) /// The http status code represents an unsuccesfull transaction
+    case invalidData(data: Data) /// The Data does not represent the expected information
+    case mappingError(json: JSON) /// Failed mapping the JSON Object to the respective Deserializable object
+    case unknown(error: Error) /// Another error ocurred
 }

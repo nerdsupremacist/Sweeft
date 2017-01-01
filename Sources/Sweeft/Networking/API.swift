@@ -111,7 +111,7 @@ public extension API {
                       headers: headers, auth: auth, body: body?.data, acceptableStatusCodes: acceptableStatusCodes)
                 .nested { data, promise in
                     guard let underlyingData = T(data: data) else {
-                        promise.error(with: .invalidData)
+                        promise.error(with: .invalidData(data: data))
                         return
                     }
                     promise.success(with: underlyingData)
