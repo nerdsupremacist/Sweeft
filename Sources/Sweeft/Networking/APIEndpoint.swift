@@ -8,7 +8,7 @@
 
 import Foundation
 
-/// Description for
+/// Description for an Endpoint in an API
 public protocol APIEndpoint {
     /// Raw value string for the key
     var rawValue: String { get }
