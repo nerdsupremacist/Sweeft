@@ -109,11 +109,18 @@ enum Demo {
         
         let dates = Date.array(ofSize: 5)
         
-        let seconds = dates.join { $0.string(using: "ss") }
+        let seconds = dates.join(by: Date.string ** "ss")
+        
+        let two = inc ** 1
+        
+        print(two())
+        
+        /// Print all the powers of two till 42
+        42 => (**) ** 2 >>> { print($0) }
         
         print(seconds)
         
-        let hours = dates ==> { $0.string(using: "HH") } >>> { Int($0) }
+        let hours = dates ==> (Date.string ** "HH") >>> { Int($0) }
         
         print(hours)
         
@@ -125,9 +132,7 @@ enum Demo {
         
         print(valueOfString)
         
-        42 => {
-            $0 + 1
-        } >>> {
+        42 => inc >>> {
             print("Looping for the \($0). time")
         }
         

@@ -12,11 +12,13 @@ import Sweeft
 extension UIImage: DataRepresentable { }
 
 struct MovieImageAPI: API {
+    
     typealias Endpoint = MovieImageEndpoint
     static var shared = MovieImageAPI()
-    static var baseURL = "https://image.tmdb.org/"
     
-    static func fetchImage(using api: MovieImageAPI = .shared, with path: String) -> Promise<UIImage, APIError> {
+    let baseURL = "https://image.tmdb.org/"
+    
+    static func fetchImage(using api: MovieImageAPI = .shared, with path: String) -> UIImage.Result {
         return api.doRepresentedRequest(to: .small, arguments: ["path": path])
     }
 }

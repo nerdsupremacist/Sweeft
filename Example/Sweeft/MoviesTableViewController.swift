@@ -15,15 +15,11 @@ class MoviesTableViewController: UITableViewController {
         static let cellIdentifier = "movie"
     }
     
-    var movies = [Movie]() {
-        didSet {
-            tableView.reloadData()
-        }
-    }
+    var movies = [Movie]()
     
     override func viewDidLoad() {
         let api = MoviesAPI.shared
-        Movie.important(using: api).onSuccess { movies in
+        Movie.featured(using: api).onSuccess { movies in
             self.movies = movies.sorted {
                 $0.vote >= $1.vote
             }

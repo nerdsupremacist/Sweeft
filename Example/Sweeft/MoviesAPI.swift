@@ -13,7 +13,8 @@ struct MoviesAPI: API {
     typealias Endpoint = MoviesEndpoint
     
     static var shared = MoviesAPI()
-    static var baseURL = "https://api.themoviedb.org/3"
+    
+    let baseURL: String
     
     let apiKey: String
     
@@ -23,12 +24,17 @@ struct MoviesAPI: API {
         ]
     }
     
+    init(version: Int = 3, apiKey: String) {
+        self.baseURL = "https://api.themoviedb.org/\(version)"
+        self.apiKey = apiKey
+    }
+    
 }
 
 extension MoviesAPI {
     
     init() {
-        self.apiKey = "18ec732ece653360e23d5835670c47a0"
+        self.init(apiKey: "18ec732ece653360e23d5835670c47a0")
     }
     
 }
