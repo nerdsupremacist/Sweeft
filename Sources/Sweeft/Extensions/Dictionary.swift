@@ -68,6 +68,7 @@ extension Dictionary: Defaultable {
 /// TODO: Find a way to inherit from this particular dict
 extension Dictionary where Key: CustomStringConvertible, Value: Serializable {
     
+    /// JSON Value
     public var json: JSON {
         return .dict(self >>= {
             return ($0.description, $1.json)

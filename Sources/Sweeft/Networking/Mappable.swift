@@ -9,11 +9,15 @@
 import Foundation
 
 public protocol Deserializable: DataRepresentable {
+
+    /// Initialize from json
     init?(from json: JSON)
+
 }
 
 public extension Deserializable {
     
+    /// Initialize from Data
     public init?(data: Data) {
         guard let json = JSON(data: data) else {
             return nil
@@ -25,10 +29,12 @@ public extension Deserializable {
 
 extension Deserializable {
     
+    /// Create an Initializer by using a path
     public static func initializer(for path: [String]) -> (JSON) -> Self? {
         return JSON.get ** path
     }
     
+    /// Create an Initializer by using a path
     public static func initializer(for path: String...) -> (JSON) -> Self? {
         return initializer(for: path)
     }

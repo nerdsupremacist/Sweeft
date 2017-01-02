@@ -15,7 +15,9 @@ public protocol DataRepresentable {
 
 public extension DataRepresentable {
     
+    /// Result of a Single Object
     public typealias Result = Response<Self>
+    /// Result of an Array of Objects
     public typealias Results = Response<[Self]>
     
 }

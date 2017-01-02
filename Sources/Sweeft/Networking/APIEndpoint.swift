@@ -23,6 +23,7 @@ extension APIEndpoint {
     
 }
 
+/// Generic easy to make API from an Endpoint Description
 public struct GenericAPI<E: APIEndpoint>: API {
     
     public typealias Endpoint = E

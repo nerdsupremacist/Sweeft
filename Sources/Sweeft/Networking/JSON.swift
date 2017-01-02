@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// JSON Object
 public enum JSON {
     
     case dict([String:JSON])
@@ -18,10 +19,12 @@ public enum JSON {
     case object(Serializable)
     case null
     
+    /// Access dictionary
     public subscript(key: String) -> JSON {
         return dict | key ?? .null
     }
     
+    /// Access array
     public subscript(index: Int) -> JSON {
         return array | index ?? .null
     }
@@ -30,6 +33,7 @@ public enum JSON {
 
 public extension JSON {
     
+    /// Internal Value stored
     var value: Any {
         switch self {
         case .dict(let value):
@@ -49,6 +53,7 @@ public extension JSON {
         }
     }
     
+    /// Get Casted Value
     func get<T>() -> T? {
         guard let item = value as? T else {
             return nil
@@ -56,6 +61,7 @@ public extension JSON {
         return item
     }
     
+    /// Get object inside JSON object by following a path
     public func get<T>(in path: [String], using mapper: (JSON) -> T?) -> T? {
         if let key = path.first {
             return self[key].get(in: path || [0], using: mapper)
@@ -63,14 +69,17 @@ public extension JSON {
         return mapper(self)
     }
     
+    /// Get Deserializable Object in Path
     public func get<T: Deserializable>(in path: [String]) -> T? {
         return get(in: path, using: T.init)
     }
     
+    /// Get Deserializable Object in Path
     public func get<T: Deserializable>(in path: String...) -> T? {
         return get(in: path)
     }
     
+    /// Get Array of objects in Path
     public func getAll<T>(in path: [String], using mapper: (JSON) -> T?) -> [T]? {
         if let key = path.first {
             return self[key].getAll(in: path || [0], using: mapper)
@@ -81,10 +90,12 @@ public extension JSON {
         return array ==> mapper
     }
     
+    /// Get Array of Deserializable Object in Path with internal Path inside array
     public func getAll<T: Deserializable>(in path: [String], for internalPath: [String] = []) -> [T]? {
         return getAll(in: path, using: T.initializer(for: internalPath))
     }
     
+    /// Get Array of Deserializable Object in Path
     public func getAll<T: Deserializable>(in path: String...) -> [T]? {
         return getAll(in: path)
     }
@@ -93,6 +104,7 @@ public extension JSON {
 
 extension JSON {
     
+    /// Serialize non-serialized objects to fully fledged JSON
     public var serialized: JSON {
         switch self {
         case .object(let value):
@@ -108,6 +120,7 @@ extension JSON {
         }
     }
     
+    /// Turn into Object for Data serialization
     public var object: Any {
         let json = self.serialized
         switch json {
@@ -126,31 +139,38 @@ extension JSON {
 
 extension JSON {
     
+    /// Get underlying String
     public var string: String? {
         let value: CustomStringConvertible? = get()
         return value?.description
     }
     
+    /// Get underlying Int
     public var int: Int? {
         return double | Int.init
     }
     
+    /// Get underlying Double
     public var double: Double? {
         return get()
     }
     
+    /// Get underlying Bool
     public var bool: Bool? {
         return get()
     }
     
+    /// Get underlying Array
     public var array: [JSON]? {
         return get()
     }
     
+    /// Get underlying Dictinary
     public var dict: [String:JSON]? {
         return get()
     }
     
+    /// Get underlying Date
     public func date(using format: String = "dd.MM.yyyy hh:mm:ss a") -> Date? {
         return string?.date(using: format)
     }
@@ -159,6 +179,7 @@ extension JSON {
 
 extension JSON {
     
+    /// Initialize from deserialized Swift JSON Dictionary or Array
     public init?(from value: Any) {
         if let dictionary = value as? [String:Any] {
             let dict = dictionary.dictionaryWithoutOptionals { ($0, JSON(from: $1)) }
@@ -180,6 +201,7 @@ extension JSON {
         return nil
     }
     
+    /// Initialize from Data and options
     public init?(data: Data, options: JSONSerialization.ReadingOptions) {
         guard let data = try? JSONSerialization.jsonObject(with: data, options: options) else {
             return nil
@@ -191,6 +213,7 @@ extension JSON {
 
 extension JSON: DataRepresentable {
     
+    /// Initialize from Data
     public init?(data: Data) {
         self.init(data: data, options: .allowFragments)
     }
@@ -199,6 +222,7 @@ extension JSON: DataRepresentable {
 
 extension JSON: DataSerializable {
     
+    /// Get data
     public var data: Data? {
         let object = self.object
         return try? JSONSerialization.data(withJSONObject: object, options: .prettyPrinted)
@@ -208,8 +232,9 @@ extension JSON: DataSerializable {
 
 extension JSON: Serializable {
     
+    /// Get JSON to send
     public var json: JSON {
-        return self
+        return serialized
     }
     
 }

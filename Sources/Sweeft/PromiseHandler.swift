@@ -45,6 +45,7 @@ public struct PromiseSuccessHandler<R, T, E: Error> {
 
 public extension PromiseSuccessHandler where R: PromiseBody {
     
+    /// Promise returned by the handler
     public var resultingPromise: Promise<R.Result, R.ErrorType> {
         let promise = Promise<R.Result, R.ErrorType>()
         then { (p) in
