@@ -19,7 +19,7 @@ public enum HTTPMethod: String {
 
 public protocol API {
     associatedtype Endpoint: APIEndpoint
-    static var baseURL: String { get }
+    var baseURL: String { get }
     var baseHeaders: [String:String] { get }
     var baseQueries: [String:String] { get }
 }
@@ -27,7 +27,7 @@ public protocol API {
 public extension API {
     
     var base: URL! {
-        return URL(string: Self.baseURL)
+        return URL(string: baseURL)
     }
     
     var baseHeaders: [String:String] {
