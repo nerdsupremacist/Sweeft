@@ -141,7 +141,7 @@ public extension Array {
      
      - Returns: Resulting array
      */
-    func moving(itemAt source: Int, to destination: Int) -> [Element] {
+    func moving(from source: Int, to destination: Int) -> [Element] {
         var copy = self
         copy.move(itemAt: source, to: destination)
         return copy
