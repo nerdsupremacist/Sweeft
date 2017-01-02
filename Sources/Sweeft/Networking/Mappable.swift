@@ -8,8 +8,19 @@
 
 import Foundation
 
-public protocol Deserializable {
+public protocol Deserializable: DataRepresentable {
     init?(from json: JSON)
+}
+
+public extension Deserializable {
+    
+    public init?(data: Data) {
+        guard let json = JSON(data: data) else {
+            return nil
+        }
+        self.init(from: json)
+    }
+    
 }
 
 extension Deserializable {
@@ -32,7 +43,7 @@ extension Deserializable {
                            arguments: [String:CustomStringConvertible] = [:],
                            headers: [String:CustomStringConvertible] = [:],
                            auth: Auth = NoAuth.standard,
-                           for path: String...) -> Response<Self> {
+                           for path: String...) -> Result {
         
         return api.doObjectRequest(with: method, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: nil, at: path)
     }
@@ -44,7 +55,7 @@ extension Deserializable {
                               headers: [String:CustomStringConvertible] = [:],
                               auth: Auth = NoAuth.standard,
                               for path: String...,
-                              using internalPath: [String] = []) -> Response<[Self]> {
+                              using internalPath: [String] = []) -> Results {
         
         return api.doObjectsRequest(with: method, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: nil, at: path)
     }
@@ -62,7 +73,7 @@ extension Serializable {
                             at endpoint: T.Endpoint,
                             arguments: [String:CustomStringConvertible] = [:],
                             headers: [String:CustomStringConvertible] = [:],
-                            auth: Auth = NoAuth.standard) -> Response<JSON> {
+                            auth: Auth = NoAuth.standard) -> JSON.Result {
         
         return api.doJSONRequest(with: method, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: json)
     }
@@ -71,7 +82,7 @@ extension Serializable {
                             at endpoint: T.Endpoint,
                             arguments: [String:CustomStringConvertible] = [:],
                             headers: [String:CustomStringConvertible] = [:],
-                            auth: Auth = NoAuth.standard) -> Response<JSON> {
+                            auth: Auth = NoAuth.standard) -> JSON.Result {
         
         return send(using: api, method: .put, at: endpoint, arguments: arguments, headers: headers, auth: auth)
     }
@@ -80,7 +91,7 @@ extension Serializable {
                     at endpoint: T.Endpoint,
                     arguments: [String:CustomStringConvertible] = [:],
                     headers: [String:CustomStringConvertible] = [:],
-                    auth: Auth = NoAuth.standard) -> Response<JSON> {
+                    auth: Auth = NoAuth.standard) -> JSON.Result {
         
         return send(using: api, method: .post, at: endpoint, arguments: arguments, headers: headers, auth: auth)
     }

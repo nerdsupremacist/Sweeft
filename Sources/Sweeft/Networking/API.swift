@@ -49,7 +49,7 @@ public extension API {
                        auth: Auth = NoAuth.standard,
                        body: Data? = nil,
                        acceptableStatusCodes: [Int] = [200],
-                       completionQueue: DispatchQueue = .main) -> Response<Data> {
+                       completionQueue: DispatchQueue = .main) -> Data.Result {
         
         let promise = Promise<Data, APIError>(completionQueue: completionQueue)
         
@@ -125,7 +125,7 @@ public extension API {
                        auth: Auth = NoAuth.standard,
                        body: JSON? = nil,
                        acceptableStatusCodes: [Int] = [200],
-                       completionQueue: DispatchQueue = .main) -> Response<JSON> {
+                       completionQueue: DispatchQueue = .main) -> JSON.Result {
         
         return doRepresentedRequest(with: method, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
     }
@@ -252,7 +252,7 @@ public extension API {
                     auth: Auth = NoAuth.standard,
                     body: JSON? = nil,
                     acceptableStatusCodes: [Int] = [200],
-                    completionQueue: DispatchQueue = .main) -> Response<JSON> {
+                    completionQueue: DispatchQueue = .main) -> JSON.Result {
         
         return doJSONRequest(with: .get, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
     }
@@ -263,7 +263,7 @@ public extension API {
                     auth: Auth = NoAuth.standard,
                     body: JSON? = nil,
                     acceptableStatusCodes: [Int] = [200],
-                    completionQueue: DispatchQueue = .main) -> Response<JSON> {
+                    completionQueue: DispatchQueue = .main) -> JSON.Result {
         
         return doJSONRequest(with: .delete, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
     }
@@ -274,7 +274,7 @@ public extension API {
                      headers: [String:CustomStringConvertible] = [:],
                      auth: Auth = NoAuth.standard,
                      acceptableStatusCodes: [Int] = [200],
-                     completionQueue: DispatchQueue = .main) -> Response<JSON> {
+                     completionQueue: DispatchQueue = .main) -> JSON.Result {
         
         return doJSONRequest(with: .post, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
     }
@@ -285,7 +285,7 @@ public extension API {
                      headers: [String:CustomStringConvertible] = [:],
                      auth: Auth = NoAuth.standard,
                      acceptableStatusCodes: [Int] = [200],
-                     completionQueue: DispatchQueue = .main) -> Response<JSON> {
+                     completionQueue: DispatchQueue = .main) -> JSON.Result {
         
         return doJSONRequest(with: .put, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
     }
