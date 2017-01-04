@@ -43,6 +43,14 @@ final class Movie: Observable {
     
 }
 
+extension Movie: ValueComparable {
+    
+    var comparable: Double {
+        return vote
+    }
+    
+}
+
 extension Movie: Hashable {
     
     var hashValue: Int {

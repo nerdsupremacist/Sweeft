@@ -20,7 +20,7 @@ class MoviesTableViewController: UITableViewController {
     override func viewDidLoad() {
         let api = MoviesAPI.shared
         Movie.featured(using: api).onSuccess { movies in
-            self.movies = movies.sorted(descending: { $0.vote })
+            self.movies = <>movies.sorted()
             movies >>> **self.tableView.reloadData
         }
         .onError { error in
