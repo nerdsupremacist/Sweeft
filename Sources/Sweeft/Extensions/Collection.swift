@@ -138,7 +138,7 @@ public extension Collection {
      
      - Returns: minimal element
      */
-    func min(_ mapping: @escaping (Iterator.Element) -> (Double)) -> Iterator.Element? {
+    func min<C: Comparable>(_ mapping: @escaping (Iterator.Element) -> (C)) -> Iterator.Element? {
         let array = self.array
         return array ==> { prev, next in
             if mapping(next) < mapping(prev) {
@@ -157,6 +157,17 @@ public extension Collection {
      */
     func max(_ mapping: @escaping (Iterator.Element) -> (Double)) -> Iterator.Element? {
         return min { -mapping($0) }
+    }
+    
+    /**
+     Will sort by applying a mapping and sorting
+     
+     - Parameter mapping: Cost function
+     
+     - Returns: sorted array
+     */
+    func sorted<C: Comparable>(using mapping: (Iterator.Element) -> (C)) -> [Iterator.Element] {
+        return sorted { mapping($0) < mapping($1) }
     }
     
 }
