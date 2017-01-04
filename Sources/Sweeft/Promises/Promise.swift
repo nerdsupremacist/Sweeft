@@ -7,6 +7,30 @@
 
 import Foundation
 
+enum PromiseState<T, E: Error> {
+    case waiting
+    case success(result: T)
+    case error(error: E)
+    
+    var result: T? {
+        switch self {
+        case .success(let result):
+            return result
+        default:
+            return nil
+        }
+    }
+    
+    var error: E? {
+        switch self {
+        case .error(let error):
+            return error
+        default:
+            return nil
+        }
+    }
+}
+
 public protocol PromiseBody {
     associatedtype Result
     associatedtype ErrorType: Error
@@ -25,6 +49,7 @@ public class Promise<T, E: Error>: PromiseBody {
     /// All the handlers
     var successHandlers = [SuccessHandler]()
     var errorHandlers = [ErrorHandler]()
+    var state: PromiseState<T, E> = .waiting
     let completionQueue: DispatchQueue
     
     /// Initializer
@@ -50,15 +75,17 @@ public class Promise<T, E: Error>: PromiseBody {
     
     /// Call this when the promise is fulfilled
     public func success(with value: T) {
+        state = .success(result: value)
         completionQueue >>> {
-            self.successHandlers => { value | $0 }
+            self.successHandlers => apply(value: value)
         }
     }
     
     /// Call this when the promise has an error
     public func error(with value: E) {
+        state = .error(error: value)
         completionQueue >>> {
-            self.errorHandlers => { value | $0 }
+            self.errorHandlers => apply(value: value)
         }
     }
     
@@ -69,10 +96,8 @@ public class Promise<T, E: Error>: PromiseBody {
     }
     
     /// Will nest a promise inside another one
-    public func nest<V>(to promise: Promise<V, E>, using mapper: @escaping (T, Promise<V, E>) -> ()) {
-        onSuccess {
-            mapper($0, promise)
-        }
+    public func nest<V>(to promise: Promise<V, E>, using mapper: @escaping (T) -> ()) {
+        onSuccess(call: mapper)
         onError(call: promise.error)
     }
     
@@ -86,7 +111,7 @@ public class Promise<T, E: Error>: PromiseBody {
     /// Will create a Promise that is based on this promise but maps the result
     public func nested<V>(_ mapper: @escaping (T, Promise<V, E>) -> ()) -> Promise<V, E> {
         let promise = Promise<V, E>(completionQueue: completionQueue)
-        nest(to: promise, using: mapper)
+        nest(to: promise, using: add(trailing: promise) >>> mapper)
         return promise
     }
     

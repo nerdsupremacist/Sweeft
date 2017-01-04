@@ -112,9 +112,7 @@ extension JSON {
         case .array(let value):
             return .array(value => { $0.serialized })
         case .dict(let value):
-            return .dict(value >>= {
-                ($0, $1.serialized)
-            })
+            return .dict(value >>= mapLast { $0.serialized })
         default:
             return self
         }
@@ -127,9 +125,7 @@ extension JSON {
         case .array(let value):
             return value => { $0.object }
         case .dict(let value):
-            return value >>= {
-                ($0.0, $0.1.object)
-            }
+            return value >>= mapLast { $0.object }
         default:
             return json.value
         }
@@ -182,7 +178,7 @@ extension JSON {
     /// Initialize from deserialized Swift JSON Dictionary or Array
     public init?(from value: Any) {
         if let dictionary = value as? [String:Any] {
-            let dict = dictionary.dictionaryWithoutOptionals { ($0, JSON(from: $1)) }
+            let dict = dictionary.dictionaryWithoutOptionals(byDividingWith: mapLast(JSON.init))
             self = .dict(dict)
             return
         }

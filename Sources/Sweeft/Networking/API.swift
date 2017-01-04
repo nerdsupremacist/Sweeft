@@ -29,6 +29,10 @@ public protocol API {
     var baseHeaders: [String:String] { get }
     /// Queries that should be included into every single request
     var baseQueries: [String:String] { get }
+    /// Will be called before performing a Request for people who like to go deep into the metal
+    func willPerform(request: inout URLRequest)
+    /// Will allow you to prepare more customizable URL Sessions
+    func session(for method: HTTPMethod, at endpoint: Endpoint) -> URLSession
 }
 
 public extension API {
@@ -38,12 +42,24 @@ public extension API {
         return URL(string: baseURL)
     }
     
+    /// Default is empty
     var baseHeaders: [String:String] {
         return [:]
     }
     
+    /// Default is empty
     var baseQueries: [String:String] {
         return [:]
+    }
+    
+    /// Default does nothing
+    func willPerform(request: inout URLRequest) {
+        // Do Nothing
+    }
+    
+    /// Default is the shared session
+    func session(for method: HTTPMethod, at endpoint: Endpoint) -> URLSession {
+        return .shared
     }
     
 }
@@ -87,13 +103,14 @@ public extension API {
         request.httpMethod = method.rawValue
         request.httpBody = body
         
-        (baseHeaders + headers >>= { ($0, $1.description) }) => {
+        (baseHeaders + headers >>= mapLast { $0.description }) => {
             request.addValue($1, forHTTPHeaderField: $0)
         }
         
         auth.apply(to: &request)
+        willPerform(request: &request)
         
-        let session = URLSession.shared
+        let session = self.session(for: method, at: endpoint)
         let task = session.dataTask(with: request) { (data, response, error) in
             if let error = error {
                 if let error = error as? URLError, error.code == .timedOut {

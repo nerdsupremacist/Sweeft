@@ -23,6 +23,7 @@ public struct PromiseSuccessHandler<R, T, E: Error> {
         self.promise = promise
         self.handler = handler
         promise.successHandlers.append(handler**)
+        promise.state.result | handler**
     }
     
     /// Add an action after the current item
@@ -68,6 +69,7 @@ public struct PromiseErrorHandler<R, T, E: Error> {
         self.promise = promise
         self.handler = handler
         promise.errorHandlers.append(handler**)
+        promise.state.error | handler**
     }
     
     /// Add an action to be done afterwards

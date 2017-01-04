@@ -40,9 +40,7 @@ public extension Dictionary where Key: CustomStringConvertible {
      - Returns: value found
      */
     func match(containing query: String) -> Value? {
-        return match {
-            return $0.description.contains(query)
-        }
+        return match(describe >>> String.contains ** query)
     }
     
 }

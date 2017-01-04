@@ -43,6 +43,18 @@ public extension String {
     }
     
     /**
+     Turns any string into a possible API
+     
+     - Parameter baseHeaders: Headers that should be included into every single request
+     - Parameter baseQueries: Queries that should be included into every single request
+     
+     - Returns: API using the string as base url
+     */
+    func api<V: APIEndpoint>(baseHeaders: [String : String] = [:], baseQueries: [String: String]) -> GenericAPI<V> {
+        return V.api(with: self, baseHeaders: baseHeaders, baseQueries: baseQueries)
+    }
+    
+    /**
      Will try to decipher the Date coded into a string
      
      - Parameter format: format in which the date is coded (Optional: default is "dd.MM.yyyy hh:mm:ss a")
