@@ -101,8 +101,8 @@ public func partialMap<V, T, O, R>(partial: @escaping (V) -> (T), map: @escaping
  
  - Returns: mapping function
  */
-public func mapFirst<V, T, R>(_ map: @escaping (V) -> (R)) -> (V, T) -> (R, T) {
-    return flipArguments >>> mapLast(map) >>> flipArguments
+public func mapFirst<V, T, R>(with map: @escaping (V) -> (R)) -> (V, T) -> (R, T) {
+    return flipArguments >>> mapLast(with: map) >>> flipArguments
 }
 
 /**
@@ -112,7 +112,7 @@ public func mapFirst<V, T, R>(_ map: @escaping (V) -> (R)) -> (V, T) -> (R, T) {
  
  - Returns: mapping function
  */
-public func mapLast<V, T, R>(_ map: @escaping (T) -> (R)) -> (V, T) -> (V, R) {
+public func mapLast<V, T, R>(with map: @escaping (T) -> (R)) -> (V, T) -> (V, R) {
     return partialMap(partial: lastArgument, map: map) { ($0.0, $1)}
 }
 

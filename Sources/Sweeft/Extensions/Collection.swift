@@ -157,7 +157,7 @@ public extension Collection {
      - Returns: best match if it exists
      */
     func best<V>(_ mapping: @escaping (Iterator.Element) -> (V), _ shouldChange: @escaping (V, V) -> Bool) -> Iterator.Element? {
-        return best(mapFirst(mapping) >>> mapLast(mapping) >>> shouldChange)
+        return best(mapFirst(with: mapping) >>> mapLast(with: mapping) >>> shouldChange)
     }
     
     /**

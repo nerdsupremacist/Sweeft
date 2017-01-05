@@ -84,6 +84,7 @@ public extension API {
                        to endpoint: Endpoint,
                        arguments: [String:CustomStringConvertible] = [:],
                        headers: [String:CustomStringConvertible] = [:],
+                       queries: [String:CustomStringConvertible] = [:],
                        auth: Auth = NoAuth.standard,
                        body: Data? = nil,
                        acceptableStatusCodes: [Int] = [200],
@@ -95,7 +96,7 @@ public extension API {
             return string.replacingOccurrences(of: "{\(argument.key)}", with: argument.value.description)
         }
         
-        let url = baseQueries ==> base.appendingPathComponent(requestString) ** { url, query in
+        let url = (baseQueries + queries >>= mapLast { $0.description }) ==> base.appendingPathComponent(requestString) ** { url, query in
             return url.appendingQuery(key: query.key, value: query.value)
         }
         
@@ -154,14 +155,19 @@ public extension API {
                                      to endpoint: Endpoint,
                                      arguments: [String:CustomStringConvertible] = [:],
                                      headers: [String:CustomStringConvertible] = [:],
+                                     queries: [String:CustomStringConvertible] = [:],
                                      auth: Auth = NoAuth.standard,
                                      body: DataSerializable? = nil,
                                      acceptableStatusCodes: [Int] = [200],
                                      completionQueue: DispatchQueue = .main) -> Response<T> {
         
+        var headers = headers
+        headers["Content-Type"] <- body?.contentType
+        headers["Accept"] <- T.accept
         
         return doDataRequest(with: method, to: endpoint, arguments: arguments,
-                      headers: headers, auth: auth, body: body?.data, acceptableStatusCodes: acceptableStatusCodes)
+                      headers: headers, queries: queries, auth: auth, body: body?.data,
+                      acceptableStatusCodes: acceptableStatusCodes)
                 .nested { data, promise in
                     guard let underlyingData = T(data: data) else {
                         promise.error(with: .invalidData(data: data))
@@ -189,12 +195,15 @@ public extension API {
                        to endpoint: Endpoint,
                        arguments: [String:CustomStringConvertible] = [:],
                        headers: [String:CustomStringConvertible] = [:],
+                       queries: [String:CustomStringConvertible] = [:],
                        auth: Auth = NoAuth.standard,
                        body: JSON? = nil,
                        acceptableStatusCodes: [Int] = [200],
                        completionQueue: DispatchQueue = .main) -> JSON.Result {
         
-        return doRepresentedRequest(with: method, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
+        return doRepresentedRequest(with: method, to: endpoint, arguments: arguments, headers: headers, queries: queries,
+                                    auth: auth, body: body,
+                                    acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
     }
     
     /**
@@ -216,6 +225,7 @@ public extension API {
                          to endpoint: Endpoint,
                          arguments: [String:CustomStringConvertible] = [:],
                          headers: [String:CustomStringConvertible] = [:],
+                         queries: [String:CustomStringConvertible] = [:],
                          auth: Auth = NoAuth.standard,
                          body: JSON? = nil,
                          acceptableStatusCodes: [Int] = [200],
@@ -223,7 +233,7 @@ public extension API {
                          at path: [String] = []) -> Response<T> {
         
         return doJSONRequest(with: method, to: endpoint, arguments: arguments,
-                      headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes)
+                      headers: headers, queries: queries, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes)
             .nested { json, promise in
                 guard let item: T = json.get(in: path) else {
                     promise.error(with: .mappingError(json: json))
@@ -252,6 +262,7 @@ public extension API {
                          to endpoint: Endpoint,
                          arguments: [String:CustomStringConvertible] = [:],
                          headers: [String:CustomStringConvertible] = [:],
+                         queries: [String:CustomStringConvertible] = [:],
                          auth: Auth = NoAuth.standard,
                          body: JSON? = nil,
                          acceptableStatusCodes: [Int] = [200],
@@ -259,7 +270,8 @@ public extension API {
                          at path: String...) -> Response<T> {
         
         return doObjectRequest(with: method, to: endpoint, arguments: arguments,
-                               headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, at: path)
+                               headers: headers, queries: queries, auth: auth, body: body,
+                               acceptableStatusCodes: acceptableStatusCodes, at: path)
     }
     
     /**
@@ -282,6 +294,7 @@ public extension API {
                           to endpoint: Endpoint,
                           arguments: [String:CustomStringConvertible] = [:],
                           headers: [String:CustomStringConvertible] = [:],
+                          queries: [String:CustomStringConvertible] = [:],
                           auth: Auth = NoAuth.standard,
                           body: JSON? = nil,
                           acceptableStatusCodes: [Int] = [200],
@@ -291,7 +304,7 @@ public extension API {
         
         
         return doJSONRequest(with: method, to: endpoint, arguments: arguments,
-                      headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes)
+                      headers: headers, queries: queries, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes)
             .nested { json, promise in
                 guard let items: [T] = json.getAll(in: path, for: internalPath) else {
                     promise.error(with: .mappingError(json: json))
@@ -321,6 +334,7 @@ public extension API {
                                     to endpoints: [Endpoint],
                                     arguments: [[String:CustomStringConvertible]] = [],
                                     headers: [String:CustomStringConvertible] = [:],
+                                    queries: [String:CustomStringConvertible] = [:],
                                     auth: Auth = NoAuth.standard,
                                     bodies: [JSON?] = [],
                                     acceptableStatusCodes: [Int] = [200],
@@ -332,7 +346,7 @@ public extension API {
             let arguments = arguments | index
             let body = bodies | index ?? nil
             return self.doObjectsRequest(with: method, to: endpoint, arguments: arguments.?,
-                                         headers: headers, auth: auth, body: body,
+                                         headers: headers, queries: queries, auth: auth, body: body,
                                          acceptableStatusCodes: acceptableStatusCodes,
                                          completionQueue: completionQueue, at: path, with: internalPath)
             
@@ -358,6 +372,7 @@ public extension API {
                                     to endpoints: [Endpoint],
                                     arguments: [[String:CustomStringConvertible]] = [],
                                     headers: [String:CustomStringConvertible] = [:],
+                                    queries: [String:CustomStringConvertible] = [:],
                                     auth: Auth = NoAuth.standard,
                                     bodies: [JSON?] = [],
                                     acceptableStatusCodes: [Int] = [200],
@@ -368,7 +383,7 @@ public extension API {
             let arguments = arguments | index
             let body = bodies | index ?? nil
             return self.doObjectRequest(with: method, to: endpoint, arguments: arguments.?,
-                                        headers: headers, auth: auth, body: body,
+                                        headers: headers, queries: queries, auth: auth, body: body,
                                         acceptableStatusCodes: acceptableStatusCodes,
                                         completionQueue: completionQueue, at: path)
             
@@ -394,6 +409,7 @@ public extension API {
                               to endpoint: Endpoint,
                               arguments: [[String:CustomStringConvertible]] = [],
                               headers: [String:CustomStringConvertible] = [:],
+                              queries: [String:CustomStringConvertible] = [:],
                               auth: Auth = NoAuth.standard,
                               bodies: [JSON?] = [],
                               acceptableStatusCodes: [Int] = [200],
@@ -401,7 +417,7 @@ public extension API {
                               at path: String...) -> Response<[T]> {
         
         let endpoints = arguments.count.range => **{ endpoint }
-        return doBulkObjectRequest(with: method, to: endpoints, arguments: arguments, headers: headers, auth: auth, bodies: bodies, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue, at: path)
+        return doBulkObjectRequest(with: method, to: endpoints, arguments: arguments, headers: headers, queries: queries, auth: auth, bodies: bodies, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue, at: path)
     }
     
     /**
@@ -420,12 +436,13 @@ public extension API {
     public func get(_ endpoint: Endpoint,
                     arguments: [String:CustomStringConvertible] = [:],
                     headers: [String:CustomStringConvertible] = [:],
+                    queries: [String:CustomStringConvertible] = [:],
                     auth: Auth = NoAuth.standard,
                     body: JSON? = nil,
                     acceptableStatusCodes: [Int] = [200],
                     completionQueue: DispatchQueue = .main) -> JSON.Result {
         
-        return doJSONRequest(with: .get, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
+        return doJSONRequest(with: .get, to: endpoint, arguments: arguments, headers: headers, queries: queries, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
     }
     
     /**
@@ -444,12 +461,13 @@ public extension API {
     public func delete(_ endpoint: Endpoint,
                     arguments: [String:CustomStringConvertible] = [:],
                     headers: [String:CustomStringConvertible] = [:],
+                    queries: [String:CustomStringConvertible] = [:],
                     auth: Auth = NoAuth.standard,
                     body: JSON? = nil,
                     acceptableStatusCodes: [Int] = [200],
                     completionQueue: DispatchQueue = .main) -> JSON.Result {
         
-        return doJSONRequest(with: .delete, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
+        return doJSONRequest(with: .delete, to: endpoint, arguments: arguments, headers: headers, queries: queries, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
     }
     
     /**
@@ -469,11 +487,12 @@ public extension API {
                      to endpoint: Endpoint,
                      arguments: [String:CustomStringConvertible] = [:],
                      headers: [String:CustomStringConvertible] = [:],
+                     queries: [String:CustomStringConvertible] = [:],
                      auth: Auth = NoAuth.standard,
                      acceptableStatusCodes: [Int] = [200],
                      completionQueue: DispatchQueue = .main) -> JSON.Result {
         
-        return doJSONRequest(with: .post, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
+        return doJSONRequest(with: .post, to: endpoint, arguments: arguments, headers: headers, queries: queries, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
     }
     
     /**
@@ -493,11 +512,12 @@ public extension API {
                      at endpoint: Endpoint,
                      arguments: [String:CustomStringConvertible] = [:],
                      headers: [String:CustomStringConvertible] = [:],
+                     queries: [String:CustomStringConvertible] = [:],
                      auth: Auth = NoAuth.standard,
                      acceptableStatusCodes: [Int] = [200],
                      completionQueue: DispatchQueue = .main) -> JSON.Result {
         
-        return doJSONRequest(with: .put, to: endpoint, arguments: arguments, headers: headers, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
+        return doJSONRequest(with: .put, to: endpoint, arguments: arguments, headers: headers, queries: queries, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
     }
     
 }

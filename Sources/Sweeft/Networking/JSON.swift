@@ -178,7 +178,7 @@ extension JSON {
     /// Initialize from deserialized Swift JSON Dictionary or Array
     public init?(from value: Any) {
         if let dictionary = value as? [String:Any] {
-            let dict = dictionary.dictionaryWithoutOptionals(byDividingWith: mapLast(JSON.init))
+            let dict = dictionary.dictionaryWithoutOptionals(byDividingWith: mapLast(with: JSON.init))
             self = .dict(dict)
             return
         }
@@ -219,9 +219,17 @@ extension JSON: DataRepresentable {
         self.init(data: data, options: .allowFragments)
     }
     
+    public var contentType: String? {
+        return "application/json"
+    }
+    
 }
 
 extension JSON: DataSerializable {
+    
+    public static var accept: String? {
+        return "application/json"
+    }
     
     /// Get data
     public var data: Data? {
