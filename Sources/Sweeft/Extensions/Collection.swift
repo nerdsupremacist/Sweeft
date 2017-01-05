@@ -179,7 +179,7 @@ public extension Collection {
      - Returns: maximal element
      */
     func max<C: Comparable>(_ mapping: @escaping (Iterator.Element) -> (C)) -> Iterator.Element? {
-        return best(mapping, (>=))
+        return best(mapping, (>))
     }
     
     /**
