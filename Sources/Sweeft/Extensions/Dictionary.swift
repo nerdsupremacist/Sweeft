@@ -68,9 +68,7 @@ extension Dictionary where Key: CustomStringConvertible, Value: Serializable {
     
     /// JSON Value
     public var json: JSON {
-        return .dict(self >>= {
-            return ($0.description, $1.json)
-        })
+        return .dict(self >>= mapFirst(describe) >>> mapLast(JSON.init))
     }
     
 }

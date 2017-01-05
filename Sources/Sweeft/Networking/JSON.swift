@@ -205,6 +205,11 @@ extension JSON {
         self.init(from: data)
     }
     
+    /// Initialize from Serializable
+    public init(from serializable: Serializable) {
+        self = serializable.json
+    }
+    
 }
 
 extension JSON: DataRepresentable {

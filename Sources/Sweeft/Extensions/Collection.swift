@@ -218,7 +218,7 @@ public extension Collection where Iterator.Element: Hashable {
 extension Collection where Iterator.Element: Serializable {
     
     public var json: JSON {
-        return .array(self => { $0.json })
+        return .array(self => JSON.init)
     }
     
 }
