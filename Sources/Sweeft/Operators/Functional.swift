@@ -288,6 +288,22 @@ public func **<V, T, O>(_ handler: @escaping (V) -> ((T) -> O), _ input: T) -> (
     return { handler($0)(input) }
 }
 
+infix operator <**: MultiplicationPrecedence
+
+/**
+ Bind with input from the right
+ 
+ - Parameter handler: function that you want to call
+ - Parameter input: input that you want to give to your function
+ 
+ - Returns: function that when called will use input given
+ */
+public func <**<V, T, O>(_ handler: @escaping (T, V) -> O, _ input: V) -> (T) -> O {
+    return {
+        handler($0, input)
+    }
+}
+
 prefix operator **
 
 /**
@@ -412,4 +428,66 @@ infix operator ||>
  */
 public func ||><C: Collection>(_ items: C?, _ handler: (C.Iterator.Element) -> Bool) -> Bool {
     return (items?.or(disjunctUsing: handler)).?
+}
+
+infix operator |>>>: MultiplicationPrecedence
+
+/**
+ Map and execute
+ 
+ - Parameter map: maps the first Argument
+ - Parameter handler: handler for all the arguments with the mapped first argument
+ 
+ - Returns: Bound closure
+ */
+public func |>>><V, T, O, R>(_ map: @escaping (V) -> (R), _ handler: @escaping (R, T) -> (O)) -> (V, T) -> O {
+    return mapFirst(with: map) >>> handler
+}
+
+/**
+ Map and execute
+ 
+ - Parameter map: maps the last Argument
+ - Parameter handler: handler for all the arguments with the mapped last argument
+ 
+ - Returns: Bound closure
+ */
+public func |>>><V, T, O, R>(_ map: @escaping (T) -> (R), _ handler: @escaping (V, R) -> (O)) -> (V, T) -> O {
+    return mapLast(with: map) >>> handler
+}
+
+/**
+ Map and execute
+ 
+ - Parameter map: maps the middle Argument
+ - Parameter handler: handler for all the arguments with the mapped middle argument
+ 
+ - Returns: Bound closure
+ */
+public func |>>><V, K, T, O, R>(_ map: @escaping (K) -> (R), _ handler: @escaping (V, R, T) -> (O)) -> (V, K, T) -> O {
+    return mapMiddle(with: map) >>> handler
+}
+
+/**
+ Map and execute
+ 
+ - Parameter map: maps each argument
+ - Parameter handler: handler for all the arguments with the mapped argument
+ 
+ - Returns: Bound closure
+ */
+public func |>>><V, O, R>(_ map: @escaping (V) -> (R), _ handler: @escaping (R, R) -> (O)) -> (V, V) -> O {
+    return mapBoth(with: map) >>> handler
+}
+
+/**
+ Map and execute
+ 
+ - Parameter map: maps each argument
+ - Parameter handler: handler for all the arguments with the mapped arguments
+ 
+ - Returns: Bound closure
+ */
+public func |>>><V, O, R>(_ map: @escaping (V) -> (R), _ handler: @escaping ([R]) -> (O)) -> ([V]) -> O {
+    return (=>) <** map >>> handler
 }
