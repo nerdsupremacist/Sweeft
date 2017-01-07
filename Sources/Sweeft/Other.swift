@@ -113,7 +113,30 @@ public func mapFirst<V, T, R>(with map: @escaping (V) -> (R)) -> (V, T) -> (R, T
  - Returns: mapping function
  */
 public func mapLast<V, T, R>(with map: @escaping (T) -> (R)) -> (V, T) -> (V, R) {
-    return partialMap(partial: lastArgument, map: map) { ($0.0, $1)}
+    return partialMap(partial: lastArgument, map: map) { ($0.0, $1) }
+}
+
+/**
+ Will map the middle argument and leave the rest intact.
+ Be careful. Type inference will try to figure things out, but if it can't do something else.
+ 
+ - Parameter map: Maps the part to another value
+ 
+ - Returns: mapping function
+ */
+public func mapMiddle<V, T, O, R>(with map: @escaping (T) -> (R)) -> (V, T, O) -> (V, R, O) {
+    return partialMap(partial: middleArgument, map: map) { ($0.0, $1, $0.2) }
+}
+
+/**
+ Will map two inputs
+ 
+ - Parameter map: Maps the values to the results
+ 
+ - Returns: mapping function
+ */
+public func mapBoth<V, R>(with map: @escaping (V) -> (R)) -> (V, V) -> (R, R) {
+    return mapFirst(with: map) >>> mapLast(with: map)
 }
 
 /**
