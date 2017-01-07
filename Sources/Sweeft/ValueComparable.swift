@@ -13,6 +13,10 @@ public protocol ValueComparable: Comparable {
     var comparable: ComparableValue { get }
 }
 
+public func ==<C: ValueComparable>(_ lhs: C, _ rhs: C) -> Bool {
+    return lhs.comparable == rhs.comparable
+}
+
 public func <<C: ValueComparable>(_ lhs: C, _ rhs: C) -> Bool {
     return lhs.comparable < rhs.comparable
 }
