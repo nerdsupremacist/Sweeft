@@ -488,6 +488,6 @@ public func |>>><V, O, R>(_ map: @escaping (V) -> (R), _ handler: @escaping (R, 
  
  - Returns: Bound closure
  */
-public func |>>><V, O, R>(_ map: @escaping (V) -> (R), _ handler: @escaping ([R]) -> (O)) -> ([V]) -> O {
+public func |>>><C: Collection, O, R>(_ map: @escaping (C.Iterator.Element) -> (R), _ handler: @escaping ([R]) -> (O)) -> (C) -> O {
     return (=>) <** map >>> handler
 }
