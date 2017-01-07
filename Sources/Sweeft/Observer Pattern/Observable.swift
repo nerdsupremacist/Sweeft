@@ -28,11 +28,7 @@ public extension Observable {
     }
     
     public func hasChanged() {
-        listeners => { (listener: Listener) in
-            listener.queue >>> {
-                 listener.handler(self)
-            }
-        }
+        listeners => { $0.queue >>> $0.handler ** self }
     }
     
 }

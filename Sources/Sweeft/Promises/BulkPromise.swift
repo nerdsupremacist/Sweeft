@@ -15,7 +15,7 @@ public class BulkPromise<T, O: Error>: Promise<[T], O> {
     private var results: [(Int, T)] {
         didSet {
             if results.count == count {
-                success(with: results.sorted(ascending: { $0.0 }) => lastArgument)
+                success(with: results.sorted(ascending: firstArgument) => lastArgument)
             }
         }
     }
