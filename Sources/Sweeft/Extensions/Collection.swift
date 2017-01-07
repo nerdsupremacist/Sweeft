@@ -139,8 +139,7 @@ public extension Collection {
      - Returns: best match if it exists
      */
     func best(_ shouldChange: @escaping (Iterator.Element, Iterator.Element) -> Bool) -> Iterator.Element? {
-        let array = self.array
-        return array ==> { prev, next in
+        return self.array ==> { prev, next in
             if shouldChange(next, prev) {
                 return next
             }
@@ -157,7 +156,7 @@ public extension Collection {
      - Returns: best match if it exists
      */
     func best<V>(_ mapping: @escaping (Iterator.Element) -> (V), _ shouldChange: @escaping (V, V) -> Bool) -> Iterator.Element? {
-        return best(mapFirst(with: mapping) >>> mapLast(with: mapping) >>> shouldChange)
+        return best(mapping |>>> shouldChange)
     }
     
     /**
@@ -183,7 +182,7 @@ public extension Collection {
     }
     
     /**
-     Will sort by applying a mapping and sorting
+     Will sort by applying a mapping for costs
      
      - Parameter mapping: Cost function
      
@@ -201,7 +200,7 @@ public extension Collection {
      - Returns: sorted array
      */
     func sorted<C: Comparable>(descending mapping: (Iterator.Element) -> (C)) -> [Iterator.Element] {
-        return sorted { mapping($0) >= mapping($1) }
+        return <>sorted(ascending: mapping)
     }
     
 }

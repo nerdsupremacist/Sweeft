@@ -9,6 +9,10 @@ import Foundation
 
 public enum Weekday: Int {
     case sunday, monday, tuesday, wednesday, thursday, friday, saturday
+    
+    var index: Int {
+        return rawValue
+    }
 }
 
 extension Weekday: Defaultable {
@@ -20,6 +24,10 @@ extension Weekday: Defaultable {
 
 public enum Month: Int {
     case january, february, march, april, may, june, july, august, september, october, november, december
+    
+    var index: Int {
+        return rawValue
+    }
 }
 
 extension Month: Defaultable {
@@ -48,6 +56,10 @@ public extension Date {
         let calendar = Calendar(identifier: .gregorian)
         let value = calendar.dateComponents([unit], from: self).value(for: unit)
         return value.?
+    }
+    
+    static var now: Date {
+        return Date()
     }
     
     var nanosecond: Int {
@@ -137,7 +149,7 @@ public struct DateDifference {
     }
     
     /// The difference in minutes
-    public var minute: Int {
+    public var minutes: Int {
         return difference(by: .minute)
     }
     
@@ -153,7 +165,7 @@ public struct DateDifference {
     
     /// The difference in weeks
     public var weeks: Int {
-        return difference(by: .weekdayOrdinal)
+        return difference(by: .weekOfYear)
     }
     
     /// The difference in years
