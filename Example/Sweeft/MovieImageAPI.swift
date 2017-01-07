@@ -18,7 +18,11 @@ struct MovieImageAPI: API {
     
     let baseURL = "https://image.tmdb.org/"
     
+    func fetchImage(with path: String) -> UIImage.Result {
+        return doRepresentedRequest(to: .small, arguments: ["path": path])
+    }
+    
     static func fetchImage(using api: MovieImageAPI = .shared, with path: String) -> UIImage.Result {
-        return api.doRepresentedRequest(to: .small, arguments: ["path": path])
+        return api.fetchImage(with: path)
     }
 }
