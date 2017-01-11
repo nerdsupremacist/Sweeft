@@ -65,7 +65,7 @@ extension Person {
                 let ids = json["cast"].array ==> { $0["id"].int } | 25.range
                 return Movie.movies(with: ids, using: api)
             }
-            .resultingPromise
+            .future
     }
     
 }

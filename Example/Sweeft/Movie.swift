@@ -82,18 +82,6 @@ extension Movie: Deserializable {
 
 extension Movie {
     
-    static func upcoming(using api: MoviesAPI = .shared) -> Movie.Results {
-        return getAll(using: api, at: .upcoming, for: "results")
-    }
-    
-    static func inTheatres(using api: MoviesAPI = .shared) -> Movie.Results {
-        return getAll(using: api, at: .nowPlaying, for: "results")
-    }
-    
-    static func popular(using api: MoviesAPI = .shared) -> Movie.Results {
-        return getAll(using: api, at: .popular, for: "results")
-    }
-    
     static func movie(with id: Int, using api: MoviesAPI = .shared) -> Movie.Result {
         return get(using: api, at: .movie, arguments: ["id": id])
     }

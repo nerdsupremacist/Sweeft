@@ -36,6 +36,8 @@ public protocol PromiseBody {
     associatedtype ErrorType: Error
     func onSuccess<O>(call handler: @escaping (Result) -> (O)) -> PromiseSuccessHandler<O, Result, ErrorType>
     func onError<O>(call handler: @escaping (ErrorType) -> (O)) -> PromiseErrorHandler<O, Result, ErrorType>
+    func nest<V>(to promise: Promise<V, ErrorType>, using mapper: @escaping (Result) -> (V))
+    func nest<V>(to promise: Promise<V, ErrorType>, using mapper: @escaping (Result) -> ())
 }
 
 /// Promise Structs to prevent you from nesting callbacks over and over again

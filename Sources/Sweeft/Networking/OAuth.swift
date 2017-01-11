@@ -54,7 +54,21 @@ public struct OAuth: Auth {
     fileprivate let refreshToken: String?
     fileprivate let expirationDate: Date?
     
+    var isExpired: Bool {
+        guard let expirationDate = expirationDate else {
+            return false
+        }
+        return expirationDate < .now
+    }
+    
+    public func refresh() {
+        
+    }
+    
     public func apply(to request: inout URLRequest) {
+        if isExpired {
+            refresh()
+        }
         request.addValue("\(tokenType) \(token)", forHTTPHeaderField: "Authorization")
     }
     
@@ -71,4 +85,84 @@ extension OAuth: Deserializable {
                   refreshToken: json["refresh_token"].string, expirationDate: nil)
     }
     
+}
+
+extension OAuth: StatusSerializable {
+    
+    public init?(from status: [String : Any]) {
+        guard let token = status["token"] as? String,
+            let tokenType = status["tokenType"] as? String else {
+                return nil
+        }
+        self.init(token: token, tokenType: tokenType, refreshToken: (status["refresh"] as? String), expirationDate: (status["expiration"] as? String)?.date())
+    }
+    
+    public var serialized: [String : Any] {
+        var dict = [
+            "token": token,
+            "tokenType": tokenType
+        ]
+        dict["refresh"] <- refreshToken
+        dict["expiration"] <- expirationDate?.string()
+        return dict
+    }
+    
+}
+
+extension OAuth {
+    
+    public func store(using key: String) {
+        OAuthStatus.key = OAUTHStatusKey(name: key)
+        OAuthStatus.value = .some(value: self)
+    }
+    
+    public static func stored(with key: String) -> OAuth? {
+        OAuthStatus.key = OAUTHStatusKey(name: key)
+        return OAuthStatus.value.auth
+    }
+    
+}
+
+enum OAuthStatusValue: StatusSerializable {
+    case none
+    case some(value: OAuth)
+    
+    public init?(from status: [String : Any]) {
+        if let value = OAuth(from: status) {
+            self = .some(value: value)
+        } else {
+            self = .none
+        }
+    }
+    
+    public var serialized: [String : Any] {
+        switch self {
+        case .none:
+            return [:]
+        case .some(let value):
+            return value.serialized
+        }
+    }
+    
+    var auth: OAuth? {
+        switch self {
+        case .none:
+            return nil
+        case .some(let value):
+            return value
+        }
+    }
+}
+
+struct OAUTHStatusKey: StatusKey {
+    let name: String
+    
+    var rawValue: String {
+        return "OAUTH-\(name)"
+    }
+}
+
+struct OAuthStatus: ObjectStatus {
+    static var key = OAUTHStatusKey(name: "shared")
+    static var defaultValue: OAuthStatusValue = .none
 }
