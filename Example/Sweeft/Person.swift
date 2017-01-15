@@ -47,11 +47,11 @@ extension Person: Deserializable {
 
 extension Person {
     
-    static func person(with id: Int, using api: MoviesAPI) -> Person.Result {
+    static func person(with id: Int, using api: MoviesAPI = .shared) -> Person.Result {
         return Person.get(using: api, at: .person, arguments: ["id": id])
     }
     
-    static func people(with ids: [Int], using api: MoviesAPI) -> Person.Results {
+    static func people(with ids: [Int], using api: MoviesAPI = .shared) -> Person.Results {
          return api.doBulkObjectRequest(to: .person, arguments: ids => { ["id": $0] })
     }
     
@@ -59,11 +59,11 @@ extension Person {
 
 extension Person {
     
-    func getMovies(using api: MoviesAPI = .shared) -> Movie.Results {
+    func getMovies(using api: MoviesAPI = .shared, limitedTo limit: Int = 25) -> Movie.Results {
         return api.get(.moviesForPerson, arguments: ["id": id])
             .onSuccess { json -> Response<[Movie]> in
-                let ids = json["cast"].array ==> { $0["id"].int } | 25.range
-                return Movie.movies(with: ids, using: api)
+                let ids = json["cast"].array ==> { $0["id"].int }
+                return Movie.movies(with: ids.array(withFirst: limit), using: api)
             }
             .future
     }

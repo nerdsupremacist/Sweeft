@@ -94,7 +94,7 @@ extension Movie {
         return api.doFlatBulkObjectRequest(to: [.nowPlaying, .upcoming, .popular],
                                            at: ["results"])
                     .nested { $0 |> { $0.vote >= 5.0 } }
-                    .nested { $0 |> Movie.isRelevant ** Date() }
+                    .nested { $0 |> Movie.isRelevant ** .now }
                     .nested { $0.noDuplicates }
     }
     

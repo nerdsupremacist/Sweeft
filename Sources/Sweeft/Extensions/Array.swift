@@ -114,10 +114,7 @@ public extension Array {
      - Returns: Array with the first n Elements
      */
     func array(withFirst number: Int) -> [Element] {
-        if number > count {
-            return self
-        }
-        return number.range => { self[$0] }
+        return self | number.range
     }
     
     /**

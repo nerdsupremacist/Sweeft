@@ -32,3 +32,11 @@ extension Role: ObservableContainer {
     }
     
 }
+
+extension Role {
+    
+    func role(called role: String, for id: Int, using api: MoviesAPI = .shared) -> Role.Result {
+        return Person.person(with: id, using: api).nested(Role.init ** role)
+    }
+    
+}
