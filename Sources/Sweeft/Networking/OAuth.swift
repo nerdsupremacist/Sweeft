@@ -26,15 +26,14 @@ public struct OAuthManager: API {
     }
     
     func body(username: String, password: String, scope: String?) -> JSON {
-        var dict = [
+        return [
             "grant_type": "password",
-            "client_id": clientID,
-            "client_secret": secret,
-            "username": username,
-            "password": password,
-            "scope": scope
-        ].dictionaryWithoutOptionals(byDividingWith: id)
-        return .dict(dict >>= JSON.init)
+            "client_id": clientID.json,
+            "client_secret": secret.json,
+            "username": username.json,
+            "password": password.json,
+            "scope": (scope?.json).?
+        ]
     }
     
     public func authenticate(at url: String, username: String, password: String, scope: String...) -> OAuth.Result {

@@ -9,10 +9,6 @@ import Foundation
 
 public extension String {
     
-    static var empty: String {
-        return ""
-    }
-    
     /// Will say if the String is a palindrome
     var isPalindrome: Bool {
         return <>self == self
@@ -115,6 +111,14 @@ extension String: Serializable {
     /// JSON Value
     public var json: JSON {
         return .string(self)
+    }
+    
+}
+
+public extension ExpressibleByStringLiteral where StringLiteralType == String {
+    
+    static var empty: Self {
+        return Self(stringLiteral: "")
     }
     
 }

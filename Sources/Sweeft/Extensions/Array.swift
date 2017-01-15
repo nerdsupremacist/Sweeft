@@ -205,3 +205,11 @@ extension Array: Defaultable {
     }
     
 }
+
+public extension ExpressibleByArrayLiteral {
+    
+    static var empty: Self {
+        return Self()
+    }
+    
+}
