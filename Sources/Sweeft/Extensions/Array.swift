@@ -9,6 +9,11 @@ import Foundation
 
 public extension Array {
     
+    /// Returns empty array
+    static var empty: [Element] {
+        return .empty
+    }
+    
     /// Array with Elements and indexes for better for loops.
     var withIndex: [(element: Element, index: Int)] {
         return count.range => { (self[$0], $0) }
@@ -199,7 +204,7 @@ extension Array: Defaultable {
     
     /// Default Value
     public static var defaultValue: [Element] {
-        return []
+        return .empty
     }
     
 }

@@ -9,6 +9,10 @@ import Foundation
 
 public extension String {
     
+    static var empty: String {
+        return ""
+    }
+    
     /// Will say if the String is a palindrome
     var isPalindrome: Bool {
         return <>self == self
@@ -50,7 +54,7 @@ public extension String {
      
      - Returns: API using the string as base url
      */
-    func api<V: APIEndpoint>(baseHeaders: [String : String] = [:], baseQueries: [String: String]) -> GenericAPI<V> {
+    func api<V: APIEndpoint>(baseHeaders: [String : String] = .empty, baseQueries: [String: String]) -> GenericAPI<V> {
         return V.api(with: self, baseHeaders: baseHeaders, baseQueries: baseQueries)
     }
     
@@ -75,7 +79,7 @@ public extension String {
      Will say if a String matches a RegEx
      
      - Parameter pattern: RegEx you want to match
-     - Parameter options: Extra options (Optional: Default is [])
+     - Parameter options: Extra options (Optional: Default is .empty)
      
      - Returns: Whether or not the string matches
      */
@@ -89,7 +93,7 @@ public extension String {
 extension String: Defaultable {
 
     /// Default Value
-    public static let defaultValue = ""
+    public static let defaultValue: String = .empty
     
 }
 

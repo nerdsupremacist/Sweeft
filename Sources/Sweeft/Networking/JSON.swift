@@ -91,7 +91,7 @@ public extension JSON {
     }
     
     /// Get Array of Deserializable Object in Path with internal Path inside array
-    public func getAll<T: Deserializable>(in path: [String], for internalPath: [String] = []) -> [T]? {
+    public func getAll<T: Deserializable>(in path: [String], for internalPath: [String] = .empty) -> [T]? {
         return getAll(in: path, using: T.initializer(for: internalPath))
     }
     
@@ -112,7 +112,7 @@ extension JSON {
         case .array(let value):
             return .array(value => { $0.serialized })
         case .dict(let value):
-            return .dict(value >>= mapLast { $0.serialized })
+            return .dict(value >>= { $0.serialized })
         default:
             return self
         }
@@ -125,7 +125,7 @@ extension JSON {
         case .array(let value):
             return value => { $0.object }
         case .dict(let value):
-            return value >>= mapLast { $0.object }
+            return value >>= { $0.object }
         default:
             return json.value
         }
@@ -241,7 +241,7 @@ extension JSON: DataSerializable {
 
 extension JSON: Serializable {
     
-    /// Get JSON to send
+    /// Get JSON to send. Which would be itself
     public var json: JSON {
         return serialized
     }

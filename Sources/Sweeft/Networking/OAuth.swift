@@ -34,7 +34,7 @@ public struct OAuthManager: API {
             "password": password
         ]
         dict["scope"] <- scope
-        return .dict(dict >>= mapLast(with: JSON.init))
+        return .dict(dict >>= JSON.init)
     }
     
     public func authenticate(at url: String, username: String, password: String, scope: String...) -> OAuth.Result {
@@ -138,7 +138,7 @@ enum OAuthStatusValue: StatusSerializable {
     public var serialized: [String : Any] {
         switch self {
         case .none:
-            return [:]
+            return .empty
         case .some(let value):
             return value.serialized
         }

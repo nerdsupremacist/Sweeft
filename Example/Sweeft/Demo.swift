@@ -49,7 +49,7 @@ enum Demo {
         
         let array: [Int?]? = [1, 2, 3, nil, 5, nil]
         
-        let res = (array ?? [])
+        let res = (array ?? .empty)
             .flatMap { $0 }
             .filter { $0 & 1 == 0 }
         
