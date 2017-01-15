@@ -31,9 +31,9 @@ public struct OAuthManager: API {
             "client_id": clientID,
             "client_secret": secret,
             "username": username,
-            "password": password
-        ]
-        dict["scope"] <- scope
+            "password": password,
+            "scope": scope
+        ].dictionaryWithoutOptionals(byDividingWith: id)
         return .dict(dict >>= JSON.init)
     }
     
@@ -94,7 +94,8 @@ extension OAuth: StatusSerializable {
             let tokenType = status["tokenType"] as? String else {
                 return nil
         }
-        self.init(token: token, tokenType: tokenType, refreshToken: (status["refresh"] as? String), expirationDate: (status["expiration"] as? String)?.date())
+        self.init(token: token, tokenType: tokenType, refreshToken: (status["refresh"] as? String),
+                  expirationDate: (status["expiration"] as? String)?.date())
     }
     
     public var serialized: [String : Any] {
@@ -113,45 +114,14 @@ extension OAuth {
     
     public func store(using key: String) {
         OAuthStatus.key = OAUTHStatusKey(name: key)
-        OAuthStatus.value = .some(value: self)
+        OAuthStatus.value = self
     }
     
     public static func stored(with key: String) -> OAuth? {
         OAuthStatus.key = OAUTHStatusKey(name: key)
-        return OAuthStatus.value.auth
+        return OAuthStatus.value
     }
     
-}
-
-enum OAuthStatusValue: StatusSerializable {
-    case none
-    case some(value: OAuth)
-    
-    public init?(from status: [String : Any]) {
-        if let value = OAuth(from: status) {
-            self = .some(value: value)
-        } else {
-            self = .none
-        }
-    }
-    
-    public var serialized: [String : Any] {
-        switch self {
-        case .none:
-            return .empty
-        case .some(let value):
-            return value.serialized
-        }
-    }
-    
-    var auth: OAuth? {
-        switch self {
-        case .none:
-            return nil
-        case .some(let value):
-            return value
-        }
-    }
 }
 
 struct OAUTHStatusKey: StatusKey {
@@ -162,7 +132,7 @@ struct OAUTHStatusKey: StatusKey {
     }
 }
 
-struct OAuthStatus: ObjectStatus {
+struct OAuthStatus: OptionalStatus {
+    typealias Value = OAuth
     static var key = OAUTHStatusKey(name: "shared")
-    static var defaultValue: OAuthStatusValue = .none
 }

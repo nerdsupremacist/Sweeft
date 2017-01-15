@@ -11,7 +11,7 @@ public extension Array {
     
     /// Returns empty array
     static var empty: [Element] {
-        return .empty
+        return []
     }
     
     /// Array with Elements and indexes for better for loops.

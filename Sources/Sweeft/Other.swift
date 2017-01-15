@@ -174,6 +174,21 @@ public func duplicateArguments<V>(_ arguments: V) -> (V, V) {
 }
 
 /**
+ Will deoptionalize the internal optionals
+ 
+ - Parameter a: value
+ - Parameter b: value
+ 
+ - Returns: a, b only if both have values, nil otherwise
+ */
+public func iff<A, B>(first a: A?, and b: B?) -> (A, B)? {
+    guard let a = a, let b = b else {
+        return nil
+    }
+    return (a, b)
+}
+
+/**
  Will increase the input by one. Can also be written as (+) ** 1
  
  - Parameter number: n
