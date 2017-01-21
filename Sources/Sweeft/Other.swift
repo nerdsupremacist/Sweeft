@@ -220,3 +220,7 @@ public func negative(_ number: Int) -> Int {
 public func describe<T: CustomStringConvertible>(of input: T) -> String {
     return input.description
 }
+
+public func divide<A, B, C>(closure handler: @escaping (A) -> (B, C)) -> ((A) -> B, (A) -> C) {
+    return (handler >>> firstArgument, handler >>> lastArgument)
+}

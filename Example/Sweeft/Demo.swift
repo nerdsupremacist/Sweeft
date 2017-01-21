@@ -107,7 +107,7 @@ enum Demo {
             print("Other Thread Called!")
         }
         
-        let dates = Date.array(ofSize: 5)
+        let dates = Date.array(of: 5)
         
         let seconds = dates.join(by: Date.string ** "ss")
         
