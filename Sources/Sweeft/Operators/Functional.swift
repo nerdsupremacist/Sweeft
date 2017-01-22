@@ -311,9 +311,7 @@ infix operator <**: MultiplicationPrecedence
  - Returns: function that when called will use input given
  */
 public func <**<V, T, O>(_ handler: @escaping (T, V) -> O, _ input: V) -> (T) -> O {
-    return {
-        handler($0, input)
-    }
+    return (flipArguments >>> handler) ** input
 }
 
 prefix operator **

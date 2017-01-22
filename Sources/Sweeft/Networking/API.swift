@@ -416,7 +416,7 @@ public extension API {
                               completionQueue: DispatchQueue = .main,
                               at path: String...) -> Response<[T]> {
         
-        let endpoints = arguments.count.range => **{ endpoint }
+        let endpoints = arguments.count.range => returning(endpoint)
         return doBulkObjectRequest(with: method, to: endpoints, arguments: arguments, headers: headers, queries: queries, auth: auth, bodies: bodies, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue, at: path)
     }
     

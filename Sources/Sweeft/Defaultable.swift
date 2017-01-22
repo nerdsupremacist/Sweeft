@@ -36,7 +36,7 @@ public extension Defaultable {
      - Parameter size: size of the array. (Default: 0)
      */
     func array(of size: Int = 0) -> [Self] {
-        return size.range => **{ self }
+        return size.range => returning(self)
     }
     
 }
