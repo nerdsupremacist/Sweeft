@@ -9,9 +9,13 @@ This is a collection of extensions and operators that make swift a bit sweeter. 
 *Note:* These operators are supposed to help me in the way I write Swift. Which is a functional style.
 So most of these regard possible problems and annoyances with functional programming in Swift.
 
-**Please** Contribute to make Swift a bit cooler looking... Post your ideas in the issues as enhancements
+
+
+**Please:** Contribute to make Swift a bit cooler looking... Post your ideas in the issues as enhancements
 
 ## Installing Sweeft
+
+<div style="text-align:center;"><img src="http://i.giphy.com/QbumCX9HFFDQA.gif" height=150></div>
 
 Sweeft is available both as a Pod in Cocoapods and as a Dependency in the Swift Package Manager. So you can choose how you include Sweeft into your project.
 
@@ -41,7 +45,10 @@ let package = Package(
 
 ## Why use Sweeft?
 
-Sweeft allows you to make your code so much shorter.
+<div style="text-align:center;"><img src="http://i.giphy.com/l4JyX3V0yydvPHNBe.gif" height=250></div>
+
+I know what you're wondering. Why the hell do I need this? 
+Well. Sweeft allows you to make your code so much shorter.
 
 For instance: let's say you have an array with some integers and some nil values.
 
@@ -79,10 +86,10 @@ let even = !array |> { $0 & 1 == 0 }
 
 Now to be clear, the last two solutions are following the same principles.
 
-In this case first we are unwrapping the array with '.?'. Meaning that if it's nil we should get an empty array. Which in turn means: we unwrapped it safely.
+First we get rid of all the nil values from the array and cast it as a [Int] using the prefix '!'.
+Then we just call filter. But since our fingers are too lazy we spelled it '|>' ;)
 
-Then we get rid of all the nil values from the array and cast it as a [Int] using the prefix '!'.
-Finally we just call filter. But since our fingers are to lazy we spelled it '|>' ;)
+<div style="text-align:center;"><img src="http://i.giphy.com/1VrOcCmld1a92.gif" height=150></div>
 
 ### Still not convinced?
 
@@ -100,6 +107,8 @@ First we filter out the non-palindromes.
 And then we filter out the non-primes.
 
 ### Wow! You're a hard sell.
+
+<div style="text-align:center;"><img src="http://i.giphy.com/Fjr6v88OPk7U4.gif" height=150></div>
 
 Ok. If you still are not sure if you should use Sweeft, see this example.
 
