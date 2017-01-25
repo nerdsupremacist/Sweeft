@@ -15,7 +15,7 @@ So most of these regard possible problems and annoyances with functional program
 
 ## Installing Sweeft
 
-<div style="text-align:center;"><img src="http://i.giphy.com/QbumCX9HFFDQA.gif" height=150></div>
+<div style="text-align:center;"><img src="http://i.giphy.com/3knKct3fGqxhK.gif" height=250></div>
 
 Sweeft is available both as a Pod in Cocoapods and as a Dependency in the Swift Package Manager. So you can choose how you include Sweeft into your project.
 
@@ -45,7 +45,7 @@ let package = Package(
 
 ## Why use Sweeft?
 
-<div style="text-align:center;"><img src="http://i.giphy.com/l4JyX3V0yydvPHNBe.gif" height=250></div>
+<div style="text-align:center;"><img src="http://i.giphy.com/l4JyX3V0yydvPHNBe.gif" height=200></div>
 
 I know what you're wondering. Why the hell do I need this? 
 Well. Sweeft allows you to make your code so much shorter.
@@ -108,7 +108,7 @@ And then we filter out the non-primes.
 
 ### Wow! You're a hard sell.
 
-<div style="text-align:center;"><img src="http://i.giphy.com/Fjr6v88OPk7U4.gif" height=150></div>
+<div style="text-align:center;"><img src="http://i.giphy.com/Fjr6v88OPk7U4.gif" height=250></div>
 
 Ok. If you still are not sure if you should use Sweeft, see this example.
 
