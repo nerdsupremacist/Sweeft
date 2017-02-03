@@ -150,6 +150,8 @@ for (item, index) in array.withIndex {
 }
 ```
 
+Which I know ```array.enumerated()``` already does. But ```array.withIndex``` just sounds so much clearer. ;)
+
 Or even better. With the built in for-each operator:
 
 ```Swift
