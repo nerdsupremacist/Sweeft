@@ -9,25 +9,30 @@
 import Foundation
 
 /// Moddels a Contraint Statisfaction Problem
-public struct CSP<Variable: Hashable, Value: CSPValue> {
-    let variables: [Variable]
+public struct CSP<Variable: Hashable, Value> {
+    
+    public typealias VariableValueSpec = (name: Variable, possible: [Value])
+    
+    let variables: [VariableValueSpec]
     let constraints: [Contraint<Variable, Value>]
+    
+    public init(variables: [VariableValueSpec], constraints: [Contraint<Variable, Value>]) {
+        self.variables = variables
+        self.constraints = constraints
+    }
 }
 
-public extension CSP {
+public extension CSP where Value: CSPValue {
+    
+    public init(variables: [Variable], constraints: [Contraint<Variable, Value>]) {
+        self.init(variables: variables => { (name: $0, possible: Value.all) },
+                  constraints: constraints)
+    }
     
     public init(constraints: [Contraint<Variable, Value>]) {
         let variables = constraints.flatMap { $0.variables }
         self.init(variables: variables.noDuplicates,
                   constraints: constraints)
-    }
-    
-}
-
-extension CSP: ArrayLiteralConvertible {
-    
-    public init(arrayLiteral elements: Contraint<Variable, Value>...) {
-        self.init(constraints: elements)
     }
     
 }
@@ -45,11 +50,6 @@ extension CSP {
         return variables.noDuplicates
     }
     
-    private func neighbourInstances(of current: Instance, in instances: [Instance]) -> [Instance] {
-        let variables = neighbours(of: current.variable)
-        return instances |> { variables.contains($0.variable) }
-    }
-    
     private func bestInstance(for instances: [Instance]) -> Instance? {
         let left = instances |> { !$0.isSolved }
         if left.count == instances.count {
@@ -59,6 +59,19 @@ extension CSP {
         }
     }
     
+    private func removeImposibleValues(in instances: [Instance]) -> [Instance] {
+        var instances = instances
+        var solved = instances |> { $0.isSolved }
+        var count: Int
+        repeat {
+            count = solved.count
+            instances <- { $0.removeImpossibleValues(regarding: instances,
+                                                     and: self.constraints(concerning: $0.variable)) }
+            solved = instances |> { $0.isSolved }
+        } while count != solved.count
+        return instances
+    }
+    
     private func solve(instances: [Instance]) -> [Instance]? {
         if instances.and(conjunctUsing: { $0.isSolved }) {
             return instances
@@ -66,22 +79,19 @@ extension CSP {
         guard let current = bestInstance(for: instances) else {
             return nil
         }
-        let harmed = neighbourInstances(of: current, in: instances)
-        let instances = instances |> { !harmed.contains($0) && $0 != current }
+        let instances = instances |> { $0 != current }
         return current.values ==> nil ** { result, value in
             if let result = result {
                 return result
             }
-            let instances = instances + .solved(variable: current.variable, value: value)
-            let other = harmed => { $0.removeImpossibleValues(regarding: instances + harmed,
-                                                              and: self.constraints(concerning: $0.variable)) }
-            return self.solve(instances: instances + other)
+            let instances = self.removeImposibleValues(in: instances + .solved(variable: current.variable, value: value))
+            return self.solve(instances: instances)
         }
     }
     
     /// Find a Solution for the problem
     public func solution() -> [Variable:Value]? {
-        let instances = variables => Instance.unsolved <** Value.all
+        let instances = variables => Instance.unsolved
         let solution = solve(instances: instances as [Instance])
         return solution?.dictionaryWithoutOptionals { ($0.variable, $0.values.first) }
     }

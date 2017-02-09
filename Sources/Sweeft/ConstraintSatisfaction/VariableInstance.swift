@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum VariableInstance<Variable: Hashable, Value: CSPValue> {
+enum VariableInstance<Variable: Hashable, Value> {
     case solved(variable: Variable, value: Value)
     case unsolved(variable: Variable, possible: [Value])
     case impossible(variable: Variable)
