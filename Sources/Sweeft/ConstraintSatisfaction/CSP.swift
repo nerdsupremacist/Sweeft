@@ -60,16 +60,17 @@ extension CSP {
     }
     
     private func removeImposibleValues(in instances: [Instance]) -> [Instance] {
-        var instances = instances
         var solved = instances |> { $0.isSolved }
-        var count: Int
-        repeat {
-            count = solved.count
-            instances <- { $0.removeImpossibleValues(regarding: instances,
-                                                     and: self.constraints(concerning: $0.variable)) }
-            solved = instances |> { $0.isSolved }
-        } while count != solved.count
-        return instances
+        let count = solved.count
+        let instances = instances => { $0.removeImpossibleValues(regarding: instances,
+                                                                 and: self.constraints(concerning: $0.variable)) }
+        solved = instances |> { $0.isSolved }
+        if count == solved.count {
+            return instances
+        } else {
+            return removeImposibleValues(in: instances)
+        }
+        
     }
     
     private func solve(instances: [Instance]) -> [Instance]? {
