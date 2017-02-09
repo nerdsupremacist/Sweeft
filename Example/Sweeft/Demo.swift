@@ -15,11 +15,17 @@ enum Demo {
         let id: String
     }
     
-    static func inc(_ n: Int) -> Int {
-        return n + 1
-    }
-    
     static func other() {
+        
+        let handler = { ($0 + 1, $0 ** 2) }
+        
+        let closures = divide(closure: handler)
+        
+        let other = closures.0 <+> closures.1
+        
+        1000 => { n in
+            assert(other(n) == handler(n))
+        }
         
         let users = [User]()
         
@@ -139,6 +145,28 @@ enum Demo {
         print(0.factorial)
         
         print(10.factorial)
+    }
+    
+    static func colorMap() {
+        if let solution = State.color(all: State.all) {
+            print("Soluction to Map Coloring!")
+            solution.forEach {
+                print("\($0.key.rawValue) -> \($0.value.rawValue)")
+            }
+        } else {
+            print("No solution available")
+        }
+    }
+    
+    static func solveQueensProblem() {
+        if let solution = QueensProblem.solve() {
+            print("Solution to queens problem")
+            solution.forEach {
+                print("Queen in x: \($0.value.x), y: \($0.value.y)")
+            }
+        } else {
+            print("No Solution :(")
+        }
     }
     
 }

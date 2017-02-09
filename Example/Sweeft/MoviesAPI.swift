@@ -38,3 +38,15 @@ extension MoviesAPI {
     }
     
 }
+
+extension MoviesAPI {
+    
+    func search(for query: String) -> SearchResult.Results {
+        return SearchResult.getAll(using: self, at: .search, queries: ["query": query], for: "results")
+    }
+    
+    static func search(for query: String) -> SearchResult.Results {
+        return shared.search(for: query)
+    }
+    
+}

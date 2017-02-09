@@ -19,4 +19,5 @@ enum MoviesEndpoint: String, APIEndpoint {
     case similar = "movie/{id}/similar"
     case person = "person/{id}"
     case moviesForPerson = "person/{id}/movie_credits"
+    case search = "search/multi"
 }

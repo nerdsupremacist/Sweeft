@@ -17,8 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
-        Demo.other()
-        Demo.demo()
+        Demo.colorMap()
+        Demo.solveQueensProblem()
         
         // Override point for customization after application launch.
         return true
