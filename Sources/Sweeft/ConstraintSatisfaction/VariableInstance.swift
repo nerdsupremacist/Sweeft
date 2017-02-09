@@ -1,5 +1,5 @@
 //
-//  ContraintSatisfaction.swift
+//  ConstraintSatisfaction.swift
 //  Pods
 //
 //  Created by Mathias Quintero on 2/8/17.
@@ -67,7 +67,7 @@ extension VariableInstance {
 extension VariableInstance {
     
     func removeImpossibleValues(regarding instances: [VariableInstance<Variable, Value>],
-                                and constraints: [Contraint<Variable, Value>]) -> VariableInstance<Variable, Value> {
+                                and constraints: [Constraint<Variable, Value>]) -> VariableInstance<Variable, Value> {
         
         let name = self.variable
         let values = self.values.filter {

@@ -19,7 +19,7 @@ enum QueensProblem {
     static func solve() -> [Int:Coordinate]? {
         let constraints = 8.anyRange.flatMap { a in
             return 8.range |> { $0 != a } => { b in
-                return Contraint<Int, Coordinate>.binary(a, b, contraint: areClear)
+                return Constraint<Int, Coordinate>.binary(a, b, Constraint: areClear)
             }
         }
         let variables = 8.range => { x in (name: x, possible: 8.range => { (x: x, y: $0) }) }

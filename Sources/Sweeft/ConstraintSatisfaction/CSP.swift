@@ -8,15 +8,15 @@
 
 import Foundation
 
-/// Moddels a Contraint Statisfaction Problem
+/// Moddels a Constraint Statisfaction Problem
 public struct CSP<Variable: Hashable, Value> {
     
     public typealias VariableValueSpec = (name: Variable, possible: [Value])
     
     let variables: [VariableValueSpec]
-    let constraints: [Contraint<Variable, Value>]
+    let constraints: [Constraint<Variable, Value>]
     
-    public init(variables: [VariableValueSpec], constraints: [Contraint<Variable, Value>]) {
+    public init(variables: [VariableValueSpec], constraints: [Constraint<Variable, Value>]) {
         self.variables = variables
         self.constraints = constraints
     }
@@ -24,12 +24,12 @@ public struct CSP<Variable: Hashable, Value> {
 
 public extension CSP where Value: CSPValue {
     
-    public init(variables: [Variable], constraints: [Contraint<Variable, Value>]) {
+    public init(variables: [Variable], constraints: [Constraint<Variable, Value>]) {
         self.init(variables: variables => { (name: $0, possible: Value.all) },
                   constraints: constraints)
     }
     
-    public init(constraints: [Contraint<Variable, Value>]) {
+    public init(constraints: [Constraint<Variable, Value>]) {
         let variables = constraints.flatMap { $0.variables }
         self.init(variables: variables.noDuplicates,
                   constraints: constraints)
@@ -41,7 +41,7 @@ extension CSP {
     
     typealias Instance = VariableInstance<Variable, Value>
     
-    func constraints(concerning variables: Variable...) -> [Contraint<Variable, Value>] {
+    func constraints(concerning variables: Variable...) -> [Constraint<Variable, Value>] {
         return self.constraints |> { variables.and(conjunctUsing: $0.variables.contains) }
     }
     

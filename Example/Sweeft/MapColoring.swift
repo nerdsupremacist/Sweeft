@@ -21,7 +21,7 @@ extension MapEntity {
     
     static func color(all: [Self]) -> [Self:Coloring]? {
         let constraints = all.flatMap { entity in
-            return entity.neighbours => { Contraint<Self, Coloring>.binary(entity, $0, contraint: (!=)) }
+            return entity.neighbours => { Constraint<Self, Coloring>.binary(entity, $0, Constraint: (!=)) }
         }
         let csp = CSP<Self, Coloring>(constraints: constraints)
         return csp.solution()

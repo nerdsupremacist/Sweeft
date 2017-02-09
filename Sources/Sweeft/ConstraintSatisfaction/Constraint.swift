@@ -12,13 +12,13 @@ public protocol CSPValue {
     static var all: [Self] { get }
 }
 
-/// Models a Contraint in a CSP
-public enum Contraint<Variable: Hashable, Value>  {
-    case unary(Variable, contraint: (Value) -> Bool)
-    case binary(Variable, Variable, contraint: (Value, Value) -> Bool)
+/// Models a Constraint in a CSP
+public enum Constraint<Variable: Hashable, Value>  {
+    case unary(Variable, Constraint: (Value) -> Bool)
+    case binary(Variable, Variable, Constraint: (Value, Value) -> Bool)
 }
 
-extension Contraint {
+extension Constraint {
     
     var variables: [Variable] {
         switch self {
@@ -31,7 +31,7 @@ extension Contraint {
     
 }
 
-extension Contraint {
+extension Constraint {
     
     private func values<Variable: Hashable, Value>(for variable: Variable, in array: [VariableInstance<Variable, Value>]) -> [Value] {
         let matching = array >>= { $0.variable } <+> { $0.values }
