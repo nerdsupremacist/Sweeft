@@ -14,8 +14,20 @@ public protocol CSPValue {
 
 /// Models a Constraint in a CSP
 public enum Constraint<Variable: Hashable, Value>  {
-    case unary(Variable, Constraint: (Value) -> Bool)
-    case binary(Variable, Variable, Constraint: (Value, Value) -> Bool)
+    case unary(Variable, constraint: (Value) -> Bool)
+    case binary(Variable, Variable, constraint: (Value, Value) -> Bool)
+    case collection([Constraint<Variable, Value>])
+}
+
+extension Constraint where Value: Equatable {
+    
+    static func allDiff(_ variables: [Variable]) -> Constraint<Variable, Value> {
+        let constraints = variables.flatMap { a in
+            return variables.map { Constraint<Variable, Value>.binary(a, $0, constraint: (!=)) }
+        }
+        return .collection(constraints)
+    }
+    
 }
 
 extension Constraint {
@@ -26,6 +38,10 @@ extension Constraint {
             return [variable]
         case .binary(let lhs, let rhs, _):
             return [lhs, rhs]
+        case .collection(let constraints):
+            return constraints
+                    .flatMap { $0.variables }
+                    .noDuplicates
         }
     }
     
@@ -46,8 +62,8 @@ extension Constraint {
             let lhs = values(for: lhs, in: instances)
             let rhs = values(for: rhs, in: instances)
             return lhs.or(disjunctUsing: { constraint ** $0 } >>> rhs.or)
-        default:
-            return false
+        case .collection(let constraints):
+            return constraints.and { $0.works(with: instances) }
         }
     }
     
