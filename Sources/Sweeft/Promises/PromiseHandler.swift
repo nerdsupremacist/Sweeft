@@ -33,7 +33,7 @@ public struct PromiseSuccessHandler<R, T, E: Error> {
     }
     
     /// Add a success Handler
-    @discardableResult public func onSuccess<O>(call handler: @escaping (T) -> (O)) -> PromiseSuccessHandler<O, T, E> {
+    @discardableResult public func and<O>(call handler: @escaping (T) -> (O)) -> PromiseSuccessHandler<O, T, E> {
         return promise.onSuccess(call: handler)
     }
     
@@ -82,7 +82,7 @@ public struct PromiseErrorHandler<R, T, E: Error> {
     }
     
     /// Add an error Handler
-    @discardableResult public func onError<O>(call handler: @escaping (E) -> (O)) -> PromiseErrorHandler<O, T, E> {
+    @discardableResult public func and<O>(call handler: @escaping (E) -> (O)) -> PromiseErrorHandler<O, T, E> {
         return promise.onError(call: handler)
     }
     
