@@ -19,9 +19,9 @@ protocol MapEntity: Hashable {
 
 extension MapEntity {
     
-    static func color(all: [Self]) -> [Self:Coloring]? {
-        let constraints = all.flatMap { entity in
-            return entity.neighbours => { Constraint<Self, Coloring>.binary(entity, $0, Constraint: (!=)) }
+    static func color(entities: [Self]) -> [Self:Coloring]? {
+        let constraints = entities.flatMap { entity in
+            return entity.neighbours => { Constraint<Self, Coloring>.binary(entity, $0, constraint: (!=)) }
         }
         let csp = CSP<Self, Coloring>(constraints: constraints)
         return csp.solution()

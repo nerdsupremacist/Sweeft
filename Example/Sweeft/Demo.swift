@@ -148,7 +148,7 @@ enum Demo {
     }
     
     static func colorMap() {
-        if let solution = State.color(all: State.all) {
+        if let solution = State.color(entities: State.all) {
             print("Soluction to Map Coloring!")
             solution.forEach {
                 print("\($0.key.rawValue) -> \($0.value.rawValue)")
