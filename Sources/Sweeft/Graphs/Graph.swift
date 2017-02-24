@@ -47,7 +47,7 @@ extension Graph {
 //        return shortestPath(from: source) { $0 == destination }
 //    }
     
-    private func computePath<V>(using prevs: [V:V], until last: V) -> [V] {
+    fileprivate func computePath<V>(using prevs: [V:V], until last: V) -> [V] {
         if let prev = prevs[last] {
             return [last] + computePath(using: prevs, until: prev)
         } else {
@@ -55,7 +55,7 @@ extension Graph {
         }
     }
     
-    func iterate(queue: PriorityQueue<QueueEntry<Node>, Double>,
+    private func iterate(queue: PriorityQueue<QueueEntry<Node>, Double>,
                  prevs: [Identifier : Identifier],
                  costs: [Identifier : Double],
                  source: Identifier,
@@ -111,6 +111,58 @@ extension Graph {
         
         return iterate(queue: queue, prevs: .empty, costs: .empty,
                        source: source.identifier, euristic: euristic, isFinal: isFinal)
+    }
+    
+}
+
+extension Graph {
+    
+    private func iterate(queue: [Node],
+                         parents: [Identifier:Identifier],
+                         source: Identifier,
+                         isFinal: @escaping (Identifier) -> Bool) -> ResultPromise<[Identifier]?> {
+        
+        var parents = parents
+        var queue = queue
+        
+        let promise = Promise<[Identifier]?, AnyError>()
+        if !queue.isEmpty {
+            let current = queue.remove(at: 0)
+            current.neighbours(in: self).onSuccess { neighbours in
+                if let item = neighbours.filter({ $0.0.identifier } >>> isFinal).first {
+                    parents[item.0.identifier] = current.identifier
+                    promise.success(with: <>self.computePath(using: parents, until: item.0.identifier))
+                } else {
+                    neighbours => { item in
+                        if parents[item.0.identifier] == nil, source != item.0.identifier {
+                            parents[item.0.identifier] = current.identifier
+                            queue.append(item.0)
+                        }
+                    }
+                    self.iterate(queue: queue, parents: parents,
+                                 source: source, isFinal: isFinal).nest(to: promise, using: id)
+                }
+            }
+            .onError { _ in
+                self.iterate(queue: queue, parents: parents,
+                             source: source, isFinal: isFinal).nest(to: promise, using: id)
+            }
+        } else {
+            promise.success(with: nil)
+        }
+        return promise
+    }
+    
+    public func bfs(from source: Node,
+                    until isFinal: @escaping (Identifier) -> Bool) -> ResultPromise<[Identifier]?> {
+        
+        if isFinal(source.identifier) {
+            let promise = Promise<[Identifier]?, AnyError>()
+            promise.success(with: [source.identifier])
+            return promise
+        }
+        let queue = [source]
+        return iterate(queue: queue, parents: .empty, source: source.identifier, isFinal: isFinal)
     }
     
 }
