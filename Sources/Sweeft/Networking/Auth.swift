@@ -17,7 +17,7 @@ public protocol Auth {
 public struct NoAuth: Auth {
     
     /// Shared instance
-    static let standard = NoAuth()
+    public static let standard = NoAuth()
     
     public func apply(to request: inout URLRequest) {
         // Do Nothing

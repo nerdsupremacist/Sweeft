@@ -168,7 +168,7 @@ extension JSON {
     
     /// Get underlying Date
     public func date(using format: String = "dd.MM.yyyy hh:mm:ss a") -> Date? {
-        return string?.date(using: format)
+        return string?.date(using: format) ?? double | Date.init(timeIntervalSince1970:)
     }
     
 }
