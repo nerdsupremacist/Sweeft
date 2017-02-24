@@ -7,7 +7,7 @@
 
 import Foundation
 
-public typealias ResultPromise<R> = Promise<R, NoError>
+public typealias ResultPromise<R> = Promise<R, AnyError>
 
 enum PromiseState<T, E: Error> {
     case waiting
@@ -122,6 +122,13 @@ public class Promise<T, E: Error>: PromiseBody {
     public func nested<V>(_ mapper: @escaping (T, Promise<V, E>) -> ()) -> Promise<V, E> {
         let promise = Promise<V, E>(completionQueue: completionQueue)
         nest(to: promise, using: add(trailing: promise) >>> mapper)
+        return promise
+    }
+    
+    public func generalizeError() -> Promise<T, AnyError> {
+        let promise = Promise<T, AnyError>(completionQueue: completionQueue)
+        onSuccess(call: promise.success)
+        onError(call: AnyError.error >>> promise.error)
         return promise
     }
     

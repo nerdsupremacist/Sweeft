@@ -10,6 +10,9 @@ import Foundation
 
 /// Enum For Representing an Empty Error Domain
 public enum NoError: Error {}
+public enum AnyError: Error {
+    case error(Error)
+}
 
 /// Structure that allows us to nest callbacks more nicely
 public struct PromiseSuccessHandler<R, T, E: Error> {

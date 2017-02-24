@@ -89,13 +89,13 @@ public extension HashableNode {
 public extension HashableNode {
     
     func shortestPath(with euristics: @escaping (Self.Identifier) -> Double = **{ 0 },
-                      to destination: Self) -> [Self.Identifier]? {
+                      to destination: Self) -> ResultPromise<[Self.Identifier]?> {
         
         return shortestPath(with: euristics, until: { $0 == destination.identifier })
     }
     
     func shortestPath(with euristics: @escaping (Self.Identifier) -> Double = **{ 0 },
-                      until isFinal: @escaping (Self.Identifier) -> Bool) -> [Self.Identifier]? {
+                      until isFinal: @escaping (Self.Identifier) -> Bool) -> ResultPromise<[Self.Identifier]?> {
         
         let graph = Graph<Self>()
         return graph.shortestPath(from: self, with: euristics, until: isFinal)
@@ -109,7 +109,7 @@ public protocol SimpleNode: GraphNode {
 
 public extension SimpleNode {
     
-    public func neighbours() -> Promise<[Connection<Self.Identifier>], NoError> {
+    public func neighbours() -> Promise<[Connection<Self.Identifier>], AnyError> {
         
         return neighbourIdentifiers().nested { identifiers in
             identifiers => Connection.simple
@@ -123,8 +123,8 @@ public protocol SyncNode: GraphNode {
 
 extension SyncNode {
     
-    public func neighbours() -> Promise<[Connection<Self.Identifier>], NoError> {
-        let promise = Promise<[Connection<Self.Identifier>], NoError>()
+    public func neighbours() -> Promise<[Connection<Self.Identifier>], AnyError> {
+        let promise = Promise<[Connection<Self.Identifier>], AnyError>()
         promise.success(with: neighbours)
         return promise
     }
