@@ -7,6 +7,8 @@
 
 import Foundation
 
+public typealias ResultPromise<R> = Promise<R, NoError>
+
 enum PromiseState<T, E: Error> {
     case waiting
     case success(result: T)
@@ -67,11 +69,17 @@ public class Promise<T, E: Error>: PromiseBody {
      - Returns: PromiseHandler Object
      */
     @discardableResult public func onSuccess<O>(call handler: @escaping (T) -> (O)) -> PromiseSuccessHandler<O, T, E> {
+        if let result = state.result {
+            handler(result)
+        }
         return PromiseSuccessHandler<O, T, E>(promise: self, handler: handler)
     }
     
     /// Add an error Handler
     @discardableResult public func onError<O>(call handler: @escaping (E) -> (O)) -> PromiseErrorHandler<O, T, E> {
+        if let error = state.error {
+            handler(error)
+        }
         return PromiseErrorHandler<O, T, E>(promise: self, handler: handler)
     }
     
