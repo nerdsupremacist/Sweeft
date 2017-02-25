@@ -8,6 +8,8 @@
 
 import Foundation
 
+fileprivate struct Null {}
+
 /// JSON Object
 public enum JSON {
     
@@ -49,7 +51,7 @@ public extension JSON {
         case .object(let value):
             return value
         case .null:
-            return NSNull()
+            return Null()
         }
     }
     
