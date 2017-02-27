@@ -19,8 +19,8 @@ public extension URL {
      - Returns: URL with the query
      */
     func appendingQuery(key: String, value: String) -> URL {
-        let query = "\(key)=\(value)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed).?
-        let string = self.absoluteString + (??query ? "&" : "?") + query
+        let newQuery = "\(key)=\(value)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed).?
+        let string = self.absoluteString + (??query ? "&" : "?") + newQuery
         return URL(string: string)!
     }
     
