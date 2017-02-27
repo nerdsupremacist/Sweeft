@@ -17,6 +17,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
+        let w = true
+        let p = false
+        
+        let maze: Maze = [
+            [w, w, w, w, p, w, w, w],
+            [w, w, p, p, p, p, p, p],
+            [w, p, p, w, w, p, w, p],
+            [w, p, w, w, w, p, w, p],
+            [p, p, p, w, w, p, w, w],
+            [p, w, p, p, p, p, w, w],
+            [p, w, w, p, w, w, w, w],
+            [p, w, w, p, p, p, p, p],
+            [p, p, p, w, w, w, w, p],
+            [w, w, p, p, p, p, p, p],
+            [w, w, w, w, w, w, w, p]
+        ]
+        let start = Maze.Coordinates(x: 4, y: 0)
+        let end = Maze.Coordinates(x: 7, y: 10)
+        maze.findWay(from: start, to: end).onSuccess { path in
+            guard let path = path else {
+                print("No Path!!!")
+                return
+            }
+            print(path)
+        }
+        
+        
         Demo.colorMap()
         Demo.solveQueensProblem()
         

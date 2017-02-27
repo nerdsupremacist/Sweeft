@@ -14,6 +14,15 @@ enum PromiseState<T, E: Error> {
     case success(result: T)
     case error(error: E)
     
+    var isDone: Bool {
+        switch self {
+        case .waiting:
+            return false
+        default:
+            return true
+        }
+    }
+    
     var result: T? {
         switch self {
         case .success(let result):
@@ -85,6 +94,9 @@ public class Promise<T, E: Error>: PromiseBody {
     
     /// Call this when the promise is fulfilled
     public func success(with value: T) {
+        guard !state.isDone else {
+            return
+        }
         state = .success(result: value)
         completionQueue >>> {
             self.successHandlers => apply(value: value)
@@ -93,6 +105,9 @@ public class Promise<T, E: Error>: PromiseBody {
     
     /// Call this when the promise has an error
     public func error(with value: E) {
+        guard !state.isDone else {
+            return
+        }
         state = .error(error: value)
         completionQueue >>> {
             self.errorHandlers => apply(value: value)

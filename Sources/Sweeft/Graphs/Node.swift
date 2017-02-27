@@ -97,6 +97,15 @@ public extension HashableNode {
         return graph.bfs(from: self, until: isFinal)
     }
     
+    func dfs(to destination: Self) -> ResultPromise<[Self.Identifier]?> {
+        return dfs { $0 == destination.identifier }
+    }
+    
+    func dfs(until isFinal: @escaping (Self.Identifier) -> Bool) -> ResultPromise<[Self.Identifier]?> {
+        let graph = Graph<Self>()
+        return graph.dfs(from: self, until: isFinal)
+    }
+    
     func shortestPath(with euristics: @escaping (Self.Identifier) -> Double = **{ 0 },
                       to destination: Self) -> ResultPromise<[Self.Identifier]?> {
         

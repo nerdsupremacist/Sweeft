@@ -12,17 +12,18 @@ import Sweeft
 
 // First here comes our actual work. Creating the constraints and calling the framework.
 
-protocol MapEntity: Hashable {
+protocol MapEntity: HashableNode, SimpleSyncNode {
     associatedtype Coloring: CSPValue, Equatable
-    var neighbours: [Self] { get }
 }
 
 extension MapEntity {
     
+    var constraints: [Constraint<Self, Coloring>] {
+        return neighbourIdentifiers.map { .binary(self, $0, constraint: (!=)) }
+    }
+    
     static func color(entities: [Self]) -> [Self:Coloring]? {
-        let constraints = entities.flatMap { entity in
-            return entity.neighbours => { Constraint<Self, Coloring>.binary(entity, $0, constraint: (!=)) }
-        }
+        let constraints = entities.flatMap { $0.constraints }
         let csp = CSP<Self, Coloring>(constraints: constraints)
         return csp.solution()
     }
@@ -57,7 +58,7 @@ extension State: MapEntity {
     
     typealias Coloring = Color
     
-    var neighbours: [State] {
+    var neighbourIdentifiers: [State] {
         switch self {
         case .westernAustralia:
             return [.northernTerritory, .southAustralia]

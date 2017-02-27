@@ -168,6 +168,11 @@ extension JSON {
         return get()
     }
     
+    /// When the date is expressed in the amount of time from now
+    public var dateInDistanceFromNow: Date? {
+        return double | Date.init(timeIntervalSinceNow:)
+    }
+    
     /// Get underlying Date
     public func date(using format: String = "dd.MM.yyyy hh:mm:ss a") -> Date? {
         return string?.date(using: format) ?? double | Date.init(timeIntervalSince1970:)
@@ -281,12 +286,20 @@ extension JSON: ExpressibleByArrayLiteral {
         self = .array(elements)
     }
     
+    public init(arrayLiteral elements: Serializable...) {
+        self = .array(elements => { $0.json })
+    }
+    
 }
 
 extension JSON: ExpressibleByDictionaryLiteral {
     
     public init(dictionaryLiteral elements: (String, JSON)...) {
         self = .dict(elements >>= id)
+    }
+    
+    public init(dictionaryLiteral elements: (String, Serializable)...) {
+        self = .dict(elements >>= { ($0, $1.json) })
     }
     
 }
