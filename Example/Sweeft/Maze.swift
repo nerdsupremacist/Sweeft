@@ -72,7 +72,7 @@ final class Maze {
     func nextDecisiveCoordinate(for point: Coordinates, in direction: Direction, steps: Int = 1) -> (Coordinates, Int) {
         let neighbour = direction.coordinates(byApplyingTo: point)
         if directions(for: neighbour).count == 2 {
-            let directions = self.directions(for: neighbour).filter { $0.opposite != direction }
+            let directions = self.directions(for: neighbour) |> { $0.opposite != direction }
             if let direction = directions.first {
                 return nextDecisiveCoordinate(for: neighbour, in: direction, steps: steps + 1)
             }
