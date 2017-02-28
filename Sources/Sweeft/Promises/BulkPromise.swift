@@ -42,7 +42,7 @@ extension BulkPromise where T: Collection {
     
 }
 
-extension BulkPromise: ArrayLiteralConvertible {
+extension BulkPromise: ExpressibleByArrayLiteral {
     
     public convenience init(arrayLiteral elements: Promise<T, O>...) {
         self.init(promises: elements)

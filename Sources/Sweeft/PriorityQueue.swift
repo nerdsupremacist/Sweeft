@@ -28,7 +28,7 @@ public class PriorityQueue<T: Hashable, P: Comparable> {
     }
     
     private func childrenOfItem(at index: Int) -> [(element: (item: T, priority: P), index: Int)] {
-        var indexes = [2 * index + 1, 2 * index + 2]
+        let indexes = [2 * index + 1, 2 * index + 2]
         return self.items.withIndex | indexes
     }
     
@@ -36,9 +36,9 @@ public class PriorityQueue<T: Hashable, P: Comparable> {
         guard index > 0 else {
             return
         }
-        var parentIndex = (index - 1)/2
-        var parent = items[parentIndex]
-        var current = items[index]
+        let parentIndex = (index - 1)/2
+        let parent = items[parentIndex]
+        let current = items[index]
         if parent.priority > current.priority {
             self.swap(parentIndex, index)
             siftUp(at: parentIndex)
@@ -46,7 +46,7 @@ public class PriorityQueue<T: Hashable, P: Comparable> {
     }
     
     private func siftDown(at index: Int) {
-        var children = childrenOfItem(at: index)
+        let children = childrenOfItem(at: index)
         guard let child = children.argmin({ $0.element.priority }) else {
             return
         }
@@ -83,13 +83,13 @@ public class PriorityQueue<T: Hashable, P: Comparable> {
     public func popWithPriority() -> (T, P)? {
         if count > 1 {
             swap(0, items.lastIndex)
-            var item = items.removeLast()
+            let item = items.removeLast()
             itemPositions[item.item] = nil
             siftDown(at: 0)
             return item
         } else {
             itemPositions = .empty
-            var item = items.first
+            let item = items.first
             items = .empty
             return item
         }
