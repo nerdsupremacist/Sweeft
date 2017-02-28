@@ -35,17 +35,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         ]
         let start = Maze.Coordinates(x: 4, y: 0)
         let end = Maze.Coordinates(x: 7, y: 10)
-        maze.findWay(from: start, to: end).onSuccess { path in
-            guard let path = path else {
-                print("No Path!!!")
-                return
-            }
+        if let path = maze.findWay(from: start, to: end) {
             print(path)
         }
         
-        
-        Demo.colorMap()
-        Demo.solveQueensProblem()
+//        
+//        Demo.colorMap()
+//        Demo.solveQueensProblem()
         
         // Override point for customization after application launch.
         return true

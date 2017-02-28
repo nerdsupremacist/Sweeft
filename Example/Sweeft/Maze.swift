@@ -88,11 +88,12 @@ final class Maze {
         return directions(for: point) => { $0.coordinates(byApplyingTo: point) }
     }
     
-    func findWay(from source: Coordinates, to destination: Coordinates) -> ResultPromise<[MazeNode]?> {
+    func findWay(from source: Coordinates, to destination: Coordinates) -> [MazeNode]? {
         let source = MazeNode(maze: self, point: source)
         let destination = MazeNode(maze: self, point: destination)
-        return source.shortestPath(with: { $0.point.distance(to: destination.point) | Double.init },
-                                   to: destination)
+        let result = try? source.shortestPath(with: { $0.point.distance(to: destination.point) | Double.init },
+                                              to: destination).wait()
+        return result ?? nil
     }
     
 }

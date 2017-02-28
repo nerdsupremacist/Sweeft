@@ -78,17 +78,11 @@ public class Promise<T, E: Error>: PromiseBody {
      - Returns: PromiseHandler Object
      */
     @discardableResult public func onSuccess<O>(call handler: @escaping (T) -> (O)) -> PromiseSuccessHandler<O, T, E> {
-        if let result = state.result {
-            handler(result)
-        }
         return PromiseSuccessHandler<O, T, E>(promise: self, handler: handler)
     }
     
     /// Add an error Handler
     @discardableResult public func onError<O>(call handler: @escaping (E) -> (O)) -> PromiseErrorHandler<O, T, E> {
-        if let error = state.error {
-            handler(error)
-        }
         return PromiseErrorHandler<O, T, E>(promise: self, handler: handler)
     }
     
@@ -98,8 +92,9 @@ public class Promise<T, E: Error>: PromiseBody {
             return
         }
         state = .success(result: value)
+        let count = self.successHandlers.count
         completionQueue >>> {
-            self.successHandlers => apply(value: value)
+            self.successHandlers.array(withFirst: count) => apply(value: value)
         }
     }
     
@@ -109,8 +104,9 @@ public class Promise<T, E: Error>: PromiseBody {
             return
         }
         state = .error(error: value)
+        let count = self.errorHandlers.count
         completionQueue >>> {
-            self.errorHandlers => apply(value: value)
+            self.errorHandlers.array(withFirst: count) => apply(value: value)
         }
     }
     
@@ -145,6 +141,29 @@ public class Promise<T, E: Error>: PromiseBody {
         onSuccess(call: promise.success)
         onError(call: AnyError.error >>> promise.error)
         return promise
+    }
+    
+    /**
+     Turns an asynchrounous handler into a synchrounous one. 
+     Warning! This can result really badly. Be very careful when calling this.
+     
+     
+     - Returns: Result of your promise
+     */
+    public func wait() throws -> T {
+        let group = DispatchGroup()
+        group.enter()
+        onSuccess { _ in
+            group.leave()
+        }
+        onError { _ in
+            group.leave()
+        }
+        group.wait()
+        if let result = state.result {
+            return result
+        }
+        throw state.error!
     }
     
 }
