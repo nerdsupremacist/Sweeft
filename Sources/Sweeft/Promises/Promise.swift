@@ -70,6 +70,24 @@ public class Promise<T, E: Error>: PromiseBody {
         self.completionQueue = completionQueue
     }
     
+    public init(successful value: T, completionQueue: DispatchQueue = .main) {
+        self.completionQueue = completionQueue
+        self.state = .success(result: value)
+    }
+    
+    public init(errored value: E, completionQueue: DispatchQueue = .main) {
+        self.completionQueue = completionQueue
+        self.state = .error(error: value)
+    }
+    
+    public static func successful(with value: T) -> Promise<T, E> {
+        return Promise<T, E>(successful: value)
+    }
+    
+    public static func errored(with value: E) -> Promise<T, E> {
+        return Promise<T, E>(errored: value)
+    }
+    
     /**
      Add success handler
      

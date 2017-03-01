@@ -108,31 +108,32 @@ public extension API {
             request.addValue($1, forHTTPHeaderField: $0)
         }
         
-        auth.apply(to: &request)
-        willPerform(request: &request)
-        
-        let session = self.session(for: method, at: endpoint)
-        let task = session.dataTask(with: request) { (data, response, error) in
-            if let error = error {
-                if let error = error as? URLError, error.code == .timedOut {
-                    promise.error(with: .timeout)
-                } else {
-                    promise.error(with: .unknown(error: error))
+        auth.apply(to: request).onSuccess { request in
+            var request = request
+            self.willPerform(request: &request)
+            let session = self.session(for: method, at: endpoint)
+            let task = session.dataTask(with: request) { (data, response, error) in
+                if let error = error {
+                    if let error = error as? URLError, error.code == .timedOut {
+                        promise.error(with: .timeout)
+                    } else {
+                        promise.error(with: .unknown(error: error))
+                    }
+                    return
                 }
-                return
+                let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 200
+                guard acceptableStatusCodes.contains(statusCode) else {
+                    promise.error(with: .invalidStatus(code: statusCode, data: data))
+                    return
+                }
+                if let data = data {
+                    promise.success(with: data)
+                } else {
+                    promise.error(with: .noData)
+                }
             }
-            let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 200
-            guard acceptableStatusCodes.contains(statusCode) else {
-                promise.error(with: .invalidStatus(code: statusCode, data: data))
-                return
-            }
-            if let data = data {
-                promise.success(with: data)
-            } else {
-                promise.error(with: .noData)
-            }
+            task.resume()
         }
-        task.resume()
         
         return promise
     }

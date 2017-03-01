@@ -142,9 +142,7 @@ public protocol SyncNode: GraphNode {
 extension SyncNode {
     
     public func neighbours() -> Promise<[Connection<Self.Identifier>], AnyError> {
-        let promise = Promise<[Connection<Self.Identifier>], AnyError>()
-        promise.success(with: neighbours)
-        return promise
+        return .successful(with: neighbours)
     }
     
 }

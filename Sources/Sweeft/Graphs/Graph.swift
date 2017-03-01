@@ -149,9 +149,7 @@ extension Graph {
                     until isFinal: @escaping (Identifier) -> Bool) -> ResultPromise<[Identifier]?> {
         
         if isFinal(source.identifier) {
-            let promise = Promise<[Identifier]?, AnyError>()
-            promise.success(with: [source.identifier])
-            return promise
+            return .successful(with: [source.identifier])
         }
         let queue = [source]
         return iterate(queue: queue, parents: .empty, source: source.identifier, isFinal: isFinal)
@@ -212,9 +210,7 @@ extension Graph {
                     until isFinal: @escaping (Identifier) -> Bool) -> ResultPromise<[Identifier]?> {
         
         if isFinal(source.identifier) {
-            let promise = ResultPromise<[Identifier]?>()
-            promise.success(with: [source.identifier])
-            return promise
+            return .successful(with: [source.identifier])
         }
         let promise = iterate(node: source, parents: .empty, source: source.identifier, until: isFinal)
         return promise.nested { (prevs, item) -> [Identifier]? in

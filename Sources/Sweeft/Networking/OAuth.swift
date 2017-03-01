@@ -14,16 +14,37 @@ public struct OAuth: Auth {
     let tokenType: String
     let refreshToken: String?
     let expirationDate: Date?
+    var manager: OAuthManager<OAuthEndpoint>?
+    var endpoint: OAuthEndpoint?
     
-    var isExpired: Bool {
+    public var isExpired: Bool {
         guard let expirationDate = expirationDate else {
             return false
         }
         return expirationDate < .now
     }
     
-    public func apply(to request: inout URLRequest) {
+    public var isRefreshable: Bool {
+        return ??refreshToken && ??expirationDate
+    }
+    
+    public func refresh() -> OAuth.Result {
+        guard let manager = manager, let endpoint = endpoint else {
+            return .errored(with: .cannotPerformRequest)
+        }
+        return manager.refresh(at: endpoint, with: self)
+    }
+    
+    public func apply(to request: URLRequest) -> Promise<URLRequest, APIError> {
+        if isExpired {
+            return refresh().onSuccess { auth in
+                return auth.apply(to: request)
+            }
+            .future
+        }
+        var request = request
         request.addValue("\(tokenType) \(token)", forHTTPHeaderField: "Authorization")
+        return .successful(with: request)
     }
     
 }
@@ -35,8 +56,12 @@ extension OAuth: Deserializable {
             let tokenType = json["token_type"].string else {
                 return nil
         }
-        self.init(token: token, tokenType: tokenType,
-                  refreshToken: json["refresh_token"].string, expirationDate: json["expiration"].date())
+        self.init(token: token,
+                  tokenType: tokenType,
+                  refreshToken: json["refresh_token"].string,
+                  expirationDate: json["expires_in"].dateInDistanceFromNow,
+                  manager: nil,
+                  endpoint: nil)
     }
     
 }
@@ -48,17 +73,22 @@ extension OAuth: StatusSerializable {
             let tokenType = status["tokenType"] as? String else {
                 return nil
         }
+        let manager = status["manager"] as? [String:Any] | OAuthManager<OAuthEndpoint>.init ?? nil
+        let endpoint = status["endpoint"] as? String | OAuthEndpoint.init(rawValue:)
         self.init(token: token, tokenType: tokenType, refreshToken: (status["refresh"] as? String),
-                  expirationDate: (status["expiration"] as? String)?.date())
+                  expirationDate: (status["expiration"] as? String)?.date(),
+                  manager: manager, endpoint: endpoint)
     }
     
     public var serialized: [String : Any] {
-        var dict = [
+        var dict: [String:Any] = [
             "token": token,
             "tokenType": tokenType
         ]
         dict["refresh"] <- refreshToken
         dict["expiration"] <- expirationDate?.string()
+        dict["endpoint"] <- endpoint?.rawValue
+        dict["manager"] <- manager?.serialized
         return dict
     }
     

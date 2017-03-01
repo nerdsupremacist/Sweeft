@@ -53,13 +53,25 @@ public struct OAuthManager<V: APIEndpoint>: API {
         return doObjectRequest(with: .post, to: endpoint, queries: body, auth: auth)
     }
     
+    private func applyRefresher(to auth: OAuth, with endpoint: Endpoint) -> OAuth {
+        let refresher = OAuthManager<OAuthEndpoint>(baseURL: baseURL,
+                                                    clientID: clientID,
+                                                    secret: secret,
+                                                    useBasicHttp: useBasicHttp,
+                                                    useJSON: useJSON)
+        var auth = auth
+        auth.manager = refresher
+        auth.endpoint = OAuthEndpoint(rawValue: endpoint.rawValue)
+        return auth
+    }
+    
     private func requestAuth(to endpoint: Endpoint, with grant: Grant) -> OAuth.Result {
         let auth = self.auth()
         let body = self.body(with: grant)
         if useJSON {
-            return jsonRequest(to: endpoint, auth: auth, body: body)
+            return jsonRequest(to: endpoint, auth: auth, body: body).nested(self.applyRefresher <** endpoint)
         } else {
-            return queriedRequest(to: endpoint, auth: auth, body: body)
+            return queriedRequest(to: endpoint, auth: auth, body: body).nested(self.applyRefresher <** endpoint)
         }
     }
     
@@ -86,3 +98,52 @@ public extension API {
     }
     
 }
+
+struct OAuthEndpoint: APIEndpoint {
+    let rawValue: String
+}
+
+extension OAuthEndpoint: StatusSerializable {
+    
+    init?(from status: [String : Any]) {
+        guard let rawValue = status["endpoint"] as? String else {
+            return nil
+        }
+        self.init(rawValue: rawValue)
+    }
+    
+    var serialized: [String : Any] {
+        return [
+            "endpoint": rawValue
+        ]
+    }
+    
+}
+
+extension OAuthManager: StatusSerializable {
+    
+    
+    public init?(from status: [String : Any]) {
+        guard let baseURL = status["url"] as? String,
+            let clientID = status["client"] as? String,
+            let secret = status["client"] as? String,
+            let basic = status["basic"] as? Bool,
+            let json = status["json"] as? Bool else {
+                return nil
+        }
+        self.init(baseURL: baseURL, clientID: clientID, secret: secret, useBasicHttp: basic, useJSON: json)
+    }
+    
+    public var serialized: [String : Any] {
+        return [
+            "url": baseURL,
+            "clientID": clientID,
+            "secret": secret,
+            "basic": useBasicHttp,
+            "json": useJSON
+        ]
+    }
+    
+}
+
+
