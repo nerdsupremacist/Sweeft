@@ -59,7 +59,6 @@ public struct OAuthManager<V: APIEndpoint>: API {
                                                     secret: secret,
                                                     useBasicHttp: useBasicHttp,
                                                     useJSON: useJSON)
-        var auth = auth
         auth.manager = refresher
         auth.endpoint = OAuthEndpoint(rawValue: endpoint.rawValue)
         return auth
@@ -126,7 +125,7 @@ extension OAuthManager: StatusSerializable {
     public init?(from status: [String : Any]) {
         guard let baseURL = status["url"] as? String,
             let clientID = status["client"] as? String,
-            let secret = status["client"] as? String,
+            let secret = status["secret"] as? String,
             let basic = status["basic"] as? Bool,
             let json = status["json"] as? Bool else {
                 return nil
@@ -137,7 +136,7 @@ extension OAuthManager: StatusSerializable {
     public var serialized: [String : Any] {
         return [
             "url": baseURL,
-            "clientID": clientID,
+            "client": clientID,
             "secret": secret,
             "basic": useBasicHttp,
             "json": useJSON

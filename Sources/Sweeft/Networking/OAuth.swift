@@ -16,7 +16,7 @@ public final class OAuth: Auth {
     let expirationDate: Date?
     var manager: OAuthManager<OAuthEndpoint>?
     var endpoint: OAuthEndpoint?
-    var delegate: OAuthDelegate?
+    public var delegate: OAuthDelegate?
     
     init(token: String, tokenType: String, refreshToken: String?, expirationDate: Date?, manager: OAuthManager<OAuthEndpoint>? = nil, endpoint: OAuthEndpoint? = nil) {
         self.token = token
