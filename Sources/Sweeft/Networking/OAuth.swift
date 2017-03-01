@@ -73,11 +73,12 @@ extension OAuth: StatusSerializable {
             let tokenType = status["tokenType"] as? String else {
                 return nil
         }
-        let manager = status["manager"] as? [String:Any] | OAuthManager<OAuthEndpoint>.init ?? nil
-        let endpoint = status["endpoint"] as? String | OAuthEndpoint.init(rawValue:)
+        let managerStatus = status["manager"] as? [String:Any] ?? .empty
+        let endpoint = (status["endpoint"] as? String) | OAuthEndpoint.init(rawValue:)
         self.init(token: token, tokenType: tokenType, refreshToken: (status["refresh"] as? String),
                   expirationDate: (status["expiration"] as? String)?.date(),
-                  manager: manager, endpoint: endpoint)
+                  manager: OAuthManager<OAuthEndpoint>(from: managerStatus),
+                  endpoint: endpoint)
     }
     
     public var serialized: [String : Any] {

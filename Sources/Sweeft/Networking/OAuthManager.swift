@@ -99,20 +99,20 @@ public extension API {
     
 }
 
-struct OAuthEndpoint: APIEndpoint {
-    let rawValue: String
+public struct OAuthEndpoint: APIEndpoint {
+    public let rawValue: String
 }
 
 extension OAuthEndpoint: StatusSerializable {
     
-    init?(from status: [String : Any]) {
+    public init?(from status: [String : Any]) {
         guard let rawValue = status["endpoint"] as? String else {
             return nil
         }
         self.init(rawValue: rawValue)
     }
     
-    var serialized: [String : Any] {
+    public var serialized: [String : Any] {
         return [
             "endpoint": rawValue
         ]
