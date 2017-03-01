@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct OAuth: Auth {
+public final class OAuth: Auth {
     
     let token: String
     let tokenType: String
@@ -16,6 +16,16 @@ public struct OAuth: Auth {
     let expirationDate: Date?
     var manager: OAuthManager<OAuthEndpoint>?
     var endpoint: OAuthEndpoint?
+    var delegate: OAuthDelegate?
+    
+    init(token: String, tokenType: String, refreshToken: String?, expirationDate: Date?, manager: OAuthManager<OAuthEndpoint>? = nil, endpoint: OAuthEndpoint? = nil) {
+        self.token = token
+        self.tokenType = tokenType
+        self.refreshToken = refreshToken
+        self.expirationDate = expirationDate
+        self.manager = manager
+        self.endpoint = endpoint
+    }
     
     public var isExpired: Bool {
         guard let expirationDate = expirationDate else {
@@ -37,7 +47,8 @@ public struct OAuth: Auth {
     
     public func apply(to request: URLRequest) -> Promise<URLRequest, APIError> {
         if isExpired {
-            return refresh().onSuccess { auth in
+            return refresh().onSuccess { (auth: OAuth) -> Promise<URLRequest, APIError> in
+                self.delegate?.didRefresh(replace: self, with: auth)
                 return auth.apply(to: request)
             }
             .future
@@ -51,7 +62,7 @@ public struct OAuth: Auth {
 
 extension OAuth: Deserializable {
     
-    public init?(from json: JSON) {
+    public convenience init?(from json: JSON) {
         guard let token = json["access_token"].string,
             let tokenType = json["token_type"].string else {
                 return nil
@@ -68,7 +79,7 @@ extension OAuth: Deserializable {
 
 extension OAuth: StatusSerializable {
     
-    public init?(from status: [String : Any]) {
+    public convenience init?(from status: [String : Any]) {
         guard let token = status["token"] as? String,
             let tokenType = status["tokenType"] as? String else {
                 return nil
