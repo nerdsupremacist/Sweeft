@@ -74,8 +74,29 @@ public struct OAuthManager<V: APIEndpoint>: API {
         }
     }
     
+    private func authenticate(at endpoint: Endpoint, with json: JSON) -> OAuth.Result {
+        if let auth = OAuth(from: json) {
+            return .successful(with: auth)
+        }
+        if let authorizationCode = json["code"].string {
+            return authenticate(at: endpoint, authorizationCode: authorizationCode)
+        }
+        return .errored(with: .mappingError(json: json))
+    }
+    
     public func refresh(at endpoint: Endpoint, with auth: OAuth) -> OAuth.Result {
         return requestAuth(to: endpoint, with: .refreshToken(token: auth.refreshToken))
+    }
+    
+    public func authenticate(at endpoint: Endpoint, callback url: URL) -> OAuth.Result {
+        if let fragment = url.fragment {
+            let json = JSON(fragment: fragment)
+            return authenticate(at: endpoint, with: json)
+        } else if let query = url.query {
+            let json = JSON(fragment: query)
+            return authenticate(at: endpoint, with: json)
+        }
+        return .errored(with: .cannotPerformRequest)
     }
     
     public func authenticate(at endpoint: Endpoint, authorizationCode code: String) -> OAuth.Result {
@@ -121,7 +142,6 @@ extension OAuthEndpoint: StatusSerializable {
 
 extension OAuthManager: StatusSerializable {
     
-    
     public init?(from status: [String : Any]) {
         guard let baseURL = status["url"] as? String,
             let clientID = status["client"] as? String,
@@ -144,5 +164,3 @@ extension OAuthManager: StatusSerializable {
     }
     
 }
-
-

@@ -88,6 +88,12 @@ public class Promise<T, E: Error>: PromiseBody {
         return Promise<T, E>(errored: value)
     }
     
+    public static func new(completionQueue: DispatchQueue = .main, _ handle: (Promise<T, E>) -> ()) -> Promise<T, E> {
+        let promise = Promise<T, E>(completionQueue: completionQueue)
+        handle(promise)
+        return promise
+    }
+    
     /**
      Add success handler
      
@@ -142,23 +148,23 @@ public class Promise<T, E: Error>: PromiseBody {
     
     /// Will create a Promise that is based on this promise but maps the result
     public func nested<V>(_ mapper: @escaping (T) -> V) -> Promise<V, E> {
-        let promise = Promise<V, E>(completionQueue: completionQueue)
-        nest(to: promise, using: mapper)
-        return promise
+        return .new { promise in
+            self.nest(to: promise, using: mapper)
+        }
     }
     
     /// Will create a Promise that is based on this promise but maps the result
     public func nested<V>(_ mapper: @escaping (T, Promise<V, E>) -> ()) -> Promise<V, E> {
-        let promise = Promise<V, E>(completionQueue: completionQueue)
-        nest(to: promise, using: add(trailing: promise) >>> mapper)
-        return promise
+        return .new { promise in
+            self.nest(to: promise, using: add(trailing: promise) >>> mapper)
+        }
     }
     
     public func generalizeError() -> Promise<T, AnyError> {
-        let promise = Promise<T, AnyError>(completionQueue: completionQueue)
-        onSuccess(call: promise.success)
-        onError(call: AnyError.error >>> promise.error)
-        return promise
+        return .new { promise in
+            onSuccess(call: promise.success)
+            onError(call: AnyError.error >>> promise.error)
+        }
     }
     
     /**

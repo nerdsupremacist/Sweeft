@@ -58,40 +58,40 @@ extension Graph {
         var costs = costs
         var prevs = prevs
         
-        let promise = Promise<[Identifier]?, AnyError>()
-        if let current = queue.pop()?.item {
-            if isFinal(current.identifier) {
-                promise.success(with: <>computePath(using: prevs, until: current.identifier))
-            } else {
-                let cost = costs[current.identifier].?
-                current.neighbours(in: self).onSuccess { neighbours in
-                    neighbours => { item in
-                        let entry = QueueEntry(item: item.0)
-                        let estimate = cost + item.1 + euristic(item.0.identifier)
-                        if let priority = queue.priority(for: entry) {
-                            if estimate < priority {
-                                queue.update(entry, with: estimate)
+        return .new { promise in
+            if let current = queue.pop()?.item {
+                if isFinal(current.identifier) {
+                    promise.success(with: <>computePath(using: prevs, until: current.identifier))
+                } else {
+                    let cost = costs[current.identifier].?
+                    current.neighbours(in: self).onSuccess { neighbours in
+                        neighbours => { item in
+                            let entry = QueueEntry(item: item.0)
+                            let estimate = cost + item.1 + euristic(item.0.identifier)
+                            if let priority = queue.priority(for: entry) {
+                                if estimate < priority {
+                                    queue.update(entry, with: estimate)
+                                    prevs[item.0.identifier] = current.identifier
+                                    costs[item.0.identifier] = cost + item.1
+                                }
+                            } else if prevs[item.0.identifier] == nil, source != item.0.identifier {
+                                queue.add(entry, with: estimate)
                                 prevs[item.0.identifier] = current.identifier
                                 costs[item.0.identifier] = cost + item.1
                             }
-                        } else if prevs[item.0.identifier] == nil, source != item.0.identifier {
-                            queue.add(entry, with: estimate)
-                            prevs[item.0.identifier] = current.identifier
-                            costs[item.0.identifier] = cost + item.1
                         }
+                        self.iterate(queue: queue, prevs: prevs, costs: costs,
+                                     source: source, euristic: euristic, isFinal: isFinal).nest(to: promise, using: id)
+                        }
+                        .onError { _ in
+                            self.iterate(queue: queue, prevs: prevs, costs: costs,
+                                         source: source, euristic: euristic, isFinal: isFinal).nest(to: promise, using: id)
                     }
-                    self.iterate(queue: queue, prevs: prevs, costs: costs,
-                                 source: source, euristic: euristic, isFinal: isFinal).nest(to: promise, using: id)
                 }
-                .onError { _ in
-                    self.iterate(queue: queue, prevs: prevs, costs: costs,
-                                 source: source, euristic: euristic, isFinal: isFinal).nest(to: promise, using: id)
-                }
+            } else {
+                promise.success(with: nil)
             }
-        } else {
-            promise.success(with: nil)
         }
-        return promise
     }
     
     public func shortestPath(from source: Node,
@@ -117,32 +117,32 @@ extension Graph {
         var parents = parents
         var queue = queue
         
-        let promise = Promise<[Identifier]?, AnyError>()
-        if !queue.isEmpty {
-            let current = queue.remove(at: 0)
-            current.neighbours(in: self).onSuccess { neighbours in
-                if let item = neighbours.filter({ $0.0.identifier } >>> isFinal).first {
-                    parents[item.0.identifier] = current.identifier
-                    promise.success(with: <>self.computePath(using: parents, until: item.0.identifier))
-                } else {
-                    neighbours => { item in
-                        if parents[item.0.identifier] == nil, source != item.0.identifier {
-                            parents[item.0.identifier] = current.identifier
-                            queue.append(item.0)
+        return .new { promise in
+            if !queue.isEmpty {
+                let current = queue.remove(at: 0)
+                current.neighbours(in: self).onSuccess { neighbours in
+                    if let item = neighbours.filter({ $0.0.identifier } >>> isFinal).first {
+                        parents[item.0.identifier] = current.identifier
+                        promise.success(with: <>self.computePath(using: parents, until: item.0.identifier))
+                    } else {
+                        neighbours => { item in
+                            if parents[item.0.identifier] == nil, source != item.0.identifier {
+                                parents[item.0.identifier] = current.identifier
+                                queue.append(item.0)
+                            }
                         }
+                        self.iterate(queue: queue, parents: parents,
+                                     source: source, isFinal: isFinal).nest(to: promise, using: id)
                     }
-                    self.iterate(queue: queue, parents: parents,
-                                 source: source, isFinal: isFinal).nest(to: promise, using: id)
+                    }
+                    .onError { _ in
+                        self.iterate(queue: queue, parents: parents,
+                                     source: source, isFinal: isFinal).nest(to: promise, using: id)
                 }
+            } else {
+                promise.success(with: nil)
             }
-            .onError { _ in
-                self.iterate(queue: queue, parents: parents,
-                             source: source, isFinal: isFinal).nest(to: promise, using: id)
-            }
-        } else {
-            promise.success(with: nil)
         }
-        return promise
     }
     
     public func bfs(from source: Node,
@@ -159,51 +159,44 @@ extension Graph {
 
 extension Graph {
     
-    private func handleQueue(nodes: [Node],
-                     parents: [Identifier:Identifier],
-                     source: Identifier,
-                     until isFinal: @escaping (Identifier) -> Bool) -> ResultPromise<([Identifier:Identifier],Identifier?)> {
-        
-        var nodes = nodes
-        let promise = ResultPromise<([Identifier:Identifier], Identifier?)>()
-        if !nodes.isEmpty {
-            let node = nodes.removeFirst()
-            if parents[node.identifier] == nil, node.identifier != source {
-                iterate(node: node, parents: parents, source: source, until: isFinal).onSuccess { (parents, node) in
-                    if let node = node {
-                        promise.success(with: (parents, node))
-                    } else {
-                        self.handleQueue(nodes: nodes, parents: parents, source: source, until: isFinal).nest(to: promise, using: id)
-                    }
-                }
-            } else {
-                return handleQueue(nodes: nodes, parents: parents, source: source, until: isFinal)
-            }
-        } else {
-            promise.success(with: (parents, nil))
-        }
-        return promise
-    }
-    
-    private func iterate(node: Node,
+    private func iterate(nodes: [Node],
                  parents: [Identifier:Identifier],
                  source: Identifier,
                  until isFinal: @escaping (Identifier) -> Bool) -> ResultPromise<([Identifier:Identifier],Identifier?)> {
         
+        
         var parents = parents
-        let promise = ResultPromise<([Identifier:Identifier], Identifier?)>()
-        node.neighbours(in: self).onSuccess { neighbours in
-            if let item = neighbours.filter({ $0.0.identifier } >>> isFinal).first {
-                parents[item.0.identifier] = node.identifier
-                promise.success(with: (parents, item.0.identifier))
+        var nodes = nodes
+        
+        return .new { promise in
+            if !nodes.isEmpty {
+                let current = nodes.remove(at: 0)
+                current.neighbours(in: self).onSuccess { neighbours in
+                    if let item = neighbours.filter({ $0.0.identifier } >>> isFinal).first {
+                        parents[item.0.identifier] = current.identifier
+                        promise.success(with: (parents, item.0.identifier))
+                    } else {
+                        let neighbours = neighbours => { $0.0 } |> { parents[$0.identifier] == nil && source != $0.identifier }
+                        neighbours => {
+                            parents[$0.identifier] = current.identifier
+                        }
+                        self.iterate(nodes: neighbours, parents: parents, source: source, until: isFinal).onSuccess { result in
+                            parents = result.0
+                            if let result = result.1 {
+                                promise.success(with: (parents, result))
+                            } else {
+                                self.iterate(nodes: nodes, parents: parents, source: source, until: isFinal).nest(to: promise, using: id)
+                            }
+                        }
+                    }
+                    }
+                    .onError { _ in
+                        self.iterate(nodes: nodes, parents: parents, source: source, until: isFinal)
+                }
             } else {
-                neighbours => { parents[$0.0.identifier] = node.identifier }
+                promise.success(with: (parents, nil))
             }
         }
-        .onError { _ in
-            promise.success(with: (parents, nil))
-        }
-        return promise
     }
     
     public func dfs(from source: Node,
@@ -212,12 +205,12 @@ extension Graph {
         if isFinal(source.identifier) {
             return .successful(with: [source.identifier])
         }
-        let promise = iterate(node: source, parents: .empty, source: source.identifier, until: isFinal)
+        let promise = iterate(nodes: [source], parents: .empty, source: source.identifier, until: isFinal)
         return promise.nested { (prevs, item) -> [Identifier]? in
             guard let item = item else {
                 return nil
             }
-            return self.computePath(using: prevs, until: item)
+            return <>self.computePath(using: prevs, until: item)
         }
     }
     

@@ -51,9 +51,9 @@ public extension PromiseSuccessHandler where R: PromiseBody {
     
     /// Promise returned by the handler
     public var future: Promise<R.Result, R.ErrorType> {
-        let promise = Promise<R.Result, R.ErrorType>()
-        then { $0.nest(to: promise, using: id) }
-        return promise
+        return .new { promise in
+            self.then { $0.nest(to: promise, using: id) }
+        }
     }
     
 }
