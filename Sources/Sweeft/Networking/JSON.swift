@@ -201,6 +201,10 @@ extension JSON {
             self = .double(double)
             return
         }
+        if let bool = value as? Bool {
+            self = .bool(bool)
+            return
+        }
         return nil
     }
     
