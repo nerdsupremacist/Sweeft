@@ -23,12 +23,35 @@ public enum JSON {
     
     /// Access dictionary
     public subscript(key: String) -> JSON {
-        return dict | key ?? .null
+        get {
+            return dict | key ?? .null
+        }
+        set {
+            switch self {
+            case .dict(var dict):
+                dict[key] = newValue
+                self = .dict(dict)
+            default:
+                break
+            }
+        }
     }
     
     /// Access array
     public subscript(index: Int) -> JSON {
-        return array | index ?? .null
+        get {
+            return array | index ?? .null
+        }
+        set {
+            switch self {
+            case .array(var array):
+                array[index] = newValue
+                self = .array(array)
+            default:
+                break
+            }
+        }
+        
     }
     
 }
@@ -298,10 +321,6 @@ extension JSON: ExpressibleByStringLiteral {
 
 extension JSON: ExpressibleByArrayLiteral {
     
-    public init(arrayLiteral elements: JSON...) {
-        self = .array(elements)
-    }
-    
     public init(arrayLiteral elements: Serializable...) {
         self = .array(elements => { $0.json })
     }
@@ -310,12 +329,9 @@ extension JSON: ExpressibleByArrayLiteral {
 
 extension JSON: ExpressibleByDictionaryLiteral {
     
-    public init(dictionaryLiteral elements: (String, JSON)...) {
+    public init(dictionaryLiteral elements: (String, Serializable?)...) {
+        let elements = elements ==> { ($0, $1?.json) } >>> iff
         self = .dict(elements >>= id)
-    }
-    
-    public init(dictionaryLiteral elements: (String, Serializable)...) {
-        self = .dict(elements >>= { ($0, $1.json) })
     }
     
 }
