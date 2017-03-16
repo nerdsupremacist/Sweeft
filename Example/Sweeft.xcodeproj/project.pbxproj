@@ -228,6 +228,7 @@
 				0E88DFA31DFDB86200F00AD4 /* Demo.swift */,
 				0E88DFA11DFDB06A00F00AD4 /* LastDateOpened.swift */,
 				0E3D4E281E609234004C1042 /* SixDegrees.swift */,
+				0E9B0C781E64D76600905304 /* Maze.swift */,
 				0E1E2FD01E47CE81002FFFFA /* Person View */,
 				0ED94DB01E1569C900FEC746 /* DetailMovieView */,
 				0E5365F21E11A477002F82DE /* MoviesView */,
@@ -236,7 +237,6 @@
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
-				0E9B0C781E64D76600905304 /* Maze.swift */,
 			);
 			name = "Example for Sweeft";
 			path = Sweeft;

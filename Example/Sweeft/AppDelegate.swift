@@ -36,7 +36,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let start = Maze.Coordinates(x: 4, y: 0)
         let end = Maze.Coordinates(x: 7, y: 10)
         if let path = maze.findWay(from: start, to: end) {
-            print(path)
+            print(path.join(with: "\n"))
+        }
+        
+        async(self.superLongFunction).onSuccess { result in
+            print(result)
+        }
+        .onError { error in
+            print(error)
         }
         
 //        
@@ -45,6 +52,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Override point for customization after application launch.
         return true
+    }
+    
+    func superLongFunction() -> Int {
+        return 42
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

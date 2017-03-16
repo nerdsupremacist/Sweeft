@@ -91,9 +91,16 @@ final class Maze {
     func findWay(from source: Coordinates, to destination: Coordinates) -> [MazeNode]? {
         let source = MazeNode(maze: self, point: source)
         let destination = MazeNode(maze: self, point: destination)
-        let result = try? source.shortestPath(with: { $0.point.distance(to: destination.point) | Double.init },
-                                              to: destination).wait()
+        let result = try? source.dfs(to: destination).wait()
         return result ?? nil
+    }
+    
+}
+
+extension Maze.Coordinates: CustomStringConvertible {
+    
+    var description: String {
+        return "(x: \(x), y: \(y))"
     }
     
 }
@@ -124,11 +131,19 @@ struct MazeNode: HashableNode, SyncNode {
 extension MazeNode {
     
     var hashValue: Int {
-        return "\(point.x),\(point.y)".hashValue
+        return point.description.hashValue
     }
     
     static func ==(lhs: MazeNode, rhs: MazeNode) -> Bool {
         return lhs.point.x == rhs.point.x && lhs.point.y == rhs.point.y
+    }
+    
+}
+
+extension MazeNode: CustomStringConvertible {
+    
+    var description: String {
+        return point.description
     }
     
 }
