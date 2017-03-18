@@ -10,12 +10,13 @@ import Foundation
 
 public final class OAuth: Auth {
     
-    let token: String
-    let tokenType: String
-    let refreshToken: String?
-    let expirationDate: Date?
+    var token: String
+    var tokenType: String
+    var refreshToken: String?
+    var expirationDate: Date?
     var manager: OAuthManager<OAuthEndpoint>?
     var endpoint: OAuthEndpoint?
+    private var refreshPromise: OAuth.Result?
     public var delegate: OAuthDelegate?
     
     init(token: String, tokenType: String, refreshToken: String?, expirationDate: Date?, manager: OAuthManager<OAuthEndpoint>? = nil, endpoint: OAuthEndpoint? = nil) {
@@ -25,6 +26,14 @@ public final class OAuth: Auth {
         self.expirationDate = expirationDate
         self.manager = manager
         self.endpoint = endpoint
+    }
+    
+    public func update(with auth: OAuth) {
+        token = auth.token
+        tokenType = auth.tokenType
+        refreshToken = auth.refreshToken
+        expirationDate = auth.expirationDate
+        delegate?.didRefresh(replace: self, with: self)
     }
     
     public var isExpired: Bool {
@@ -47,11 +56,13 @@ public final class OAuth: Auth {
     
     public func apply(to request: URLRequest) -> Promise<URLRequest, APIError> {
         if isExpired {
-            return refresh().onSuccess { (auth: OAuth) -> Promise<URLRequest, APIError> in
-                self.delegate?.didRefresh(replace: self, with: auth)
-                return auth.apply(to: request)
-            }
-            .future
+            refreshPromise = self.refreshPromise ?? refresh()
+            return refreshPromise?.onSuccess { (auth: OAuth) -> Promise<URLRequest, APIError> in
+                self.refreshPromise = nil
+                self.update(with: auth)
+                return self.apply(to: request)
+                }
+                .future ?? .errored(with: .cannotPerformRequest)
         }
         var request = request
         request.addValue("\(tokenType) \(token)", forHTTPHeaderField: "Authorization")
