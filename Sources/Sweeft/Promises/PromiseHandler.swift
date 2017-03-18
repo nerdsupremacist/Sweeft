@@ -47,12 +47,13 @@ public struct PromiseSuccessHandler<R, T, E: Error> {
     
 }
 
-public extension PromiseSuccessHandler where R: PromiseBody {
+public extension PromiseSuccessHandler where R: PromiseBody, R.ErrorType == E {
     
     /// Promise returned by the handler
     public var future: Promise<R.Result, R.ErrorType> {
         return .new { promise in
             self.then { $0.nest(to: promise, using: id) }
+            self.onError(call: promise.error)
         }
     }
     
