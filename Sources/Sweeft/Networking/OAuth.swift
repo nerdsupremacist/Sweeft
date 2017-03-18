@@ -8,7 +8,9 @@
 
 import Foundation
 
-public final class OAuth: Auth {
+public final class OAuth: Auth, Observable {
+    
+    public var listeners = [Listener]()
     
     var token: String
     var tokenType: String
@@ -17,7 +19,6 @@ public final class OAuth: Auth {
     var manager: OAuthManager<OAuthEndpoint>?
     var endpoint: OAuthEndpoint?
     private var refreshPromise: OAuth.Result?
-    public var delegate: OAuthDelegate?
     
     init(token: String, tokenType: String, refreshToken: String?, expirationDate: Date?, manager: OAuthManager<OAuthEndpoint>? = nil, endpoint: OAuthEndpoint? = nil) {
         self.token = token
@@ -33,7 +34,7 @@ public final class OAuth: Auth {
         tokenType = auth.tokenType
         refreshToken = auth.refreshToken
         expirationDate = auth.expirationDate
-        delegate?.didRefresh(replace: self, with: self)
+        hasChanged()
     }
     
     public var isExpired: Bool {
