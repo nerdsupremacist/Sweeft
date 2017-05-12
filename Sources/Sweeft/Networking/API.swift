@@ -31,6 +31,7 @@ public protocol API {
     var baseQueries: [String:String] { get }
     /// Will be called before performing a Request for people who like to go deep into the metal
     func willPerform(request: inout URLRequest)
+    
     /// Will allow you to prepare more customizable URL Sessions
     func session(for method: HTTPMethod, at endpoint: Endpoint) -> URLSession
 }
@@ -40,6 +41,11 @@ public extension API {
     /// URL Object for the API
     var base: URL! {
         return URL(string: baseURL)
+    }
+    
+    // Cache
+    var cache: FileCache {
+        return FileCache(directory: String(describing: Self.self))
     }
     
     /// Default is empty
@@ -77,6 +83,7 @@ public extension API {
      - Parameter body: Data that should be sent in the HTTP Body
      - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
      - Parameter completionQueue: Queue in which the promise should be run
+     - Parameter maxCacheTime: Time the response should be cached
      
      - Returns: Promise of Data
      */
@@ -88,7 +95,8 @@ public extension API {
                        auth: Auth = NoAuth.standard,
                        body: Data? = nil,
                        acceptableStatusCodes: [Int] = [200],
-                       completionQueue: DispatchQueue = .main) -> Data.Result {
+                       completionQueue: DispatchQueue = .main,
+                       maxCacheTime: TimeInterval = 0) -> Data.Result {
         
         let requestString = arguments ==> endpoint.rawValue ** { string, argument in
             return string.replacingOccurrences(of: "{\(argument.key)}", with: argument.value.description)
@@ -96,6 +104,12 @@ public extension API {
         
         let url = (baseQueries + queries >>= { $0.description }) ==> base.appendingPathComponent(requestString) ** { url, query in
             return url.appendingQuery(key: query.key, value: query.value)
+        }
+        
+        let cacheKey = url.relativePath.replacingOccurrences(of: "/", with: "_")
+        
+        if let cached = cache.get(with: cacheKey, maxTime: maxCacheTime) {
+            return .successful(with: cached)
         }
         
         var request = URLRequest(url: url)
@@ -125,6 +139,9 @@ public extension API {
                     return
                 }
                 if let data = data {
+                    if maxCacheTime > 0 {
+                        self.cache.store(data, with: cacheKey)
+                    }
                     promise.success(with: data)
                 } else {
                     promise.error(with: .noData)
@@ -145,6 +162,7 @@ public extension API {
      - Parameter body: Object with the Data that should be sent
      - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
      - Parameter completionQueue: Queue in which the promise should be run
+     - Parameter maxCacheTime: Time the response should be cached
      
      - Returns: Promise of a Represented Object
      */
@@ -156,15 +174,23 @@ public extension API {
                                      auth: Auth = NoAuth.standard,
                                      body: DataSerializable? = nil,
                                      acceptableStatusCodes: [Int] = [200],
-                                     completionQueue: DispatchQueue = .main) -> Response<T> {
+                                     completionQueue: DispatchQueue = .main,
+                                     maxCacheTime: TimeInterval = 0) -> Response<T> {
         
         var headers = headers
         headers["Content-Type"] <- body?.contentType
         headers["Accept"] <- T.accept
         
-        return doDataRequest(with: method, to: endpoint, arguments: arguments,
-                      headers: headers, queries: queries, auth: auth, body: body?.data,
-                      acceptableStatusCodes: acceptableStatusCodes)
+        return doDataRequest(with: method,
+                             to: endpoint,
+                             arguments: arguments,
+                             headers: headers,
+                             queries: queries,
+                             auth: auth,
+                             body: body?.data,
+                             acceptableStatusCodes: acceptableStatusCodes,
+                             completionQueue: completionQueue,
+                             maxCacheTime: maxCacheTime)
                 .nested { data, promise in
                     guard let underlyingData = T(data: data) else {
                         promise.error(with: .invalidData(data: data))
@@ -185,6 +211,7 @@ public extension API {
      - Parameter body: JSON that should be sent in the HTTP Body
      - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
      - Parameter completionQueue: Queue in which the promise should be run
+     - Parameter maxCacheTime: Time the response should be cached
      
      - Returns: Promise of JSON Object
      */
@@ -196,11 +223,19 @@ public extension API {
                        auth: Auth = NoAuth.standard,
                        body: JSON? = nil,
                        acceptableStatusCodes: [Int] = [200],
-                       completionQueue: DispatchQueue = .main) -> JSON.Result {
+                       completionQueue: DispatchQueue = .main,
+                       maxCacheTime: TimeInterval = 0) -> JSON.Result {
         
-        return doRepresentedRequest(with: method, to: endpoint, arguments: arguments, headers: headers, queries: queries,
-                                    auth: auth, body: body,
-                                    acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
+        return doRepresentedRequest(with: method,
+                                    to: endpoint,
+                                    arguments: arguments,
+                                    headers: headers,
+                                    queries: queries,
+                                    auth: auth,
+                                    body: body,
+                                    acceptableStatusCodes: acceptableStatusCodes,
+                                    completionQueue: completionQueue,
+                                    maxCacheTime: maxCacheTime)
     }
     
     /**
@@ -215,6 +250,7 @@ public extension API {
      - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
      - Parameter completionQueue: Queue in which the promise should be run
      - Parameter path: path of the object inside the json response
+     - Parameter maxCacheTime: Time the response should be cached
      
      - Returns: Promise of the Object
      */
@@ -227,11 +263,20 @@ public extension API {
                          body: JSON? = nil,
                          acceptableStatusCodes: [Int] = [200],
                          completionQueue: DispatchQueue = .main,
-                         at path: [String] = .empty) -> Response<T> {
+                         at path: [String] = .empty,
+                         maxCacheTime: TimeInterval = 0) -> Response<T> {
         
-        return doJSONRequest(with: method, to: endpoint, arguments: arguments,
-                      headers: headers, queries: queries, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes)
-            .nested { json, promise in
+        return doJSONRequest(with: method,
+                             to: endpoint,
+                             arguments: arguments,
+                             headers: headers,
+                             queries: queries,
+                             auth: auth,
+                             body: body,
+                             acceptableStatusCodes: acceptableStatusCodes,
+                             completionQueue: completionQueue,
+                             maxCacheTime: maxCacheTime).nested { json, promise in
+                                
                 guard let item: T = json.get(in: path) else {
                     promise.error(with: .mappingError(json: json))
                     return
@@ -252,25 +297,35 @@ public extension API {
      - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
      - Parameter completionQueue: Queue in which the promise should be run
      - Parameter path: path of the object inside the json response
+     - Parameter maxCacheTime: Time the response should be cached
      
      - Returns: Promise of the Object
      */
-    public func doObjectRequest<T: Deserializable>(with method: HTTPMethod = .get,
-                         to endpoint: Endpoint,
-                         arguments: [String:CustomStringConvertible] = .empty,
-                         headers: [String:CustomStringConvertible] = .empty,
-                         queries: [String:CustomStringConvertible] = .empty,
-                         auth: Auth = NoAuth.standard,
-                         body: JSON? = nil,
-                         acceptableStatusCodes: [Int] = [200],
-                         completionQueue: DispatchQueue = .main,
-                         at path: String...) -> Response<T> {
-        
-        return doObjectRequest(with: method, to: endpoint, arguments: arguments,
-                               headers: headers, queries: queries, auth: auth, body: body,
-                               acceptableStatusCodes: acceptableStatusCodes, at: path)
-    }
-    
+//    public func doObjectRequest<T: Deserializable>(with method: HTTPMethod = .get,
+//                                                   to endpoint: Endpoint,
+//                                                   arguments: [String:CustomStringConvertible] = .empty,
+//                                                   headers: [String:CustomStringConvertible] = .empty,
+//                                                   queries: [String:CustomStringConvertible] = .empty,
+//                                                   auth: Auth = NoAuth.standard,
+//                                                   body: JSON? = nil,
+//                                                   acceptableStatusCodes: [Int] = [200],
+//                                                   completionQueue: DispatchQueue = .main,
+//                                                   at path: String...,
+//                                                   maxCacheTime: TimeInterval = 0) -> Response<T> {
+//        
+//        return doObjectRequest(with: method,
+//                               to: endpoint,
+//                               arguments: arguments,
+//                               headers: headers,
+//                               queries: queries,
+//                               auth: auth,
+//                               body: body,
+//                               acceptableStatusCodes: acceptableStatusCodes,
+//                               completionQueue: completionQueue,
+//                               at: path,
+//                               maxCacheTime: maxCacheTime)
+//    }
+//    
     /**
      Will do a simple Request for an array of Deserializable Objects
      
@@ -284,6 +339,7 @@ public extension API {
      - Parameter completionQueue: Queue in which the promise should be run
      - Parameter path: path of the array inside the json object
      - Parameter internalPath: path of the object inside the individual objects inside the array
+     - Parameter maxCacheTime: Time the response should be cached
      
      - Returns: Promise of Object Array
      */
@@ -297,12 +353,20 @@ public extension API {
                           acceptableStatusCodes: [Int] = [200],
                           completionQueue: DispatchQueue = .main,
                           at path: [String] = .empty,
-                          with internalPath: [String] = .empty) -> Response<[T]> {
+                          with internalPath: [String] = .empty,
+                          maxCacheTime: TimeInterval = 0) -> Response<[T]> {
         
         
-        return doJSONRequest(with: method, to: endpoint, arguments: arguments,
-                      headers: headers, queries: queries, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes)
-            .nested { json, promise in
+        return doJSONRequest(with: method,
+                             to: endpoint,
+                             arguments: arguments,
+                             headers: headers,
+                             queries: queries,
+                             auth: auth,
+                             body: body,
+                             acceptableStatusCodes: acceptableStatusCodes,
+                             maxCacheTime: maxCacheTime).nested { json, promise in
+                                
                 guard let items: [T] = json.getAll(in: path, for: internalPath) else {
                     promise.error(with: .mappingError(json: json))
                     return
@@ -324,6 +388,7 @@ public extension API {
      - Parameter completionQueue: Queue in which the promise should be run
      - Parameter path: path of the array inside the json object
      - Parameter internalPath: path of the object inside the individual objects inside the array
+     - Parameter maxCacheTime: Time the response should be cached
      
      - Returns: Promise of Array of objects
      */
@@ -337,15 +402,25 @@ public extension API {
                                     acceptableStatusCodes: [Int] = [200],
                                     completionQueue: DispatchQueue = .main,
                                     at path: [String] = .empty,
-                                    with internalPath: [String] = .empty) -> Response<[T]> {
+                                    with internalPath: [String] = .empty,
+                                    maxCacheTime: TimeInterval = 0) -> Response<[T]> {
         
         return BulkPromise<[T], APIError>(promises: endpoints => { endpoint, index in
+            
             let arguments = arguments | index
             let body = bodies | index ?? nil
-            return self.doObjectsRequest(with: method, to: endpoint, arguments: arguments.?,
-                                         headers: headers, queries: queries, auth: auth, body: body,
+            return self.doObjectsRequest(with: method,
+                                         to: endpoint,
+                                         arguments: arguments.?,
+                                         headers: headers,
+                                         queries: queries,
+                                         auth: auth,
+                                         body: body,
                                          acceptableStatusCodes: acceptableStatusCodes,
-                                         completionQueue: completionQueue, at: path, with: internalPath)
+                                         completionQueue: completionQueue,
+                                         at: path,
+                                         with: internalPath,
+                                         maxCacheTime: maxCacheTime)
             
         }, completionQueue: completionQueue).flattened
     }
@@ -362,6 +437,7 @@ public extension API {
      - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
      - Parameter completionQueue: Queue in which the promise should be run
      - Parameter path: path of the array inside the json object
+     - Parameter maxCacheTime: Time the response should be cached
      
      - Returns: Promise of Array of objects
      */
@@ -374,15 +450,24 @@ public extension API {
                                     bodies: [JSON?] = .empty,
                                     acceptableStatusCodes: [Int] = [200],
                                     completionQueue: DispatchQueue = .main,
-                                    at path: [String] = .empty) -> Response<[T]> {
+                                    at path: [String] = .empty,
+                                    maxCacheTime: TimeInterval = 0) -> Response<[T]> {
         
         return BulkPromise(promises: endpoints => { endpoint, index in
+            
             let arguments = arguments | index
             let body = bodies | index ?? nil
-            return self.doObjectRequest(with: method, to: endpoint, arguments: arguments.?,
-                                        headers: headers, queries: queries, auth: auth, body: body,
+            return self.doObjectRequest(with: method,
+                                        to: endpoint,
+                                        arguments: arguments.?,
+                                        headers: headers,
+                                        queries: queries,
+                                        auth: auth,
+                                        body: body,
                                         acceptableStatusCodes: acceptableStatusCodes,
-                                        completionQueue: completionQueue, at: path)
+                                        completionQueue: completionQueue,
+                                        at: path,
+                                        maxCacheTime: maxCacheTime)
             
         }, completionQueue: completionQueue)
     }
@@ -399,6 +484,7 @@ public extension API {
      - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
      - Parameter completionQueue: Queue in which the promise should be run
      - Parameter path: path of the array inside the json object
+     - Parameter maxCacheTime: Time the response should be cached
      
      - Returns: Promise of Array of objects
      */
@@ -411,10 +497,21 @@ public extension API {
                               bodies: [JSON?] = .empty,
                               acceptableStatusCodes: [Int] = [200],
                               completionQueue: DispatchQueue = .main,
-                              at path: String...) -> Response<[T]> {
+                              at path: String...,
+                              maxCacheTime: TimeInterval = 0) -> Response<[T]> {
         
         let endpoints = arguments.count.range => returning(endpoint)
-        return doBulkObjectRequest(with: method, to: endpoints, arguments: arguments, headers: headers, queries: queries, auth: auth, bodies: bodies, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue, at: path)
+        return doBulkObjectRequest(with: method,
+                                   to: endpoints,
+                                   arguments: arguments,
+                                   headers: headers,
+                                   queries: queries,
+                                   auth: auth,
+                                   bodies: bodies,
+                                   acceptableStatusCodes: acceptableStatusCodes,
+                                   completionQueue: completionQueue,
+                                   at: path,
+                                   maxCacheTime: maxCacheTime)
     }
     
     /**
@@ -427,6 +524,7 @@ public extension API {
      - Parameter body: JSON Object that should be sent in the HTTP Body
      - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
      - Parameter completionQueue: Queue in which the promise should be run
+     - Parameter maxCacheTime: Time the response should be cached
      
      - Returns: Promise of JSON Object
      */
@@ -437,9 +535,19 @@ public extension API {
                     auth: Auth = NoAuth.standard,
                     body: JSON? = nil,
                     acceptableStatusCodes: [Int] = [200],
-                    completionQueue: DispatchQueue = .main) -> JSON.Result {
+                    completionQueue: DispatchQueue = .main,
+                    maxCacheTime: TimeInterval = 0) -> JSON.Result {
         
-        return doJSONRequest(with: .get, to: endpoint, arguments: arguments, headers: headers, queries: queries, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
+        return doJSONRequest(with: .get,
+                             to: endpoint,
+                             arguments: arguments,
+                             headers: headers,
+                             queries: queries,
+                             auth: auth,
+                             body: body,
+                             acceptableStatusCodes: acceptableStatusCodes,
+                             completionQueue: completionQueue,
+                             maxCacheTime: maxCacheTime)
     }
     
     /**
@@ -452,6 +560,7 @@ public extension API {
      - Parameter body: JSON Object that should be sent in the HTTP Body
      - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
      - Parameter completionQueue: Queue in which the promise should be run
+     - Parameter maxCacheTime: Time the response should be cached
      
      - Returns: Promise of JSON Object
      */
@@ -462,9 +571,19 @@ public extension API {
                     auth: Auth = NoAuth.standard,
                     body: JSON? = nil,
                     acceptableStatusCodes: [Int] = [200],
-                    completionQueue: DispatchQueue = .main) -> JSON.Result {
+                    completionQueue: DispatchQueue = .main,
+                    maxCacheTime: TimeInterval = 0) -> JSON.Result {
         
-        return doJSONRequest(with: .delete, to: endpoint, arguments: arguments, headers: headers, queries: queries, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
+        return doJSONRequest(with: .delete,
+                             to: endpoint,
+                             arguments: arguments,
+                             headers: headers,
+                             queries: queries,
+                             auth: auth,
+                             body: body,
+                             acceptableStatusCodes: acceptableStatusCodes,
+                             completionQueue: completionQueue,
+                             maxCacheTime: maxCacheTime)
     }
     
     /**
@@ -477,6 +596,7 @@ public extension API {
      - Parameter auth: Authentication Manager for the request
      - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
      - Parameter completionQueue: Queue in which the promise should be run
+     - Parameter maxCacheTime: Time the response should be cached
      
      - Returns: Promise of JSON Object
      */
@@ -487,9 +607,19 @@ public extension API {
                      queries: [String:CustomStringConvertible] = .empty,
                      auth: Auth = NoAuth.standard,
                      acceptableStatusCodes: [Int] = [200],
-                     completionQueue: DispatchQueue = .main) -> JSON.Result {
+                     completionQueue: DispatchQueue = .main,
+                     maxCacheTime: TimeInterval = 0) -> JSON.Result {
         
-        return doJSONRequest(with: .post, to: endpoint, arguments: arguments, headers: headers, queries: queries, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
+        return doJSONRequest(with: .post,
+                             to: endpoint,
+                             arguments: arguments,
+                             headers: headers,
+                             queries: queries,
+                             auth: auth,
+                             body: body,
+                             acceptableStatusCodes: acceptableStatusCodes,
+                             completionQueue: completionQueue,
+                             maxCacheTime: maxCacheTime)
     }
     
     /**
@@ -502,6 +632,7 @@ public extension API {
      - Parameter auth: Authentication Manager for the request
      - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
      - Parameter completionQueue: Queue in which the promise should be run
+     - Parameter maxCacheTime: Time the response should be cached
      
      - Returns: Promise of JSON Object
      */
@@ -512,9 +643,19 @@ public extension API {
                      queries: [String:CustomStringConvertible] = .empty,
                      auth: Auth = NoAuth.standard,
                      acceptableStatusCodes: [Int] = [200],
-                     completionQueue: DispatchQueue = .main) -> JSON.Result {
+                     completionQueue: DispatchQueue = .main,
+                     maxCacheTime: TimeInterval = 0) -> JSON.Result {
         
-        return doJSONRequest(with: .put, to: endpoint, arguments: arguments, headers: headers, queries: queries, auth: auth, body: body, acceptableStatusCodes: acceptableStatusCodes, completionQueue: completionQueue)
+        return doJSONRequest(with: .put,
+                             to: endpoint,
+                             arguments: arguments,
+                             headers: headers,
+                             queries: queries,
+                             auth: auth,
+                             body: body,
+                             acceptableStatusCodes: acceptableStatusCodes,
+                             completionQueue: completionQueue,
+                             maxCacheTime: maxCacheTime)
     }
     
 }

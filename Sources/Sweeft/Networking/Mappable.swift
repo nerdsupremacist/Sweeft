@@ -50,9 +50,18 @@ extension Deserializable {
                            headers: [String:CustomStringConvertible] = .empty,
                            queries: [String:CustomStringConvertible] = .empty,
                            auth: Auth = NoAuth.standard,
-                           for path: String...) -> Result {
+                           for path: String...,
+                           maxCacheTime: TimeInterval = 0) -> Result {
         
-        return api.doObjectRequest(with: method, to: endpoint, arguments: arguments, headers: headers, queries: queries, auth: auth, body: nil, at: path)
+        return api.doObjectRequest(with: method,
+                                   to: endpoint,
+                                   arguments: arguments,
+                                   headers: headers,
+                                   queries: queries,
+                                   auth: auth,
+                                   body: nil,
+                                   at: path,
+                                   maxCacheTime: maxCacheTime)
     }
     
     public static func getAll<T: API>(using api: T,
@@ -63,9 +72,18 @@ extension Deserializable {
                               queries: [String:CustomStringConvertible] = .empty,
                               auth: Auth = NoAuth.standard,
                               for path: String...,
-                              using internalPath: [String] = .empty) -> Results {
+                              using internalPath: [String] = .empty,
+                              maxCacheTime: TimeInterval = 0) -> Results {
         
-        return api.doObjectsRequest(with: method, to: endpoint, arguments: arguments, headers: headers, queries: queries, auth: auth, body: nil, at: path)
+        return api.doObjectsRequest(with: method,
+                                    to: endpoint,
+                                    arguments: arguments,
+                                    headers: headers,
+                                    queries: queries,
+                                    auth: auth,
+                                    body: nil,
+                                    at: path,
+                                    maxCacheTime: maxCacheTime)
     }
     
 }
@@ -84,7 +102,13 @@ extension Serializable {
                             queries: [String:CustomStringConvertible] = .empty,
                             auth: Auth = NoAuth.standard) -> JSON.Result {
         
-        return api.doJSONRequest(with: method, to: endpoint, arguments: arguments, headers: headers, queries: queries, auth: auth, body: json)
+        return api.doJSONRequest(with: method,
+                                 to: endpoint,
+                                 arguments: arguments,
+                                 headers: headers,
+                                 queries: queries,
+                                 auth: auth,
+                                 body: json)
     }
     
     public func put<T: API>(using api: T,
@@ -94,7 +118,13 @@ extension Serializable {
                             queries: [String:CustomStringConvertible] = .empty,
                             auth: Auth = NoAuth.standard) -> JSON.Result {
         
-        return send(using: api, method: .put, at: endpoint, arguments: arguments, headers: headers, queries: queries, auth: auth)
+        return send(using: api,
+                    method: .put,
+                    at: endpoint,
+                    arguments: arguments,
+                    headers: headers,
+                    queries: queries,
+                    auth: auth)
     }
     
     public func post<T: API>(using api: T,
@@ -104,7 +134,13 @@ extension Serializable {
                     queries: [String:CustomStringConvertible] = .empty,
                     auth: Auth = NoAuth.standard) -> JSON.Result {
         
-        return send(using: api, method: .post, at: endpoint, arguments: arguments, headers: headers, queries: queries, auth: auth)
+        return send(using: api,
+                    method: .post,
+                    at: endpoint,
+                    arguments: arguments,
+                    headers: headers,
+                    queries: queries,
+                    auth: auth)
     }
     
 }
