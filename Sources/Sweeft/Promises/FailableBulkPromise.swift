@@ -1,23 +1,21 @@
 //
 //  TryBulkPromise.swift
-//  MyTV
+//  Sweeft
 //
 //  Created by Mathias Quintero on 6/19/17.
 //  Copyright © 2017 Mathias Quintero. All rights reserved.
 //
 
-import Sweeft
-
-class FailableBulkPromise<V, R, E: Error>: Promise<R, E> {
+public class FailableBulkPromise<V, R, E: Error>: Promise<R, E> {
     
-    let inputs: [V]
-    let transform: (V) -> Promise<R, E>
+    private let inputs: [V]
+    private let transform: (V) -> Promise<R, E>
     
     private var lastError: E?
     
     private var current = 0
     
-    init(inputs: [V], transform: @escaping (V) -> Promise<R, E>) {
+    public init(inputs: [V], transform: @escaping (V) -> Promise<R, E>) {
         self.inputs = inputs
         self.transform = transform
         super.init()
@@ -46,7 +44,7 @@ class FailableBulkPromise<V, R, E: Error>: Promise<R, E> {
         doit()
     }
     
-    func `continue`() -> FailableBulkPromise<V, R, E> {
+    public func `continue`() -> FailableBulkPromise<V, R, E> {
         let inputs = self.inputs.array(from: current)
         return FailableBulkPromise(inputs: inputs, transform: transform)
     }
