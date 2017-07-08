@@ -96,7 +96,7 @@ public extension API {
                        body: Data? = nil,
                        acceptableStatusCodes: [Int] = [200],
                        completionQueue: DispatchQueue = .main,
-                       maxCacheTime: TimeInterval = 0) -> Data.Result {
+                       maxCacheTime: CacheTime = .no) -> Data.Result {
         
         let requestString = arguments ==> endpoint.rawValue ** { string, argument in
             return string.replacingOccurrences(of: "{\(argument.key)}", with: argument.value.description)
@@ -139,7 +139,7 @@ public extension API {
                     return
                 }
                 if let data = data {
-                    if maxCacheTime > 0 {
+                    if maxCacheTime != .no {
                         self.cache.store(data, with: cacheKey)
                     }
                     promise.success(with: data)
@@ -175,7 +175,7 @@ public extension API {
                                      body: DataSerializable? = nil,
                                      acceptableStatusCodes: [Int] = [200],
                                      completionQueue: DispatchQueue = .main,
-                                     maxCacheTime: TimeInterval = 0) -> Response<T> {
+                                     maxCacheTime: CacheTime = .no) -> Response<T> {
         
         var headers = headers
         headers["Content-Type"] <- body?.contentType
@@ -224,7 +224,7 @@ public extension API {
                        body: JSON? = nil,
                        acceptableStatusCodes: [Int] = [200],
                        completionQueue: DispatchQueue = .main,
-                       maxCacheTime: TimeInterval = 0) -> JSON.Result {
+                       maxCacheTime: CacheTime = .no) -> JSON.Result {
         
         return doRepresentedRequest(with: method,
                                     to: endpoint,
@@ -264,7 +264,7 @@ public extension API {
                          acceptableStatusCodes: [Int] = [200],
                          completionQueue: DispatchQueue = .main,
                          at path: [String] = .empty,
-                         maxCacheTime: TimeInterval = 0) -> Response<T> {
+                         maxCacheTime: CacheTime = .no) -> Response<T> {
         
         return doJSONRequest(with: method,
                              to: endpoint,
@@ -311,7 +311,7 @@ public extension API {
 //                                                   acceptableStatusCodes: [Int] = [200],
 //                                                   completionQueue: DispatchQueue = .main,
 //                                                   at path: String...,
-//                                                   maxCacheTime: TimeInterval = 0) -> Response<T> {
+//                                                   maxCacheTime: CacheTime = .no) -> Response<T> {
 //        
 //        return doObjectRequest(with: method,
 //                               to: endpoint,
@@ -354,7 +354,7 @@ public extension API {
                           completionQueue: DispatchQueue = .main,
                           at path: [String] = .empty,
                           with internalPath: [String] = .empty,
-                          maxCacheTime: TimeInterval = 0) -> Response<[T]> {
+                          maxCacheTime: CacheTime = .no) -> Response<[T]> {
         
         
         return doJSONRequest(with: method,
@@ -403,7 +403,7 @@ public extension API {
                                     completionQueue: DispatchQueue = .main,
                                     at path: [String] = .empty,
                                     with internalPath: [String] = .empty,
-                                    maxCacheTime: TimeInterval = 0) -> Response<[T]> {
+                                    maxCacheTime: CacheTime = .no) -> Response<[T]> {
         
         return BulkPromise<[T], APIError>(promises: endpoints => { endpoint, index in
             
@@ -451,7 +451,7 @@ public extension API {
                                     acceptableStatusCodes: [Int] = [200],
                                     completionQueue: DispatchQueue = .main,
                                     at path: [String] = .empty,
-                                    maxCacheTime: TimeInterval = 0) -> Response<[T]> {
+                                    maxCacheTime: CacheTime = .no) -> Response<[T]> {
         
         return BulkPromise(promises: endpoints => { endpoint, index in
             
@@ -498,7 +498,7 @@ public extension API {
                               acceptableStatusCodes: [Int] = [200],
                               completionQueue: DispatchQueue = .main,
                               at path: String...,
-                              maxCacheTime: TimeInterval = 0) -> Response<[T]> {
+                              maxCacheTime: CacheTime = .no) -> Response<[T]> {
         
         let endpoints = arguments.count.range => returning(endpoint)
         return doBulkObjectRequest(with: method,
@@ -536,7 +536,7 @@ public extension API {
                     body: JSON? = nil,
                     acceptableStatusCodes: [Int] = [200],
                     completionQueue: DispatchQueue = .main,
-                    maxCacheTime: TimeInterval = 0) -> JSON.Result {
+                    maxCacheTime: CacheTime = .no) -> JSON.Result {
         
         return doJSONRequest(with: .get,
                              to: endpoint,
@@ -572,7 +572,7 @@ public extension API {
                     body: JSON? = nil,
                     acceptableStatusCodes: [Int] = [200],
                     completionQueue: DispatchQueue = .main,
-                    maxCacheTime: TimeInterval = 0) -> JSON.Result {
+                    maxCacheTime: CacheTime = .no) -> JSON.Result {
         
         return doJSONRequest(with: .delete,
                              to: endpoint,
@@ -608,7 +608,7 @@ public extension API {
                      auth: Auth = NoAuth.standard,
                      acceptableStatusCodes: [Int] = [200],
                      completionQueue: DispatchQueue = .main,
-                     maxCacheTime: TimeInterval = 0) -> JSON.Result {
+                     maxCacheTime: CacheTime = .no) -> JSON.Result {
         
         return doJSONRequest(with: .post,
                              to: endpoint,
@@ -644,7 +644,7 @@ public extension API {
                      auth: Auth = NoAuth.standard,
                      acceptableStatusCodes: [Int] = [200],
                      completionQueue: DispatchQueue = .main,
-                     maxCacheTime: TimeInterval = 0) -> JSON.Result {
+                     maxCacheTime: CacheTime = .no) -> JSON.Result {
         
         return doJSONRequest(with: .put,
                              to: endpoint,

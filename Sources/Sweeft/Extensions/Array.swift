@@ -133,6 +133,17 @@ public extension Array {
     }
     
     /**
+     Will give you the array starting at a specific index
+     
+     - Parameter index: Index at which you want to start
+     
+     - Returns: Array with the last n Elements
+     */
+    func array(from index: Int) -> [Element] {
+        return array(withLast: count - index)
+    }
+    
+    /**
      Will shift the index of an item to another inced
      
      - Parameter source: index of the item you want to move

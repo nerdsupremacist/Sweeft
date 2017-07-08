@@ -51,7 +51,7 @@ extension Deserializable {
                            queries: [String:CustomStringConvertible] = .empty,
                            auth: Auth = NoAuth.standard,
                            for path: String...,
-                           maxCacheTime: TimeInterval = 0) -> Result {
+                           maxCacheTime: CacheTime = .no) -> Result {
         
         return api.doObjectRequest(with: method,
                                    to: endpoint,
@@ -73,7 +73,7 @@ extension Deserializable {
                               auth: Auth = NoAuth.standard,
                               for path: String...,
                               using internalPath: [String] = .empty,
-                              maxCacheTime: TimeInterval = 0) -> Results {
+                              maxCacheTime: CacheTime = .no) -> Results {
         
         return api.doObjectsRequest(with: method,
                                     to: endpoint,

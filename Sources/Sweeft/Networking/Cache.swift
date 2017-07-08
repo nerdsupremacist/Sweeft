@@ -8,9 +8,59 @@
 
 import Foundation
 
+public enum CacheTime {
+    case no
+    case time(TimeInterval)
+    case forever
+}
+
+extension CacheTime: ExpressibleByFloatLiteral {
+    
+    public init(floatLiteral value: TimeInterval) {
+        if value <= 0 {
+            self = .no
+        } else {
+            self = .time(value)
+        }
+    }
+    
+}
+
+extension CacheTime {
+    
+    func isCreationDateValid(date: Date) -> Bool {
+        switch self {
+        case .no:
+            return false
+        case .forever:
+            return true
+        case .time(let time):
+            return Date.now.timeIntervalSince(date) < time
+        }
+    }
+    
+}
+
+extension CacheTime: Equatable {
+    
+    public static func ==(_ lhs: CacheTime, _ rhs: CacheTime) -> Bool {
+        switch (lhs, rhs) {
+        case (.no, .no):
+            return true
+        case (.forever, .forever):
+            return true
+        case (.time(let a), .time(let b)):
+            return a == b
+        default:
+            return false
+        }
+    }
+    
+}
+
 public protocol Cache {
     associatedtype Value
-    func get(with identifier: String, maxTime: TimeInterval) -> Value?
+    func get(with identifier: String, maxTime: CacheTime) -> Value?
     func store(_ data: Value, with identifier: String)
     func delete(at identifier: String)
 }
@@ -18,6 +68,10 @@ public protocol Cache {
 public struct FileCache {
     
     public let directory: String
+    
+    public init(directory: String) {
+        self.directory = directory
+    }
     
 }
 
@@ -36,14 +90,14 @@ extension FileCache: Cache {
         return searchPathURL.appendingPathComponent(identifier)
     }
     
-    public func get(with identifier: String, maxTime: TimeInterval) -> Data? {
+    public func get(with identifier: String, maxTime: CacheTime) -> Data? {
         let fileURL = url(for: identifier)
         do {
             let attributes = try fileManager.attributesOfItem(atPath: fileURL.path)
             guard let lastUpdated = attributes[FileAttributeKey.modificationDate] as? Date else {
                 return nil
             }
-            guard Date.now.timeIntervalSince(lastUpdated) < maxTime else {
+            guard maxTime.isCreationDateValid(date: lastUpdated) else {
                 delete(at: identifier)
                 return nil
             }
