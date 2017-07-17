@@ -73,44 +73,64 @@ public extension API {
 public extension API {
     
     /**
-     Will do a simple Request
+     Will form a url for a request
      
-     - Parameter method: HTTP Method
      - Parameter endpoint: endpoint of the API it should be sent to
      - Parameter arguments: arguments encoded into the endpoint string
-     - Parameter headers: HTTP Headers that should be added to the request
-     - Parameter auth: Authentication Manager for the request
-     - Parameter body: Data that should be sent in the HTTP Body
-     - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
-     - Parameter completionQueue: Queue in which the promise should be run
-     - Parameter maxCacheTime: Time the response should be cached
+     - Parameter queries: queries that should be appended to the url
      
-     - Returns: Promise of Data
+     - Returns: resulting URL
      */
-    public func doDataRequest(with method: HTTPMethod = .get,
-                       to endpoint: Endpoint,
-                       arguments: [String:CustomStringConvertible] = .empty,
-                       headers: [String:CustomStringConvertible] = .empty,
-                       queries: [String:CustomStringConvertible] = .empty,
-                       auth: Auth = NoAuth.standard,
-                       body: Data? = nil,
-                       acceptableStatusCodes: [Int] = [200],
-                       completionQueue: DispatchQueue = .main,
-                       maxCacheTime: CacheTime = .no) -> Data.Result {
+    public func url(for endpoint: Endpoint,
+                    arguments: [String:CustomStringConvertible] = .empty,
+                    queries: [String:CustomStringConvertible] = .empty) -> URL {
         
         let requestString = arguments ==> endpoint.rawValue ** { string, argument in
             return string.replacingOccurrences(of: "{\(argument.key)}", with: argument.value.description)
         }
         
-        let url = (baseQueries + queries >>= { $0.description }) ==> base.appendingPathComponent(requestString) ** { url, query in
+        return (baseQueries + queries >>= { $0.description }) ==> base.appendingPathComponent(requestString) ** { url, query in
             return url.appendingQuery(key: query.key, value: query.value)
         }
+    }
+    
+    /**
+     Will form a URLRequest
+     
+     - Parameter method: HTTP Method
+     - Parameter endpoint: endpoint of the API it should be sent to
+     - Parameter arguments: arguments encoded into the endpoint string
+     - Parameter headers: HTTP Headers that should be added to the request
+     - Parameter queries: queries that should be appended to the url
+     - Parameter body: Data that should be sent in the HTTP Body
+     
+     - Returns: resulting URLRequest
+     */
+    public func request(with method: HTTPMethod = .get,
+                        for endpoint: Endpoint,
+                        arguments: [String:CustomStringConvertible] = .empty,
+                        headers: [String:CustomStringConvertible] = .empty,
+                        queries: [String:CustomStringConvertible] = .empty,
+                        body: Data? = nil) -> URLRequest {
         
-        let cacheKey = url.relativePath.replacingOccurrences(of: "/", with: "_")
-        
-        if let cached = cache.get(with: cacheKey, maxTime: maxCacheTime) {
-            return .successful(with: cached)
-        }
+        let url = self.url(for: endpoint, arguments: arguments, queries: queries)
+        return request(with: method, to: url, headers: headers, body: body)
+    }
+    
+    /**
+     Will form a URLRequest
+     
+     - Parameter method: HTTP Method
+     - Parameter url: URL that should be requested
+     - Parameter headers: HTTP Headers that should be added to the request
+     - Parameter body: Data that should be sent in the HTTP Body
+     
+     - Returns: resulting URLRequest
+     */
+    public func request(with method: HTTPMethod = .get,
+                        to url: URL,
+                        headers: [String:CustomStringConvertible] = .empty,
+                        body: Data? = nil) -> URLRequest {
         
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
@@ -120,7 +140,29 @@ public extension API {
             request.addValue($1, forHTTPHeaderField: $0)
         }
         
-        return auth.apply(to: request).nested { request, promise in
+        return request
+    }
+    
+    /**
+     Will perform a URLRequest
+     
+     - Parameter request: Request that should be performed
+     - Parameter method: HTTP Method
+     - Parameter endpoint: Requested endpoint
+     - Parameter cacheKey: Key for the Cache
+     - Parameter acceptableStatusCodes: Status codes that are considered a success
+     - Parameter maxCacheTime: Time the response should be cached
+     
+     - Returns: Promise of Data
+     */
+    public func perform(request: URLRequest,
+                        method: HTTPMethod,
+                        at endpoint: Endpoint,
+                        cacheKey: String,
+                        acceptableStatusCodes: [Int] = [200],
+                        maxCacheTime: CacheTime = .no) -> Data.Result {
+        
+        return .new { promise in
             var request = request
             self.willPerform(request: &request)
             let session = self.session(for: method, at: endpoint)
@@ -148,6 +190,51 @@ public extension API {
                 }
             }
             task.resume()
+        }
+    }
+    
+    /**
+     Will do a simple Request
+     
+     - Parameter method: HTTP Method
+     - Parameter endpoint: endpoint of the API it should be sent to
+     - Parameter arguments: arguments encoded into the endpoint string
+     - Parameter headers: HTTP Headers that should be added to the request
+     - Parameter auth: Authentication Manager for the request
+     - Parameter body: Data that should be sent in the HTTP Body
+     - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
+     - Parameter completionQueue: Queue in which the promise should be run
+     - Parameter maxCacheTime: Time the response should be cached
+     
+     - Returns: Promise of Data
+     */
+    public func doDataRequest(with method: HTTPMethod = .get,
+                       to endpoint: Endpoint,
+                       arguments: [String:CustomStringConvertible] = .empty,
+                       headers: [String:CustomStringConvertible] = .empty,
+                       queries: [String:CustomStringConvertible] = .empty,
+                       auth: Auth = NoAuth.standard,
+                       body: Data? = nil,
+                       acceptableStatusCodes: [Int] = [200],
+                       completionQueue: DispatchQueue = .main,
+                       maxCacheTime: CacheTime = .no) -> Data.Result {
+        
+        let url = self.url(for: endpoint, arguments: arguments, queries: queries)
+        let cacheKey = url.relativePath.replacingOccurrences(of: "/", with: "_")
+        
+        if let cached = cache.get(with: cacheKey, maxTime: maxCacheTime) {
+            return .successful(with: cached)
+        }
+        
+        let request = self.request(with: method, to: url, headers: headers, body: body)
+        
+        return auth.apply(to: request).next { request in
+            return self.perform(request: request,
+                                method: method,
+                                at: endpoint,
+                                cacheKey: cacheKey,
+                                acceptableStatusCodes: acceptableStatusCodes,
+                                maxCacheTime: maxCacheTime)
         }
     }
     
@@ -285,47 +372,6 @@ public extension API {
             }
     }
     
-    /**
-     Will do a simple Request for a Deserializable Object
-     
-     - Parameter method: HTTP Method
-     - Parameter endpoint: endpoint of the API it should be sent to
-     - Parameter arguments: arguments encoded into the endpoint string
-     - Parameter headers: HTTP Headers that should be added to the request
-     - Parameter auth: Authentication Manager for the request
-     - Parameter body: JSON Object that should be sent in the HTTP Body
-     - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
-     - Parameter completionQueue: Queue in which the promise should be run
-     - Parameter path: path of the object inside the json response
-     - Parameter maxCacheTime: Time the response should be cached
-     
-     - Returns: Promise of the Object
-     */
-//    public func doObjectRequest<T: Deserializable>(with method: HTTPMethod = .get,
-//                                                   to endpoint: Endpoint,
-//                                                   arguments: [String:CustomStringConvertible] = .empty,
-//                                                   headers: [String:CustomStringConvertible] = .empty,
-//                                                   queries: [String:CustomStringConvertible] = .empty,
-//                                                   auth: Auth = NoAuth.standard,
-//                                                   body: JSON? = nil,
-//                                                   acceptableStatusCodes: [Int] = [200],
-//                                                   completionQueue: DispatchQueue = .main,
-//                                                   at path: String...,
-//                                                   maxCacheTime: CacheTime = .no) -> Response<T> {
-//        
-//        return doObjectRequest(with: method,
-//                               to: endpoint,
-//                               arguments: arguments,
-//                               headers: headers,
-//                               queries: queries,
-//                               auth: auth,
-//                               body: body,
-//                               acceptableStatusCodes: acceptableStatusCodes,
-//                               completionQueue: completionQueue,
-//                               at: path,
-//                               maxCacheTime: maxCacheTime)
-//    }
-//    
     /**
      Will do a simple Request for an array of Deserializable Objects
      
