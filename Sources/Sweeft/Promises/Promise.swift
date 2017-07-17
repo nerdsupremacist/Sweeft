@@ -116,9 +116,10 @@ public class Promise<T, E: Error>: PromiseBody {
             return
         }
         state = .success(result: value)
-        let count = self.successHandlers.count
+        let handlers = successHandlers
+        successHandlers = []
         completionQueue >>> {
-            self.successHandlers.array(withFirst: count) => apply(value: value)
+            handlers => apply(value: value)
         }
     }
     
@@ -128,9 +129,10 @@ public class Promise<T, E: Error>: PromiseBody {
             return
         }
         state = .error(error: value)
-        let count = self.errorHandlers.count
+        let handlers = errorHandlers
+        errorHandlers = []
         completionQueue >>> {
-            self.errorHandlers.array(withFirst: count) => apply(value: value)
+            handlers => apply(value: value)
         }
     }
     
@@ -174,7 +176,7 @@ public class Promise<T, E: Error>: PromiseBody {
     }
     
     /**
-     Turns an asynchrounous handler into a synchrounous one. 
+     Turns an asynchrounous handler into a synchrounous one.
      Warning! This can result really badly. Be very careful when calling this.
      
      
@@ -197,3 +199,4 @@ public class Promise<T, E: Error>: PromiseBody {
     }
     
 }
+

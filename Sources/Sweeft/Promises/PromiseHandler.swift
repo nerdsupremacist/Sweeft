@@ -25,8 +25,11 @@ public struct PromiseSuccessHandler<R, T, E: Error> {
     init(promise: Promise<T, E>, handler: @escaping Handler) {
         self.promise = promise
         self.handler = handler
-        promise.successHandlers.append(handler**)
-        promise.state.result | handler**
+        if let result = promise.state.result {
+            _ = handler(result)
+        } else {
+            promise.successHandlers.append(handler**)
+        }
     }
     
     /// Add an action after the current item
@@ -70,8 +73,11 @@ public struct PromiseErrorHandler<R, T, E: Error> {
     init(promise: Promise<T, E>, handler: @escaping Handler) {
         self.promise = promise
         self.handler = handler
-        promise.errorHandlers.append(handler**)
-        promise.state.error | handler**
+        if let error = promise.state.error {
+            _ = handler(error)
+        } else {
+            promise.errorHandlers.append(handler**)
+        }
     }
     
     /// Add an action to be done afterwards
