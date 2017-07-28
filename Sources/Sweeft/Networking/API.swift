@@ -19,6 +19,29 @@ public enum HTTPMethod: String {
     case delete = "DELETE"
 }
 
+public struct APIResponse {
+    
+    let response: HTTPURLResponse
+    public let data: Data?
+    
+    public var headers: [String : String] {
+        return response.allHeaderFields ==> { ($0.key.description, $0.value as? String) } >>> iff >>= id
+    }
+    
+    public var statusCode: Int {
+        return response.statusCode
+    }
+    
+    public var location: URL? {
+        return headers["Location"] | URL.init(string:)
+    }
+    
+    public var date: Date? {
+        return headers["Date"]?.date()
+    }
+    
+}
+
 /// API Body
 public protocol API {
     /// Endpoint Reference
@@ -158,9 +181,7 @@ public extension API {
     public func perform(request: URLRequest,
                         method: HTTPMethod,
                         at endpoint: Endpoint,
-                        cacheKey: String,
-                        acceptableStatusCodes: [Int] = [200],
-                        maxCacheTime: CacheTime = .no) -> Data.Result {
+                        acceptableStatusCodes: [Int] = [200]) -> Response<APIResponse> {
         
         return .new { promise in
             var request = request
@@ -175,21 +196,36 @@ public extension API {
                     }
                     return
                 }
-                let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 200
-                guard acceptableStatusCodes.contains(statusCode) else {
-                    promise.error(with: .invalidStatus(code: statusCode, data: data))
-                    return
+                guard let response = response as? HTTPURLResponse else {
+                    return promise.error(with: .invalidResponse)
                 }
-                if let data = data {
-                    if maxCacheTime != .no {
-                        self.cache.store(data, with: cacheKey)
-                    }
-                    promise.success(with: data)
-                } else {
-                    promise.error(with: .noData)
+                guard acceptableStatusCodes.contains(response.statusCode) else {
+                    return promise.error(with: .invalidStatus(code: response.statusCode, data: data))
                 }
+                promise.success(with: APIResponse(response: response, data: data))
             }
             task.resume()
+        }
+    }
+    
+    public func doRequest(with method: HTTPMethod = .get,
+                          to endpoint: Endpoint,
+                          arguments: [String:CustomStringConvertible] = .empty,
+                          headers: [String:CustomStringConvertible] = .empty,
+                          queries: [String:CustomStringConvertible] = .empty,
+                          auth: Auth = NoAuth.standard,
+                          body: Data? = nil,
+                          acceptableStatusCodes: [Int] = [200],
+                          completionQueue: DispatchQueue = .main) -> Response<APIResponse> {
+        
+        let url = self.url(for: endpoint, arguments: arguments, queries: queries)
+        let request = self.request(with: method, to: url, headers: headers, body: body)
+        
+        return auth.apply(to: request).next { request in
+            return self.perform(request: request,
+                                method: method,
+                                at: endpoint,
+                                acceptableStatusCodes: acceptableStatusCodes)
         }
     }
     
@@ -209,15 +245,15 @@ public extension API {
      - Returns: Promise of Data
      */
     public func doDataRequest(with method: HTTPMethod = .get,
-                       to endpoint: Endpoint,
-                       arguments: [String:CustomStringConvertible] = .empty,
-                       headers: [String:CustomStringConvertible] = .empty,
-                       queries: [String:CustomStringConvertible] = .empty,
-                       auth: Auth = NoAuth.standard,
-                       body: Data? = nil,
-                       acceptableStatusCodes: [Int] = [200],
-                       completionQueue: DispatchQueue = .main,
-                       maxCacheTime: CacheTime = .no) -> Data.Result {
+                              to endpoint: Endpoint,
+                              arguments: [String:CustomStringConvertible] = .empty,
+                              headers: [String:CustomStringConvertible] = .empty,
+                              queries: [String:CustomStringConvertible] = .empty,
+                              auth: Auth = NoAuth.standard,
+                              body: Data? = nil,
+                              acceptableStatusCodes: [Int] = [200],
+                              completionQueue: DispatchQueue = .main,
+                              maxCacheTime: CacheTime = .no) -> Data.Result {
         
         let url = self.url(for: endpoint, arguments: arguments, queries: queries)
         let cacheKey = url.relativePath.replacingOccurrences(of: "/", with: "_")
@@ -226,15 +262,24 @@ public extension API {
             return .successful(with: cached)
         }
         
-        let request = self.request(with: method, to: url, headers: headers, body: body)
-        
-        return auth.apply(to: request).next { request in
-            return self.perform(request: request,
-                                method: method,
-                                at: endpoint,
-                                cacheKey: cacheKey,
-                                acceptableStatusCodes: acceptableStatusCodes,
-                                maxCacheTime: maxCacheTime)
+        return doRequest(with: method,
+                         to: endpoint,
+                         arguments: arguments,
+                         headers: headers,
+                         queries: queries,
+                         auth: auth,
+                         body: body,
+                         acceptableStatusCodes: acceptableStatusCodes,
+                         completionQueue: completionQueue).nested { (response, promise) in
+                            
+                            if let data = response.data {
+                                if maxCacheTime != .no {
+                                    self.cache.store(data, with: cacheKey)
+                                }
+                                promise.success(with: data)
+                            } else {
+                                promise.error(with: .noData)
+                            }
         }
     }
     
@@ -254,15 +299,15 @@ public extension API {
      - Returns: Promise of a Represented Object
      */
     public func doRepresentedRequest<T: DataRepresentable>(with method: HTTPMethod = .get,
-                                     to endpoint: Endpoint,
-                                     arguments: [String:CustomStringConvertible] = .empty,
-                                     headers: [String:CustomStringConvertible] = .empty,
-                                     queries: [String:CustomStringConvertible] = .empty,
-                                     auth: Auth = NoAuth.standard,
-                                     body: DataSerializable? = nil,
-                                     acceptableStatusCodes: [Int] = [200],
-                                     completionQueue: DispatchQueue = .main,
-                                     maxCacheTime: CacheTime = .no) -> Response<T> {
+                                                           to endpoint: Endpoint,
+                                                           arguments: [String:CustomStringConvertible] = .empty,
+                                                           headers: [String:CustomStringConvertible] = .empty,
+                                                           queries: [String:CustomStringConvertible] = .empty,
+                                                           auth: Auth = NoAuth.standard,
+                                                           body: DataSerializable? = nil,
+                                                           acceptableStatusCodes: [Int] = [200],
+                                                           completionQueue: DispatchQueue = .main,
+                                                           maxCacheTime: CacheTime = .no) -> Response<T> {
         
         var headers = headers
         headers["Content-Type"] <- body?.contentType
@@ -278,13 +323,13 @@ public extension API {
                              acceptableStatusCodes: acceptableStatusCodes,
                              completionQueue: completionQueue,
                              maxCacheTime: maxCacheTime)
-                .nested { data, promise in
-                    guard let underlyingData = T(data: data) else {
-                        promise.error(with: .invalidData(data: data))
-                        return
-                    }
-                    promise.success(with: underlyingData)
+            .nested { data, promise in
+                guard let underlyingData = T(data: data) else {
+                    promise.error(with: .invalidData(data: data))
+                    return
                 }
+                promise.success(with: underlyingData)
+        }
     }
     
     /**
@@ -303,15 +348,15 @@ public extension API {
      - Returns: Promise of JSON Object
      */
     public func doJSONRequest(with method: HTTPMethod = .get,
-                       to endpoint: Endpoint,
-                       arguments: [String:CustomStringConvertible] = .empty,
-                       headers: [String:CustomStringConvertible] = .empty,
-                       queries: [String:CustomStringConvertible] = .empty,
-                       auth: Auth = NoAuth.standard,
-                       body: JSON? = nil,
-                       acceptableStatusCodes: [Int] = [200],
-                       completionQueue: DispatchQueue = .main,
-                       maxCacheTime: CacheTime = .no) -> JSON.Result {
+                              to endpoint: Endpoint,
+                              arguments: [String:CustomStringConvertible] = .empty,
+                              headers: [String:CustomStringConvertible] = .empty,
+                              queries: [String:CustomStringConvertible] = .empty,
+                              auth: Auth = NoAuth.standard,
+                              body: JSON? = nil,
+                              acceptableStatusCodes: [Int] = [200],
+                              completionQueue: DispatchQueue = .main,
+                              maxCacheTime: CacheTime = .no) -> JSON.Result {
         
         return doRepresentedRequest(with: method,
                                     to: endpoint,
@@ -342,16 +387,16 @@ public extension API {
      - Returns: Promise of the Object
      */
     public func doObjectRequest<T: Deserializable>(with method: HTTPMethod = .get,
-                         to endpoint: Endpoint,
-                         arguments: [String:CustomStringConvertible] = .empty,
-                         headers: [String:CustomStringConvertible] = .empty,
-                         queries: [String:CustomStringConvertible] = .empty,
-                         auth: Auth = NoAuth.standard,
-                         body: JSON? = nil,
-                         acceptableStatusCodes: [Int] = [200],
-                         completionQueue: DispatchQueue = .main,
-                         at path: [String] = .empty,
-                         maxCacheTime: CacheTime = .no) -> Response<T> {
+                                                   to endpoint: Endpoint,
+                                                   arguments: [String:CustomStringConvertible] = .empty,
+                                                   headers: [String:CustomStringConvertible] = .empty,
+                                                   queries: [String:CustomStringConvertible] = .empty,
+                                                   auth: Auth = NoAuth.standard,
+                                                   body: JSON? = nil,
+                                                   acceptableStatusCodes: [Int] = [200],
+                                                   completionQueue: DispatchQueue = .main,
+                                                   at path: [String] = .empty,
+                                                   maxCacheTime: CacheTime = .no) -> Response<T> {
         
         return doJSONRequest(with: method,
                              to: endpoint,
@@ -364,12 +409,12 @@ public extension API {
                              completionQueue: completionQueue,
                              maxCacheTime: maxCacheTime).nested { json, promise in
                                 
-                guard let item: T = json.get(in: path) else {
-                    promise.error(with: .mappingError(json: json))
-                    return
-                }
-                promise.success(with: item)
-            }
+                                guard let item: T = json.get(in: path) else {
+                                    promise.error(with: .mappingError(json: json))
+                                    return
+                                }
+                                promise.success(with: item)
+        }
     }
     
     /**
@@ -390,17 +435,17 @@ public extension API {
      - Returns: Promise of Object Array
      */
     public func doObjectsRequest<T: Deserializable>(with method: HTTPMethod = .get,
-                          to endpoint: Endpoint,
-                          arguments: [String:CustomStringConvertible] = .empty,
-                          headers: [String:CustomStringConvertible] = .empty,
-                          queries: [String:CustomStringConvertible] = .empty,
-                          auth: Auth = NoAuth.standard,
-                          body: JSON? = nil,
-                          acceptableStatusCodes: [Int] = [200],
-                          completionQueue: DispatchQueue = .main,
-                          at path: [String] = .empty,
-                          with internalPath: [String] = .empty,
-                          maxCacheTime: CacheTime = .no) -> Response<[T]> {
+                                                    to endpoint: Endpoint,
+                                                    arguments: [String:CustomStringConvertible] = .empty,
+                                                    headers: [String:CustomStringConvertible] = .empty,
+                                                    queries: [String:CustomStringConvertible] = .empty,
+                                                    auth: Auth = NoAuth.standard,
+                                                    body: JSON? = nil,
+                                                    acceptableStatusCodes: [Int] = [200],
+                                                    completionQueue: DispatchQueue = .main,
+                                                    at path: [String] = .empty,
+                                                    with internalPath: [String] = .empty,
+                                                    maxCacheTime: CacheTime = .no) -> Response<[T]> {
         
         
         return doJSONRequest(with: method,
@@ -413,12 +458,12 @@ public extension API {
                              acceptableStatusCodes: acceptableStatusCodes,
                              maxCacheTime: maxCacheTime).nested { json, promise in
                                 
-                guard let items: [T] = json.getAll(in: path, for: internalPath) else {
-                    promise.error(with: .mappingError(json: json))
-                    return
-                }
-                promise.success(with: items)
-            }
+                                guard let items: [T] = json.getAll(in: path, for: internalPath) else {
+                                    promise.error(with: .mappingError(json: json))
+                                    return
+                                }
+                                promise.success(with: items)
+        }
     }
     
     /**
@@ -439,17 +484,17 @@ public extension API {
      - Returns: Promise of Array of objects
      */
     public func doFlatBulkObjectRequest<T: Deserializable>(with method: HTTPMethod = .get,
-                                    to endpoints: [Endpoint],
-                                    arguments: [[String:CustomStringConvertible]] = .empty,
-                                    headers: [String:CustomStringConvertible] = .empty,
-                                    queries: [String:CustomStringConvertible] = .empty,
-                                    auth: Auth = NoAuth.standard,
-                                    bodies: [JSON?] = .empty,
-                                    acceptableStatusCodes: [Int] = [200],
-                                    completionQueue: DispatchQueue = .main,
-                                    at path: [String] = .empty,
-                                    with internalPath: [String] = .empty,
-                                    maxCacheTime: CacheTime = .no) -> Response<[T]> {
+                                                           to endpoints: [Endpoint],
+                                                           arguments: [[String:CustomStringConvertible]] = .empty,
+                                                           headers: [String:CustomStringConvertible] = .empty,
+                                                           queries: [String:CustomStringConvertible] = .empty,
+                                                           auth: Auth = NoAuth.standard,
+                                                           bodies: [JSON?] = .empty,
+                                                           acceptableStatusCodes: [Int] = [200],
+                                                           completionQueue: DispatchQueue = .main,
+                                                           at path: [String] = .empty,
+                                                           with internalPath: [String] = .empty,
+                                                           maxCacheTime: CacheTime = .no) -> Response<[T]> {
         
         return BulkPromise<[T], APIError>(promises: endpoints => { endpoint, index in
             
@@ -468,7 +513,7 @@ public extension API {
                                          with: internalPath,
                                          maxCacheTime: maxCacheTime)
             
-        }, completionQueue: completionQueue).flattened
+            }, completionQueue: completionQueue).flattened
     }
     
     /**
@@ -488,16 +533,16 @@ public extension API {
      - Returns: Promise of Array of objects
      */
     public func doBulkObjectRequest<T: Deserializable>(with method: HTTPMethod = .get,
-                                    to endpoints: [Endpoint],
-                                    arguments: [[String:CustomStringConvertible]] = .empty,
-                                    headers: [String:CustomStringConvertible] = .empty,
-                                    queries: [String:CustomStringConvertible] = .empty,
-                                    auth: Auth = NoAuth.standard,
-                                    bodies: [JSON?] = .empty,
-                                    acceptableStatusCodes: [Int] = [200],
-                                    completionQueue: DispatchQueue = .main,
-                                    at path: [String] = .empty,
-                                    maxCacheTime: CacheTime = .no) -> Response<[T]> {
+                                                       to endpoints: [Endpoint],
+                                                       arguments: [[String:CustomStringConvertible]] = .empty,
+                                                       headers: [String:CustomStringConvertible] = .empty,
+                                                       queries: [String:CustomStringConvertible] = .empty,
+                                                       auth: Auth = NoAuth.standard,
+                                                       bodies: [JSON?] = .empty,
+                                                       acceptableStatusCodes: [Int] = [200],
+                                                       completionQueue: DispatchQueue = .main,
+                                                       at path: [String] = .empty,
+                                                       maxCacheTime: CacheTime = .no) -> Response<[T]> {
         
         return BulkPromise(promises: endpoints => { endpoint, index in
             
@@ -515,9 +560,9 @@ public extension API {
                                         at: path,
                                         maxCacheTime: maxCacheTime)
             
-        }, completionQueue: completionQueue)
+            }, completionQueue: completionQueue)
     }
-
+    
     /**
      Will do a series of requests for objects asynchounously and return an array with all the responses
      
@@ -535,16 +580,16 @@ public extension API {
      - Returns: Promise of Array of objects
      */
     public func doBulkObjectRequest<T: Deserializable>(with method: HTTPMethod = .get,
-                              to endpoint: Endpoint,
-                              arguments: [[String:CustomStringConvertible]] = .empty,
-                              headers: [String:CustomStringConvertible] = .empty,
-                              queries: [String:CustomStringConvertible] = .empty,
-                              auth: Auth = NoAuth.standard,
-                              bodies: [JSON?] = .empty,
-                              acceptableStatusCodes: [Int] = [200],
-                              completionQueue: DispatchQueue = .main,
-                              at path: String...,
-                              maxCacheTime: CacheTime = .no) -> Response<[T]> {
+                                                       to endpoint: Endpoint,
+                                                       arguments: [[String:CustomStringConvertible]] = .empty,
+                                                       headers: [String:CustomStringConvertible] = .empty,
+                                                       queries: [String:CustomStringConvertible] = .empty,
+                                                       auth: Auth = NoAuth.standard,
+                                                       bodies: [JSON?] = .empty,
+                                                       acceptableStatusCodes: [Int] = [200],
+                                                       completionQueue: DispatchQueue = .main,
+                                                       at path: String...,
+        maxCacheTime: CacheTime = .no) -> Response<[T]> {
         
         let endpoints = arguments.count.range => returning(endpoint)
         return doBulkObjectRequest(with: method,
@@ -611,14 +656,14 @@ public extension API {
      - Returns: Promise of JSON Object
      */
     public func delete(_ endpoint: Endpoint,
-                    arguments: [String:CustomStringConvertible] = .empty,
-                    headers: [String:CustomStringConvertible] = .empty,
-                    queries: [String:CustomStringConvertible] = .empty,
-                    auth: Auth = NoAuth.standard,
-                    body: JSON? = nil,
-                    acceptableStatusCodes: [Int] = [200],
-                    completionQueue: DispatchQueue = .main,
-                    maxCacheTime: CacheTime = .no) -> JSON.Result {
+                       arguments: [String:CustomStringConvertible] = .empty,
+                       headers: [String:CustomStringConvertible] = .empty,
+                       queries: [String:CustomStringConvertible] = .empty,
+                       auth: Auth = NoAuth.standard,
+                       body: JSON? = nil,
+                       acceptableStatusCodes: [Int] = [200],
+                       completionQueue: DispatchQueue = .main,
+                       maxCacheTime: CacheTime = .no) -> JSON.Result {
         
         return doJSONRequest(with: .delete,
                              to: endpoint,
@@ -683,14 +728,14 @@ public extension API {
      - Returns: Promise of JSON Object
      */
     public func put(_ body: JSON? = nil,
-                     at endpoint: Endpoint,
-                     arguments: [String:CustomStringConvertible] = .empty,
-                     headers: [String:CustomStringConvertible] = .empty,
-                     queries: [String:CustomStringConvertible] = .empty,
-                     auth: Auth = NoAuth.standard,
-                     acceptableStatusCodes: [Int] = [200],
-                     completionQueue: DispatchQueue = .main,
-                     maxCacheTime: CacheTime = .no) -> JSON.Result {
+                    at endpoint: Endpoint,
+                    arguments: [String:CustomStringConvertible] = .empty,
+                    headers: [String:CustomStringConvertible] = .empty,
+                    queries: [String:CustomStringConvertible] = .empty,
+                    auth: Auth = NoAuth.standard,
+                    acceptableStatusCodes: [Int] = [200],
+                    completionQueue: DispatchQueue = .main,
+                    maxCacheTime: CacheTime = .no) -> JSON.Result {
         
         return doJSONRequest(with: .put,
                              to: endpoint,
@@ -705,3 +750,21 @@ public extension API {
     }
     
 }
+
+public protocol CustomAPI: API, URLSessionDataDelegate {
+    func configuration(for method: HTTPMethod, at endpoint: Endpoint) -> URLSessionConfiguration
+}
+
+extension CustomAPI {
+    
+    public func configuration(for method: HTTPMethod, at endpoint: Endpoint) -> URLSessionConfiguration {
+        return .default
+    }
+    
+    public func session(for method: HTTPMethod, at endpoint: Endpoint) -> URLSession {
+        let configuration = self.configuration(for: method, at: endpoint)
+        return URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+    }
+    
+}
+

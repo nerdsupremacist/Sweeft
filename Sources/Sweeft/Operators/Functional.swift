@@ -50,6 +50,21 @@ public func |<T, V>(_ value: T?, function: ((T) -> V)) -> V? {
 }
 
 /**
+ Pipe. Will pass the value to a function. Like in Bash
+ 
+ - Parameter value: Item you want to pass
+ - Parameter function: Function you want to pass it to
+ 
+ - Returns: result of function
+ */
+public func |<T, V>(_ value: T?, function: ((T) -> V?)) -> V? {
+    guard let value = value else {
+        return nil
+    }
+    return function(value)
+}
+
+/**
  nil-check Handler?
  
  - Parameter handler: Closure you want to evaluate
@@ -115,8 +130,8 @@ infix operator ==>: AdditionPrecedence
  FlatMap
  
  - Parameters:
-    - items: collection
-    - handler: mapping function
+ - items: collection
+ - handler: mapping function
  
  - Returns: result of flatMapping the collection with the function
  */
@@ -540,3 +555,4 @@ public func <+><A, B, C>(_ a: @escaping (A) -> B, _ b: @escaping (A) -> C) -> (A
 public prefix func <><A, B, C>(_ handler: @escaping (A) -> (B) -> C) -> (A, B) -> C {
     return { handler($0)($1) }
 }
+
