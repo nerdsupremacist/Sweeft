@@ -6,31 +6,34 @@
 //  Copyright © 2017 Mathias Quintero. All rights reserved.
 //
 
-public class FailableBulkPromise<V, R, E: Error>: Promise<R, E> {
+public class FailableBulkPromise<R, E: Error>: Promise<R, E> {
     
-    private let inputs: [V]
-    private let transform: (V) -> Promise<R, E>
+    public typealias Factory = () -> Promise<R, E>
+    
+    private let factories: [Factory]
     
     private var lastError: E?
     
     private var current = 0
     
-    public init(inputs: [V], transform: @escaping (V) -> Promise<R, E>) {
-        self.inputs = inputs
-        self.transform = transform
+    public convenience init<V>(inputs: [V], transform: @escaping (V) -> Promise<R, E>) {
+        self.init(factories: inputs => { input in { transform(input) } })
+    }
+    
+    public init(factories: [Factory]) {
+        self.factories = factories
         super.init()
         doit()
     }
     
     func doit() {
-        guard current < inputs.count else {
+        guard current < factories.count else {
             if let lastError = lastError {
                 error(with: lastError)
             }
             return
         }
-        let input = inputs[current]
-        let promise = transform(input)
+        let promise = factories[current]()
         promise.onSuccess(call: self.handleValue).onError(call: self.handleError)
     }
     
@@ -44,9 +47,14 @@ public class FailableBulkPromise<V, R, E: Error>: Promise<R, E> {
         doit()
     }
     
-    public func `continue`() -> FailableBulkPromise<V, R, E> {
-        let inputs = self.inputs.array(from: current)
-        return FailableBulkPromise(inputs: inputs, transform: transform)
+    public func `continue`() -> FailableBulkPromise<R, E> {
+        let factories = self.factories.array(from: current)
+        return FailableBulkPromise(factories: factories)
     }
     
+}
+
+public func ??<V, E>(_ lhs: @escaping @autoclosure () -> Promise<V, E>, _ rhs: @escaping @autoclosure () -> Promise<V, E>) -> FailableBulkPromise<V, E> {
+    
+    return FailableBulkPromise(factories: [lhs, rhs])
 }
