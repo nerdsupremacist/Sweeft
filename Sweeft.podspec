@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'Sweeft'
-  s.version          = '0.10.2'
+  s.version          = '0.11.0'
   s.summary          = 'Swift but a bit Sweeter - More Syntactic Sugar for Swift'
 
   s.description      = "A collection of different operators and extensions that make writing in Swift a bit sweeter."
