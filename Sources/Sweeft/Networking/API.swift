@@ -11,37 +11,6 @@ import Foundation
 /// Response promise from an API
 public typealias Response<T> = Promise<T, APIError>
 
-/// Allowed Methods for HTTP Requests
-public enum HTTPMethod: String {
-    case get = "GET"
-    case put = "PUT"
-    case post = "POST"
-    case delete = "DELETE"
-}
-
-public struct APIResponse {
-    
-    let response: HTTPURLResponse
-    public let data: Data?
-    
-    public var headers: [String : String] {
-        return response.allHeaderFields ==> { ($0.key.description, $0.value as? String) } >>> iff >>= id
-    }
-    
-    public var statusCode: Int {
-        return response.statusCode
-    }
-    
-    public var location: URL? {
-        return headers["Location"] | URL.init(string:)
-    }
-    
-    public var date: Date? {
-        return headers["Date"]?.date()
-    }
-    
-}
-
 /// API Body
 public protocol API {
     /// Endpoint Reference
@@ -747,23 +716,6 @@ public extension API {
                              acceptableStatusCodes: acceptableStatusCodes,
                              completionQueue: completionQueue,
                              maxCacheTime: maxCacheTime)
-    }
-    
-}
-
-public protocol CustomAPI: API, URLSessionDataDelegate {
-    func configuration(for method: HTTPMethod, at endpoint: Endpoint) -> URLSessionConfiguration
-}
-
-extension CustomAPI {
-    
-    public func configuration(for method: HTTPMethod, at endpoint: Endpoint) -> URLSessionConfiguration {
-        return .default
-    }
-    
-    public func session(for method: HTTPMethod, at endpoint: Endpoint) -> URLSession {
-        let configuration = self.configuration(for: method, at: endpoint)
-        return URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
     }
     
 }
