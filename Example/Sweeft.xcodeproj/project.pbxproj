@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		063581C800872D52CBA16A34 /* Pods_Sweeft_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8BE4A50210A64AF4DBAB641 /* Pods_Sweeft_Example.framework */; };
 		0E1E2FD21E47CEAA002FFFFA /* SearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E1E2FD11E47CEAA002FFFFA /* SearchResult.swift */; };
+		0E2B76471F2CCC8D0018937D /* DependecyGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E2B76461F2CCC8D0018937D /* DependecyGraph.swift */; };
 		0E3D4E291E609234004C1042 /* SixDegrees.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E3D4E281E609234004C1042 /* SixDegrees.swift */; };
 		0E5365DC1E1187CB002F82DE /* MoviesAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E5365DB1E1187CB002F82DE /* MoviesAPI.swift */; };
 		0E5365DE1E1187D4002F82DE /* MoviesEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E5365DD1E1187D4002F82DE /* MoviesEndpoint.swift */; };
@@ -62,6 +63,7 @@
 /* Begin PBXFileReference section */
 		0B4D10F081BDF80BA8EF3F78 /* Pods-Sweeft_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Sweeft_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Sweeft_Tests/Pods-Sweeft_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		0E1E2FD11E47CEAA002FFFFA /* SearchResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchResult.swift; sourceTree = "<group>"; };
+		0E2B76461F2CCC8D0018937D /* DependecyGraph.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DependecyGraph.swift; sourceTree = "<group>"; };
 		0E3D4E281E609234004C1042 /* SixDegrees.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SixDegrees.swift; sourceTree = "<group>"; };
 		0E5365DB1E1187CB002F82DE /* MoviesAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoviesAPI.swift; sourceTree = "<group>"; };
 		0E5365DD1E1187D4002F82DE /* MoviesEndpoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoviesEndpoint.swift; sourceTree = "<group>"; };
@@ -224,6 +226,7 @@
 			children = (
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				0E9CECE71E4BA9DB00D81892 /* MapColoring.swift */,
+				0E2B76461F2CCC8D0018937D /* DependecyGraph.swift */,
 				0E9CECE91E4BB74A00D81892 /* QueensProblem.swift */,
 				0E88DFA31DFDB86200F00AD4 /* Demo.swift */,
 				0E88DFA11DFDB06A00F00AD4 /* LastDateOpened.swift */,
@@ -492,6 +495,7 @@
 				0E63EB9B1E1470AF00A0084B /* Person.swift in Sources */,
 				0E3D4E291E609234004C1042 /* SixDegrees.swift in Sources */,
 				0ED94DAF1E15617600FEC746 /* RoleTableViewCell.swift in Sources */,
+				0E2B76471F2CCC8D0018937D /* DependecyGraph.swift in Sources */,
 				0E5365EF1E11A1FE002F82DE /* MovieImageAPI.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 				0E5365E81E119EA5002F82DE /* MovieTableViewCell.swift in Sources */,
