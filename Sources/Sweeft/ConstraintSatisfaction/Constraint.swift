@@ -49,7 +49,7 @@ extension Constraint {
 
 extension Constraint {
     
-    private func values<Variable: Hashable, Value>(for variable: Variable, in array: [VariableInstance<Variable, Value>]) -> [Value] {
+    private func values<Variable, Value>(for variable: Variable, in array: [VariableInstance<Variable, Value>]) -> [Value] {
         let matching = array >>= { $0.variable } <+> { $0.values }
         return matching[variable].?
     }
