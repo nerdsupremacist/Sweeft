@@ -14,6 +14,14 @@ public enum AnyError: Error {
     case error(Error)
 }
 
+extension AnyError: GenerizableError {
+    
+    public init(error: Error) {
+        self = .error(error)
+    }
+    
+}
+
 /// Structure that allows us to nest callbacks more nicely
 public struct PromiseSuccessHandler<R, T, E: Error> {
     
