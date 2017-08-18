@@ -21,9 +21,9 @@ public func after(_ time: TimeInterval = 0.0, in queue: DispatchQueue = .main, h
 }
 
 
-public func async<T>(runQueue: DispatchQueue,
+public func async<T, E: GenerizableError>(runQueue: DispatchQueue,
                      completionQueue: DispatchQueue = .main,
-                     _ handle: @escaping () throws -> T) -> Promise<T, AnyError> {
+                     _ handle: @escaping () throws -> T) -> Promise<T, E> {
     
     return .new(completionQueue: completionQueue) { promise in
         runQueue >>> {
@@ -31,23 +31,24 @@ public func async<T>(runQueue: DispatchQueue,
                 let result = try handle()
                 promise.success(with: result)
             } catch let error {
-                promise.error(with: .error(error))
+                let error = error as? E ?? E(error: error)
+                promise.error(with: error)
             }
         }
     }
 }
 
-public func async<T>(qos: DispatchQoS = .background,
+public func async<T, E: GenerizableError>(qos: DispatchQoS = .background,
                      completionQueue: DispatchQueue = .main,
-                     _ handle: @escaping () throws -> T) -> Promise<T, AnyError> {
+                     _ handle: @escaping () throws -> T) -> Promise<T, E> {
     
     let queue = DispatchQueue(label: String(describing: qos), qos: qos)
     return async(runQueue: queue, completionQueue: completionQueue, handle)
 }
 
-public func async<I, T>(qos: DispatchQoS = .background,
+public func async<I, T, E: GenerizableError>(qos: DispatchQoS = .background,
                         completionQueue: DispatchQueue = .main,
-                        _ handle: @escaping (I) -> T) -> (I) -> Promise<T, AnyError> {
+                        _ handle: @escaping (I) -> T) -> (I) -> Promise<T, E> {
     
     return { async(qos: qos, completionQueue: completionQueue, handle ** $0) }
 }
