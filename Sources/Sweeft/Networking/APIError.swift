@@ -18,4 +18,13 @@ public enum APIError: Error {
     case invalidData(data: Data) /// The Data does not represent the expected information
     case mappingError(json: JSON) /// Failed mapping the JSON Object to the respective Deserializable object
     case unknown(error: Error) /// Another error ocurreda
+    case generic(error: Error)
+}
+
+extension APIError: GenerizableError {
+    
+    public init(error: Error) {
+        self = .generic(error: error)
+    }
+    
 }
