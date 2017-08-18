@@ -17,10 +17,6 @@ Pod::Spec.new do |s|
 
   s.source_files = 'Sources/Sweeft/**/*'
 
-  # s.resource_bundles = {
-  #   'Sweeft' => ['Sweeft/Assets/*.png']
-  # }
-
   # s.public_header_files = 'Pod/Classes/**/*.h'
   s.frameworks = ['Foundation', 'Security']
   # s.dependency 'AFNetworking', '~> 2.3'
