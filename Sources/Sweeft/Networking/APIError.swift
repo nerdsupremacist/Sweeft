@@ -17,14 +17,13 @@ public enum APIError: Error {
     case invalidStatus(code: Int, data: Data?) /// The http status code represents an unsuccesfull transaction
     case invalidData(data: Data) /// The Data does not represent the expected information
     case mappingError(json: JSON) /// Failed mapping the JSON Object to the respective Deserializable object
-    case unknown(error: Error) /// Another error ocurreda
-    case generic(error: Error)
+    case unknown(error: Error) /// Another error ocurred
 }
 
 extension APIError: GenerizableError {
     
     public init(error: Error) {
-        self = .generic(error: error)
+        self = .unknown(error: error)
     }
     
 }
