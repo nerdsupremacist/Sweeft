@@ -110,7 +110,11 @@ public class Promise<T, E: Error>: PromiseBody {
     
     /// Add a
     @discardableResult public func onResult(call handler: @escaping ResultHandler) -> Promise<T, E> {
-        resultHandlers.append(handler)
+        if let result = state.result {
+            handler(result)
+        } else {
+            resultHandlers.append(handler)
+        }
         return self
     }
     
