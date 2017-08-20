@@ -44,7 +44,7 @@ public struct PromiseSuccessHandler<R, T, E: Error> {
     init(promise: Promise<T, E>, handler: @escaping Handler) {
         self.promise = promise
         self.handler = handler
-        if let result = promise.state.result {
+        if let result = promise.state.value {
             _ = handler(result)
         } else {
             promise.successHandlers.append(handler**)
@@ -72,7 +72,7 @@ public struct PromiseSuccessHandler<R, T, E: Error> {
 public extension PromiseSuccessHandler where R: PromiseBody, R.ErrorType == E {
     
     /// Promise returned by the handler
-    public var future: Promise<R.Result, R.ErrorType> {
+    public var future: Promise<R.ResultType, R.ErrorType> {
         return .new { promise in
             self.then { $0.nest(to: promise, using: id) }
             self.onError(call: promise.error)

@@ -252,7 +252,7 @@ extension Collection where Iterator.Element: Serializable {
 
 extension Collection where Iterator.Element: PromiseBody {
     
-    public var bulk: BulkPromise<Iterator.Element.Result, Iterator.Element.ErrorType> {
+    public var bulk: BulkPromise<Iterator.Element.ResultType, Iterator.Element.ErrorType> {
         return BulkPromise(promises: self ==> { $0 as? Promise })
     }
     
