@@ -22,6 +22,17 @@ extension AnyError: GenerizableError {
     
 }
 
+extension AnyError {
+    
+    public var error: Error {
+        switch self {
+        case .error(let error):
+            return error
+        }
+    }
+    
+}
+
 /// Structure that allows us to nest callbacks more nicely
 public struct PromiseSuccessHandler<R, T, E: Error> {
     
