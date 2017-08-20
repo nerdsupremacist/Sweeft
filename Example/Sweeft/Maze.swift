@@ -91,8 +91,8 @@ final class Maze {
     func findWay(from source: Coordinates, to destination: Coordinates) -> [MazeNode]? {
         let source = MazeNode(maze: self, point: source)
         let destination = MazeNode(maze: self, point: destination)
-        let result = try? source.dfs(to: destination).wait()
-        return result ?? nil
+        let result = source.dfs(to: destination).wait()
+        return result.value ?? nil
     }
     
 }
