@@ -7,6 +7,14 @@
 
 import Foundation
 
+func calling<R, E, V>(_ handler: @escaping (Result<R, E>) -> (V)) -> (R) -> (V) {
+    return { handler(.value($0)) }
+}
+
+func calling<R, E, V>(_ handler: @escaping (Result<R, E>) -> (V)) -> (E) -> (V) {
+    return { handler(.error($0)) }
+}
+
 public enum Result<T, E: Error> {
     case value(T)
     case error(E)

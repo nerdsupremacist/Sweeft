@@ -120,7 +120,7 @@ public class Promise<T, E: Error>: PromiseBody {
             return
         }
         state = .done(result: .value(value))
-        let handlers = successHandlers
+        let handlers = successHandlers + (resultHandlers => calling)
         successHandlers = []
         errorHandlers = []
         resultHandlers = []
@@ -135,7 +135,7 @@ public class Promise<T, E: Error>: PromiseBody {
             return
         }
         state = .done(result: .error(value))
-        let handlers = errorHandlers
+        let handlers = errorHandlers + (resultHandlers => calling)
         successHandlers = []
         errorHandlers = []
         resultHandlers = []
