@@ -39,11 +39,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             print(path.join(with: "\n"))
         }
         
-        async(self.superLongFunction).onSuccess { result in
-            print(result)
-        }
-        .onError { error in
-            print(error)
+        superLongAsyncFunction().onResult { result in
+            switch result {
+            case .value(let value):
+                print("Value: \(value)")
+            case .error(let error):
+                print("Error: \(error)")
+            }
         }
         
 //        
@@ -52,6 +54,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Override point for customization after application launch.
         return true
+    }
+    
+    func superLongAsyncFunction() -> Promise<Int, APIError> {
+        return async(self.superLongFunction)
     }
     
     func superLongFunction() -> Int {

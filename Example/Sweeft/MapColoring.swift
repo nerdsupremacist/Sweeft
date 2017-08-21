@@ -19,7 +19,7 @@ protocol MapEntity: HashableNode, SimpleSyncNode {
 extension MapEntity {
     
     var constraints: [Constraint<Self, Coloring>] {
-        return neighbourIdentifiers.map { .binary(self, $0, constraint: (!=)) }
+        return neighbourIdentifiers => { .binary(self, $0, constraint: (!=)) }
     }
     
     static func color(entities: [Self]) -> [Self:Coloring]? {
