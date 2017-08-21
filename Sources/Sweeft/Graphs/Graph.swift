@@ -171,7 +171,8 @@ extension Graph {
         return .new { promise in
             if !nodes.isEmpty {
                 let current = nodes.remove(at: 0)
-                current.neighbours(in: self).onSuccess { neighbours in
+                let neighbours = current.neighbours(in: self)
+                neighbours.onSuccess { neighbours in
                     if let item = neighbours.filter({ $0.0.identifier } >>> isFinal).first {
                         parents[item.0.identifier] = current.identifier
                         promise.success(with: (parents, item.0.identifier))
@@ -189,9 +190,9 @@ extension Graph {
                             }
                         }
                     }
-                    }
-                    .onError { _ in
-                        self.iterate(nodes: nodes, parents: parents, source: source, until: isFinal)
+                }
+                .onError { _ in
+                    self.iterate(nodes: nodes, parents: parents, source: source, until: isFinal)
                 }
             } else {
                 promise.success(with: (parents, nil))
