@@ -256,7 +256,7 @@ public func ||<V, C: Collection>(_ dictionary: [C.Iterator.Element:V]?, _ keys: 
  
  - Returns: is a a subset of b
  */
-public func <=<T: Hashable>(_ a: Set<T>, _ b: Set<T>) -> Bool {
+public func <=<T>(_ a: Set<T>, _ b: Set<T>) -> Bool {
     return a.isSubset(of: b)
 }
 
@@ -268,7 +268,7 @@ public func <=<T: Hashable>(_ a: Set<T>, _ b: Set<T>) -> Bool {
     - b: Set
  - Returns: is a a superset of b
  */
-public func >=<T: Hashable>(_ a: Set<T>, _ b: Set<T>) -> Bool {
+public func >=<T>(_ a: Set<T>, _ b: Set<T>) -> Bool {
     return b <= a
 }
 
@@ -280,7 +280,7 @@ public func >=<T: Hashable>(_ a: Set<T>, _ b: Set<T>) -> Bool {
  
  - Returns: is a a strict subset of b
  */
-public func <<T: Hashable>(_ a: Set<T>, _ b: Set<T>) -> Bool {
+public func <<T>(_ a: Set<T>, _ b: Set<T>) -> Bool {
     return a <= b && a.count < b.count
 }
 
@@ -292,7 +292,7 @@ public func <<T: Hashable>(_ a: Set<T>, _ b: Set<T>) -> Bool {
  
  - Returns: is a a strict superset of b
  */
-public func ><T: Hashable>(_ a: Set<T>, _ b: Set<T>) -> Bool {
+public func ><T>(_ a: Set<T>, _ b: Set<T>) -> Bool {
     return b < a
 }
 
@@ -306,7 +306,7 @@ infix operator <>: ComparisonPrecedence
  
  - Returns: are a and b disjoint
  */
-public func <><T: Hashable>(_ a: Set<T>, _ b: Set<T>) -> Bool {
+public func <><T>(_ a: Set<T>, _ b: Set<T>) -> Bool {
     return a.isDisjoint(with: b)
 }
 

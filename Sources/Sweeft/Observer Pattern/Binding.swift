@@ -49,7 +49,7 @@ public func **<C: ObservableContainer, O>(_ container: C?, _ mapping: @escaping 
 }
 
 /// Apply handler to binding
-public func >>><T: Observable, O>(_ binding: Binding<T, O>?, _ handler: @escaping (O) -> ()) {
+public func >>><T, O>(_ binding: Binding<T, O>?, _ handler: @escaping (O) -> ()) {
     var binding = binding
     binding?.apply(to: handler)
 }
