@@ -387,6 +387,53 @@ public extension API {
     }
     
     /**
+     Will do a simple Request for an APIResponseObject
+     
+     - Parameter method: HTTP Method
+     - Parameter endpoint: endpoint of the API it should be sent to
+     - Parameter arguments: arguments encoded into the endpoint string
+     - Parameter headers: HTTP Headers that should be added to the request
+     - Parameter auth: Authentication Manager for the request
+     - Parameter body: JSON Object that should be sent in the HTTP Body
+     - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
+     - Parameter completionQueue: Queue in which the promise should be run
+     - Parameter path: path of the object inside the json response
+     - Parameter maxCacheTime: Time the response should be cached
+     
+     - Returns: Promise of the Object
+     */
+    public func doObjectRequest<T: APIResponseObject>(with method: HTTPMethod = .get,
+                                                      to endpoint: Endpoint,
+                                                      arguments: [String:CustomStringConvertible] = .empty,
+                                                      headers: [String:CustomStringConvertible] = .empty,
+                                                      queries: [String:CustomStringConvertible] = .empty,
+                                                      auth: Auth = NoAuth.standard,
+                                                      body: JSON? = nil,
+                                                      acceptableStatusCodes: [Int] = [200],
+                                                      completionQueue: DispatchQueue = .main,
+                                                      at path: [String] = .empty,
+                                                      maxCacheTime: CacheTime = .no) -> Response<T> where T.API == Self {
+        
+        return doJSONRequest(with: method,
+                             to: endpoint,
+                             arguments: arguments,
+                             headers: headers,
+                             queries: queries,
+                             auth: auth,
+                             body: body,
+                             acceptableStatusCodes: acceptableStatusCodes,
+                             completionQueue: completionQueue,
+                             maxCacheTime: maxCacheTime).nested { json, promise in
+                                
+                                guard let item: T = json.get(in: path, with: self) else {
+                                    promise.error(with: .mappingError(json: json))
+                                    return
+                                }
+                                promise.success(with: item)
+        }
+    }
+    
+    /**
      Will do a simple Request for an array of Deserializable Objects
      
      - Parameter method: HTTP Method
@@ -428,6 +475,55 @@ public extension API {
                              maxCacheTime: maxCacheTime).nested { json, promise in
                                 
                                 guard let items: [T] = json.getAll(in: path, for: internalPath) else {
+                                    promise.error(with: .mappingError(json: json))
+                                    return
+                                }
+                                promise.success(with: items)
+        }
+    }
+    
+    /**
+     Will do a simple Request for an array of Deserializable Objects
+     
+     - Parameter method: HTTP Method
+     - Parameter endpoint: endpoint of the API it should be sent to
+     - Parameter arguments: arguments encoded into the endpoint string
+     - Parameter headers: HTTP Headers that should be added to the request
+     - Parameter auth: Authentication Manager for the request
+     - Parameter body: JSON Object that should be sent in the HTTP Body
+     - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
+     - Parameter completionQueue: Queue in which the promise should be run
+     - Parameter path: path of the array inside the json object
+     - Parameter internalPath: path of the object inside the individual objects inside the array
+     - Parameter maxCacheTime: Time the response should be cached
+     
+     - Returns: Promise of Object Array
+     */
+    public func doObjectsRequest<T: APIResponseObject>(with method: HTTPMethod = .get,
+                                                    to endpoint: Endpoint,
+                                                    arguments: [String:CustomStringConvertible] = .empty,
+                                                    headers: [String:CustomStringConvertible] = .empty,
+                                                    queries: [String:CustomStringConvertible] = .empty,
+                                                    auth: Auth = NoAuth.standard,
+                                                    body: JSON? = nil,
+                                                    acceptableStatusCodes: [Int] = [200],
+                                                    completionQueue: DispatchQueue = .main,
+                                                    at path: [String] = .empty,
+                                                    with internalPath: [String] = .empty,
+                                                    maxCacheTime: CacheTime = .no) -> Response<[T]> where T.API == Self {
+        
+        
+        return doJSONRequest(with: method,
+                             to: endpoint,
+                             arguments: arguments,
+                             headers: headers,
+                             queries: queries,
+                             auth: auth,
+                             body: body,
+                             acceptableStatusCodes: acceptableStatusCodes,
+                             maxCacheTime: maxCacheTime).nested { json, promise in
+                                
+                                guard let items: [T] = json.getAll(in: path, for: internalPath, using: self) else {
                                     promise.error(with: .mappingError(json: json))
                                     return
                                 }
