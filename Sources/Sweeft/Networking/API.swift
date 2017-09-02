@@ -190,7 +190,7 @@ public extension API {
         let url = self.url(for: endpoint, arguments: arguments, queries: queries)
         let request = self.request(with: method, to: url, headers: headers, body: body)
         
-        return auth.apply(to: request).next { request in
+        return auth.apply(to: request).next(completionQueue: completionQueue) { request in
             return self.perform(request: request,
                                 method: method,
                                 at: endpoint,
@@ -238,8 +238,7 @@ public extension API {
                          queries: queries,
                          auth: auth,
                          body: body,
-                         acceptableStatusCodes: acceptableStatusCodes,
-                         completionQueue: completionQueue).nested { (response, promise) in
+                         acceptableStatusCodes: acceptableStatusCodes).nested(completionQueue: completionQueue) { (response, promise) in
                             
                             if let data = response.data {
                                 if maxCacheTime != .no {
@@ -290,9 +289,8 @@ public extension API {
                              auth: auth,
                              body: body?.data,
                              acceptableStatusCodes: acceptableStatusCodes,
-                             completionQueue: completionQueue,
                              maxCacheTime: maxCacheTime)
-            .nested { data, promise in
+            .nested(completionQueue: completionQueue) { data, promise in
                 guard let underlyingData = T(data: data) else {
                     promise.error(with: .invalidData(data: data))
                     return
@@ -375,8 +373,7 @@ public extension API {
                              auth: auth,
                              body: body,
                              acceptableStatusCodes: acceptableStatusCodes,
-                             completionQueue: completionQueue,
-                             maxCacheTime: maxCacheTime).nested { json, promise in
+                             maxCacheTime: maxCacheTime).nested(completionQueue: completionQueue) { json, promise in
                                 
                                 guard let item: T = json.get(in: path) else {
                                     promise.error(with: .mappingError(json: json))
@@ -422,8 +419,7 @@ public extension API {
                              auth: auth,
                              body: body,
                              acceptableStatusCodes: acceptableStatusCodes,
-                             completionQueue: completionQueue,
-                             maxCacheTime: maxCacheTime).nested { json, promise in
+                             maxCacheTime: maxCacheTime).nested(completionQueue: completionQueue) { json, promise in
                                 
                                 guard let item: T = json.get(in: path, with: self) else {
                                     promise.error(with: .mappingError(json: json))
@@ -472,7 +468,7 @@ public extension API {
                              auth: auth,
                              body: body,
                              acceptableStatusCodes: acceptableStatusCodes,
-                             maxCacheTime: maxCacheTime).nested { json, promise in
+                             maxCacheTime: maxCacheTime).nested(completionQueue: completionQueue) { json, promise in
                                 
                                 guard let items: [T] = json.getAll(in: path, for: internalPath) else {
                                     promise.error(with: .mappingError(json: json))
@@ -521,7 +517,7 @@ public extension API {
                              auth: auth,
                              body: body,
                              acceptableStatusCodes: acceptableStatusCodes,
-                             maxCacheTime: maxCacheTime).nested { json, promise in
+                             maxCacheTime: maxCacheTime).nested(completionQueue: completionQueue) { json, promise in
                                 
                                 guard let items: [T] = json.getAll(in: path, for: internalPath, using: self) else {
                                     promise.error(with: .mappingError(json: json))
@@ -573,7 +569,6 @@ public extension API {
                                          auth: auth,
                                          body: body,
                                          acceptableStatusCodes: acceptableStatusCodes,
-                                         completionQueue: completionQueue,
                                          at: path,
                                          with: internalPath,
                                          maxCacheTime: maxCacheTime)
@@ -621,7 +616,6 @@ public extension API {
                                         auth: auth,
                                         body: body,
                                         acceptableStatusCodes: acceptableStatusCodes,
-                                        completionQueue: completionQueue,
                                         at: path,
                                         maxCacheTime: maxCacheTime)
             

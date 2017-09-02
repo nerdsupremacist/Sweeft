@@ -161,27 +161,32 @@ public class Promise<T, E: Error>: PromiseBody {
     }
     
     /// Will create a Promise that is based on this promise but maps the result
-    public func nested<V>(_ mapper: @escaping (T) -> V) -> Promise<V, E> {
-        return .new { promise in
+    public func nested<V>(completionQueue: DispatchQueue = .global(),
+                          _ mapper: @escaping (T) -> V) -> Promise<V, E> {
+        
+        return .new(completionQueue: completionQueue) { promise in
             self.nest(to: promise, using: mapper)
         }
     }
     
     /// Will create a Promise that is based on this promise but maps the result
-    public func nested<V>(_ mapper: @escaping (T, Promise<V, E>) -> ()) -> Promise<V, E> {
-        return .new { promise in
+    public func nested<V>(completionQueue: DispatchQueue = .global(),
+                          _ mapper: @escaping (T, Promise<V, E>) -> ()) -> Promise<V, E> {
+        
+        return .new(completionQueue: completionQueue) { promise in
             self.nest(to: promise, using: add(trailing: promise) >>> mapper)
         }
     }
     
-    public func next<V>(_ mapper: @escaping (T) -> Promise<V, E>) -> Promise<V, E> {
-        return .new { promise in
+    public func next<V>(completionQueue: DispatchQueue = .global(),
+                        _ mapper: @escaping (T) -> Promise<V, E>) -> Promise<V, E> {
+        return .new(completionQueue: completionQueue) { promise in
             self.onSuccess(call: mapper).future.nest(to: promise, using: id)
         }
     }
     
-    public func generalizeError() -> Promise<T, AnyError> {
-        return .new { promise in
+    public func generalizeError(completionQueue: DispatchQueue = .global()) -> Promise<T, AnyError> {
+        return .new(completionQueue: completionQueue) { promise in
             onSuccess(call: promise.success)
             onError(call: AnyError.error >>> promise.error)
         }
