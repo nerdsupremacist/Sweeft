@@ -38,7 +38,7 @@ public struct PromiseSuccessHandler<R, T, E: Error> {
     
     typealias Handler = (T) -> R
     
-    private unowned var promise: Promise<T, E>
+    private var promise: Promise<T, E>
     private var handler: Handler
     
     init(promise: Promise<T, E>, handler: @escaping Handler) {
@@ -86,7 +86,7 @@ public struct PromiseErrorHandler<R, T, E: Error> {
     
     typealias Handler = (E) -> R
     
-    private unowned var promise: Promise<T, E>
+    private var promise: Promise<T, E>
     private var handler: Handler
     
     init(promise: Promise<T, E>, handler: @escaping Handler) {
