@@ -64,16 +64,16 @@ public class Promise<T, E: Error>: PromiseBody {
     let completionQueue: DispatchQueue
     
     /// Initializer
-    public init(completionQueue: DispatchQueue = .main) {
+    public init(completionQueue: DispatchQueue = .global()) {
         self.completionQueue = completionQueue
     }
     
-    public init(successful value: T, completionQueue: DispatchQueue = .main) {
+    public init(successful value: T, completionQueue: DispatchQueue = .global()) {
         self.completionQueue = completionQueue
         self.state = .done(result: .value(value))
     }
     
-    public init(errored value: E, completionQueue: DispatchQueue = .main) {
+    public init(errored value: E, completionQueue: DispatchQueue = .global()) {
         self.completionQueue = completionQueue
         self.state = .done(result: .error(value))
     }
@@ -86,7 +86,7 @@ public class Promise<T, E: Error>: PromiseBody {
         return Promise<T, E>(errored: value)
     }
     
-    public static func new(completionQueue: DispatchQueue = .main, _ handle: (Promise<T, E>) -> ()) -> Promise<T, E> {
+    public static func new(completionQueue: DispatchQueue = .global(), _ handle: (Promise<T, E>) -> ()) -> Promise<T, E> {
         let promise = Promise<T, E>(completionQueue: completionQueue)
         handle(promise)
         return promise

@@ -20,7 +20,7 @@ public final class BulkPromise<T, O: Error>: Promise<[T], O> {
         }
     }
     
-    public init(promises: [Promise<T,O>], completionQueue: DispatchQueue = .main) {
+    public init(promises: [Promise<T,O>], completionQueue: DispatchQueue = .global()) {
         count = promises.count
         super.init(completionQueue: completionQueue)
         promises => { promise, index in

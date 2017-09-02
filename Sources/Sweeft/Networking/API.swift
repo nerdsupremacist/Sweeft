@@ -185,7 +185,7 @@ public extension API {
                           auth: Auth = NoAuth.standard,
                           body: Data? = nil,
                           acceptableStatusCodes: [Int] = [200],
-                          completionQueue: DispatchQueue = .main) -> Response<APIResponse> {
+                          completionQueue: DispatchQueue = .global()) -> Response<APIResponse> {
         
         let url = self.url(for: endpoint, arguments: arguments, queries: queries)
         let request = self.request(with: method, to: url, headers: headers, body: body)
@@ -221,7 +221,7 @@ public extension API {
                               auth: Auth = NoAuth.standard,
                               body: Data? = nil,
                               acceptableStatusCodes: [Int] = [200],
-                              completionQueue: DispatchQueue = .main,
+                              completionQueue: DispatchQueue = .global(),
                               maxCacheTime: CacheTime = .no) -> Data.Result {
         
         let url = self.url(for: endpoint, arguments: arguments, queries: queries)
@@ -275,7 +275,7 @@ public extension API {
                                                            auth: Auth = NoAuth.standard,
                                                            body: DataSerializable? = nil,
                                                            acceptableStatusCodes: [Int] = [200],
-                                                           completionQueue: DispatchQueue = .main,
+                                                           completionQueue: DispatchQueue = .global(),
                                                            maxCacheTime: CacheTime = .no) -> Response<T> {
         
         var headers = headers
@@ -324,7 +324,7 @@ public extension API {
                               auth: Auth = NoAuth.standard,
                               body: JSON? = nil,
                               acceptableStatusCodes: [Int] = [200],
-                              completionQueue: DispatchQueue = .main,
+                              completionQueue: DispatchQueue = .global(),
                               maxCacheTime: CacheTime = .no) -> JSON.Result {
         
         return doRepresentedRequest(with: method,
@@ -363,7 +363,7 @@ public extension API {
                                                    auth: Auth = NoAuth.standard,
                                                    body: JSON? = nil,
                                                    acceptableStatusCodes: [Int] = [200],
-                                                   completionQueue: DispatchQueue = .main,
+                                                   completionQueue: DispatchQueue = .global(),
                                                    at path: [String] = .empty,
                                                    maxCacheTime: CacheTime = .no) -> Response<T> {
         
@@ -410,7 +410,7 @@ public extension API {
                                                       auth: Auth = NoAuth.standard,
                                                       body: JSON? = nil,
                                                       acceptableStatusCodes: [Int] = [200],
-                                                      completionQueue: DispatchQueue = .main,
+                                                      completionQueue: DispatchQueue = .global(),
                                                       at path: [String] = .empty,
                                                       maxCacheTime: CacheTime = .no) -> Response<T> where T.API == Self {
         
@@ -458,7 +458,7 @@ public extension API {
                                                     auth: Auth = NoAuth.standard,
                                                     body: JSON? = nil,
                                                     acceptableStatusCodes: [Int] = [200],
-                                                    completionQueue: DispatchQueue = .main,
+                                                    completionQueue: DispatchQueue = .global(),
                                                     at path: [String] = .empty,
                                                     with internalPath: [String] = .empty,
                                                     maxCacheTime: CacheTime = .no) -> Response<[T]> {
@@ -507,7 +507,7 @@ public extension API {
                                                     auth: Auth = NoAuth.standard,
                                                     body: JSON? = nil,
                                                     acceptableStatusCodes: [Int] = [200],
-                                                    completionQueue: DispatchQueue = .main,
+                                                    completionQueue: DispatchQueue = .global(),
                                                     at path: [String] = .empty,
                                                     with internalPath: [String] = .empty,
                                                     maxCacheTime: CacheTime = .no) -> Response<[T]> where T.API == Self {
@@ -556,7 +556,7 @@ public extension API {
                                                            auth: Auth = NoAuth.standard,
                                                            bodies: [JSON?] = .empty,
                                                            acceptableStatusCodes: [Int] = [200],
-                                                           completionQueue: DispatchQueue = .main,
+                                                           completionQueue: DispatchQueue = .global(),
                                                            at path: [String] = .empty,
                                                            with internalPath: [String] = .empty,
                                                            maxCacheTime: CacheTime = .no) -> Response<[T]> {
@@ -605,7 +605,7 @@ public extension API {
                                                        auth: Auth = NoAuth.standard,
                                                        bodies: [JSON?] = .empty,
                                                        acceptableStatusCodes: [Int] = [200],
-                                                       completionQueue: DispatchQueue = .main,
+                                                       completionQueue: DispatchQueue = .global(),
                                                        at path: [String] = .empty,
                                                        maxCacheTime: CacheTime = .no) -> Response<[T]> {
         
@@ -652,7 +652,7 @@ public extension API {
                                                        auth: Auth = NoAuth.standard,
                                                        bodies: [JSON?] = .empty,
                                                        acceptableStatusCodes: [Int] = [200],
-                                                       completionQueue: DispatchQueue = .main,
+                                                       completionQueue: DispatchQueue = .global(),
                                                        at path: String...,
         maxCacheTime: CacheTime = .no) -> Response<[T]> {
         
@@ -691,7 +691,7 @@ public extension API {
                     auth: Auth = NoAuth.standard,
                     body: JSON? = nil,
                     acceptableStatusCodes: [Int] = [200],
-                    completionQueue: DispatchQueue = .main,
+                    completionQueue: DispatchQueue = .global(),
                     maxCacheTime: CacheTime = .no) -> JSON.Result {
         
         return doJSONRequest(with: .get,
@@ -727,7 +727,7 @@ public extension API {
                        auth: Auth = NoAuth.standard,
                        body: JSON? = nil,
                        acceptableStatusCodes: [Int] = [200],
-                       completionQueue: DispatchQueue = .main,
+                       completionQueue: DispatchQueue = .global(),
                        maxCacheTime: CacheTime = .no) -> JSON.Result {
         
         return doJSONRequest(with: .delete,
@@ -763,7 +763,7 @@ public extension API {
                      queries: [String:CustomStringConvertible] = .empty,
                      auth: Auth = NoAuth.standard,
                      acceptableStatusCodes: [Int] = [200],
-                     completionQueue: DispatchQueue = .main,
+                     completionQueue: DispatchQueue = .global(),
                      maxCacheTime: CacheTime = .no) -> JSON.Result {
         
         return doJSONRequest(with: .post,
@@ -799,7 +799,7 @@ public extension API {
                     queries: [String:CustomStringConvertible] = .empty,
                     auth: Auth = NoAuth.standard,
                     acceptableStatusCodes: [Int] = [200],
-                    completionQueue: DispatchQueue = .main,
+                    completionQueue: DispatchQueue = .global(),
                     maxCacheTime: CacheTime = .no) -> JSON.Result {
         
         return doJSONRequest(with: .put,
