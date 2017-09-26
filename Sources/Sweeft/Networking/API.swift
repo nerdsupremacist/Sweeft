@@ -198,7 +198,7 @@ public extension API {
         
         let auth = auth ?? self.auth
         
-        return auth.apply(to: request).next(completionQueue: completionQueue) { request in
+        return auth.apply(to: request).flatMap(completionQueue: completionQueue) { request in
             return self.perform(request: request,
                                 method: method,
                                 at: endpoint,
@@ -246,15 +246,15 @@ public extension API {
                          queries: queries,
                          auth: auth,
                          body: body,
-                         acceptableStatusCodes: acceptableStatusCodes).nested(completionQueue: completionQueue) { (response, promise) in
+                         acceptableStatusCodes: acceptableStatusCodes).flatMap(completionQueue: completionQueue) { response in
                             
                             if let data = response.data {
                                 if maxCacheTime != .no {
                                     self.cache.store(data, with: cacheKey)
                                 }
-                                promise.success(with: data)
+                                return .successful(with: data)
                             } else {
-                                promise.error(with: .noData)
+                                return .errored(with: .noData)
                             }
         }
     }
@@ -297,13 +297,12 @@ public extension API {
                              auth: auth,
                              body: body?.data,
                              acceptableStatusCodes: acceptableStatusCodes,
-                             maxCacheTime: maxCacheTime)
-            .nested(completionQueue: completionQueue) { data, promise in
+                             maxCacheTime: maxCacheTime).flatMap(completionQueue: completionQueue) { data in
+                                
                 guard let underlyingData = T(data: data) else {
-                    promise.error(with: .invalidData(data: data))
-                    return
+                    return .errored(with: .invalidData(data: data))
                 }
-                promise.success(with: underlyingData)
+                return .successful(with: underlyingData)
         }
     }
     
@@ -382,13 +381,12 @@ public extension API {
                              auth: auth,
                              body: body,
                              acceptableStatusCodes: acceptableStatusCodes,
-                             maxCacheTime: maxCacheTime).nested(completionQueue: completionQueue) { json, promise in
+                             maxCacheTime: maxCacheTime).flatMap(completionQueue: completionQueue) { json in
                                 
                                 guard let item: T = json.get(in: path) else {
-                                    promise.error(with: .mappingError(json: json))
-                                    return
+                                    return .errored(with: .mappingError(json: json))
                                 }
-                                promise.success(with: item)
+                                return .successful(with: item)
         }
     }
     
@@ -428,13 +426,12 @@ public extension API {
                              auth: auth,
                              body: body,
                              acceptableStatusCodes: acceptableStatusCodes,
-                             maxCacheTime: maxCacheTime).nested(completionQueue: completionQueue) { json, promise in
+                             maxCacheTime: maxCacheTime).flatMap(completionQueue: completionQueue) { json in
                                 
                                 guard let item: T = json.get(in: path, with: self) else {
-                                    promise.error(with: .mappingError(json: json))
-                                    return
+                                    return .errored(with: .mappingError(json: json))
                                 }
-                                promise.success(with: item)
+                                return .successful(with: item)
         }
     }
     
@@ -479,13 +476,12 @@ public extension API {
                              auth: auth,
                              body: body,
                              acceptableStatusCodes: acceptableStatusCodes,
-                             maxCacheTime: maxCacheTime).nested(completionQueue: completionQueue) { json, promise in
+                             maxCacheTime: maxCacheTime).flatMap(completionQueue: completionQueue) { json in
                                 
                                 guard let items: [T] = json.getAll(in: path, for: internalPath) else {
-                                    promise.error(with: .mappingError(json: json))
-                                    return
+                                    return .errored(with: .mappingError(json: json))
                                 }
-                                promise.success(with: items)
+                                return .successful(with: items)
         }
     }
     
@@ -528,13 +524,12 @@ public extension API {
                              auth: auth,
                              body: body,
                              acceptableStatusCodes: acceptableStatusCodes,
-                             maxCacheTime: maxCacheTime).nested(completionQueue: completionQueue) { json, promise in
+                             maxCacheTime: maxCacheTime).flatMap(completionQueue: completionQueue) { json in
                                 
                                 guard let items: [T] = json.getAll(in: path, for: internalPath, using: self) else {
-                                    promise.error(with: .mappingError(json: json))
-                                    return
+                                    return .errored(with: .mappingError(json: json))
                                 }
-                                promise.success(with: items)
+                                return .successful(with: items)
         }
     }
     
@@ -600,9 +595,9 @@ public extension API {
 //                                          maxCacheTime: CacheTime = .no,
 //                                          dateDecodingStrategy: JSONDecoder.DateDecodingStrategy = .iso8601,
 //                                          dataDecodingStrategy: JSONDecoder.DataDecodingStrategy = .base64) -> Response<T> {
-//        
+//
 //        let body = body.flatMap { try? JSONEncoder().encode($0) }
-//        
+//
 //        return doDataRequest(with: method,
 //                             to: endpoint,
 //                             arguments: arguments,
@@ -612,7 +607,7 @@ public extension API {
 //                             body: body,
 //                             acceptableStatusCodes: acceptableStatusCodes,
 //                             maxCacheTime: maxCacheTime).nested(completionQueue: completionQueue) { data in
-//                                
+//
 //                                let decoder = JSONDecoder()
 //                                decoder.dataDecodingStrategy = dataDecodingStrategy
 //                                decoder.dateDecodingStrategy = dateDecodingStrategy
@@ -695,7 +690,7 @@ public extension API {
                                                        acceptableStatusCodes: [Int] = [200],
                                                        completionQueue: DispatchQueue = .global(),
                                                        at path: String...,
-        maxCacheTime: CacheTime = .no) -> Response<[T]> {
+                                                       maxCacheTime: CacheTime = .no) -> Response<[T]> {
         
         let endpoints = arguments.count.range => returning(endpoint)
         return doBulkObjectRequest(with: method,
@@ -709,150 +704,6 @@ public extension API {
                                    completionQueue: completionQueue,
                                    at: path,
                                    maxCacheTime: maxCacheTime)
-    }
-    
-    /**
-     Do a JSON GET Request
-     
-     - Parameter endpoint: endpoint of the API it should be sent to
-     - Parameter arguments: Arguments encoded into the endpoint string
-     - Parameter headers: HTTP Headers that should be added to the request
-     - Parameter auth: Authentication Manager for the request
-     - Parameter body: JSON Object that should be sent in the HTTP Body
-     - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
-     - Parameter completionQueue: Queue in which the promise should be run
-     - Parameter maxCacheTime: Time the response should be cached
-     
-     - Returns: Promise of JSON Object
-     */
-    public func get(_ endpoint: Endpoint,
-                    arguments: [String:CustomStringConvertible] = .empty,
-                    headers: [String:CustomStringConvertible] = .empty,
-                    queries: [String:CustomStringConvertible] = .empty,
-                    auth: Auth? = nil,
-                    body: JSON? = nil,
-                    acceptableStatusCodes: [Int] = [200],
-                    completionQueue: DispatchQueue = .global(),
-                    maxCacheTime: CacheTime = .no) -> JSON.Result {
-        
-        return doJSONRequest(with: .get,
-                             to: endpoint,
-                             arguments: arguments,
-                             headers: headers,
-                             queries: queries,
-                             auth: auth,
-                             body: body,
-                             acceptableStatusCodes: acceptableStatusCodes,
-                             completionQueue: completionQueue,
-                             maxCacheTime: maxCacheTime)
-    }
-    
-    /**
-     Do a JSON DELETE Request
-     
-     - Parameter endpoint: endpoint of the API it should be sent to
-     - Parameter arguments: Arguments encoded into the endpoint string
-     - Parameter headers: HTTP Headers that should be added to the request
-     - Parameter auth: Authentication Manager for the request
-     - Parameter body: JSON Object that should be sent in the HTTP Body
-     - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
-     - Parameter completionQueue: Queue in which the promise should be run
-     - Parameter maxCacheTime: Time the response should be cached
-     
-     - Returns: Promise of JSON Object
-     */
-    public func delete(_ endpoint: Endpoint,
-                       arguments: [String:CustomStringConvertible] = .empty,
-                       headers: [String:CustomStringConvertible] = .empty,
-                       queries: [String:CustomStringConvertible] = .empty,
-                       auth: Auth? = nil,
-                       body: JSON? = nil,
-                       acceptableStatusCodes: [Int] = [200],
-                       completionQueue: DispatchQueue = .global(),
-                       maxCacheTime: CacheTime = .no) -> JSON.Result {
-        
-        return doJSONRequest(with: .delete,
-                             to: endpoint,
-                             arguments: arguments,
-                             headers: headers,
-                             queries: queries,
-                             auth: auth,
-                             body: body,
-                             acceptableStatusCodes: acceptableStatusCodes,
-                             completionQueue: completionQueue,
-                             maxCacheTime: maxCacheTime)
-    }
-    
-    /**
-     Do a JSON POST Request
-     
-     - Parameter body: JSON Object that should be sent in the HTTP Body
-     - Parameter endpoint: endpoint of the API it should be sent to
-     - Parameter arguments: Arguments encoded into the endpoint string
-     - Parameter headers: HTTP Headers that should be added to the request
-     - Parameter auth: Authentication Manager for the request
-     - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
-     - Parameter completionQueue: Queue in which the promise should be run
-     - Parameter maxCacheTime: Time the response should be cached
-     
-     - Returns: Promise of JSON Object
-     */
-    public func post(_ body: JSON? = nil,
-                     to endpoint: Endpoint,
-                     arguments: [String:CustomStringConvertible] = .empty,
-                     headers: [String:CustomStringConvertible] = .empty,
-                     queries: [String:CustomStringConvertible] = .empty,
-                     auth: Auth? = nil,
-                     acceptableStatusCodes: [Int] = [200],
-                     completionQueue: DispatchQueue = .global(),
-                     maxCacheTime: CacheTime = .no) -> JSON.Result {
-        
-        return doJSONRequest(with: .post,
-                             to: endpoint,
-                             arguments: arguments,
-                             headers: headers,
-                             queries: queries,
-                             auth: auth,
-                             body: body,
-                             acceptableStatusCodes: acceptableStatusCodes,
-                             completionQueue: completionQueue,
-                             maxCacheTime: maxCacheTime)
-    }
-    
-    /**
-     Do a JSON PUT Request
-     
-     - Parameter body: JSON Object that should be sent in the HTTP Body
-     - Parameter endpoint: endpoint of the API it should be sent to
-     - Parameter arguments: Arguments encoded into the endpoint string
-     - Parameter headers: HTTP Headers that should be added to the request
-     - Parameter auth: Authentication Manager for the request
-     - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
-     - Parameter completionQueue: Queue in which the promise should be run
-     - Parameter maxCacheTime: Time the response should be cached
-     
-     - Returns: Promise of JSON Object
-     */
-    public func put(_ body: JSON? = nil,
-                    at endpoint: Endpoint,
-                    arguments: [String:CustomStringConvertible] = .empty,
-                    headers: [String:CustomStringConvertible] = .empty,
-                    queries: [String:CustomStringConvertible] = .empty,
-                    auth: Auth? = nil,
-                    acceptableStatusCodes: [Int] = [200],
-                    completionQueue: DispatchQueue = .global(),
-                    maxCacheTime: CacheTime = .no) -> JSON.Result {
-        
-        return doJSONRequest(with: .put,
-                             to: endpoint,
-                             arguments: arguments,
-                             headers: headers,
-                             queries: queries,
-                             auth: auth,
-                             body: body,
-                             acceptableStatusCodes: acceptableStatusCodes,
-                             completionQueue: completionQueue,
-                             maxCacheTime: maxCacheTime)
     }
     
 }

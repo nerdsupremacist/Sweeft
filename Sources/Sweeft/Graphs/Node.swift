@@ -52,7 +52,7 @@ extension GraphNode {
     
     public func neighbours<P: NodeProvider>(in provider: P) -> ResultPromise<[(Self, Double)]> where P.Node == Self, P.Identifier == Self.Identifier {
         
-        return self.neighbours().nested {
+        return self.neighbours().map {
             return $0.flatMap({ (provider.node(for: $0.identifier), $0.cost) } >>> iff)
         }
     }
@@ -77,7 +77,7 @@ public extension HashableNode {
     func neighbours<P: NodeProvider>(in provider: P) -> ResultPromise<[(Self, Double)]>
                                                     where P.Node == Self, P.Identifier == Self.Identifier {
         
-        return neighbours().nested {
+        return neighbours().map {
             $0.map { ($0.identifier, $0.cost) }
         }
     }
@@ -127,7 +127,7 @@ public extension SimpleNode {
     
     public func neighbours() -> Promise<[Connection<Self.Identifier>], AnyError> {
         
-        return neighbourIdentifiers().nested { identifiers in
+        return neighbourIdentifiers().map { identifiers in
             identifiers => Connection.simple
         }
     }

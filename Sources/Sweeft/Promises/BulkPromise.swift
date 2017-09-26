@@ -38,7 +38,7 @@ public final class BulkPromise<T, O: Error>: Promise<[T], O> {
 extension BulkPromise where T: Collection {
     
     public var flattened: Promise<[T.Iterator.Element], O> {
-        return nested { result in
+        return map { result in
             return result.flatMap(id)
         }
     }

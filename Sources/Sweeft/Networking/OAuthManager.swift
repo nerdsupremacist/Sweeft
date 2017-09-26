@@ -68,9 +68,9 @@ public struct OAuthManager<V: APIEndpoint>: API {
         let auth = self.auth()
         let body = self.body(with: grant)
         if useJSON {
-            return jsonRequest(to: endpoint, auth: auth, body: body).nested(self.applyRefresher <** endpoint)
+            return jsonRequest(to: endpoint, auth: auth, body: body).map(self.applyRefresher <** endpoint)
         } else {
-            return queriedRequest(to: endpoint, auth: auth, body: body).nested(self.applyRefresher <** endpoint)
+            return queriedRequest(to: endpoint, auth: auth, body: body).map(self.applyRefresher <** endpoint)
         }
     }
     

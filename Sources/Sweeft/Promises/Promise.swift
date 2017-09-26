@@ -68,22 +68,21 @@ public class Promise<T, E: Error>: PromiseBody {
         self.completionQueue = completionQueue
     }
     
-    public init(successful value: T, completionQueue: DispatchQueue = .global()) {
+    public init(result: Result, completionQueue: DispatchQueue = .global()) {
         self.completionQueue = completionQueue
-        self.state = .done(result: .value(value))
+        self.state = .done(result: result)
     }
     
-    public init(errored value: E, completionQueue: DispatchQueue = .global()) {
-        self.completionQueue = completionQueue
-        self.state = .done(result: .error(value))
+    public static func with(result: Result) -> Promise<T, E> {
+        return Promise(result: result)
     }
     
     public static func successful(with value: T) -> Promise<T, E> {
-        return Promise<T, E>(successful: value)
+        return .with(result: .value(value))
     }
     
     public static func errored(with value: E) -> Promise<T, E> {
-        return Promise<T, E>(errored: value)
+        return .with(result: .error(value))
     }
     
     public static func new(completionQueue: DispatchQueue = .global(), _ handle: (Promise<T, E>) -> ()) -> Promise<T, E> {
@@ -161,7 +160,7 @@ public class Promise<T, E: Error>: PromiseBody {
     }
     
     /// Will create a Promise that is based on this promise but maps the result
-    public func nested<V>(completionQueue: DispatchQueue = .global(),
+    public func map<V>(completionQueue: DispatchQueue = .global(),
                           _ mapper: @escaping (T) -> V) -> Promise<V, E> {
         
         return .new(completionQueue: completionQueue) { promise in
@@ -169,17 +168,9 @@ public class Promise<T, E: Error>: PromiseBody {
         }
     }
     
-    /// Will create a Promise that is based on this promise but maps the result
-    public func nested<V>(completionQueue: DispatchQueue = .global(),
-                          _ mapper: @escaping (T, Promise<V, E>) -> ()) -> Promise<V, E> {
-        
-        return .new(completionQueue: completionQueue) { promise in
-            self.nest(to: promise, using: add(trailing: promise) >>> mapper)
-        }
-    }
-    
-    public func next<V>(completionQueue: DispatchQueue = .global(),
+    public func flatMap<V>(completionQueue: DispatchQueue = .global(),
                         _ mapper: @escaping (T) -> Promise<V, E>) -> Promise<V, E> {
+        
         return .new(completionQueue: completionQueue) { promise in
             self.onSuccess(call: mapper).future.nest(to: promise, using: id)
         }

@@ -207,7 +207,7 @@ extension Graph {
             return .successful(with: [source.identifier])
         }
         let promise = iterate(nodes: [source], parents: .empty, source: source.identifier, until: isFinal)
-        return promise.nested { (prevs, item) -> [Identifier]? in
+        return promise.map { (prevs, item) -> [Identifier]? in
             guard let item = item else {
                 return nil
             }
