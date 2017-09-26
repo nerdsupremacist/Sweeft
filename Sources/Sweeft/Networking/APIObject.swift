@@ -7,10 +7,14 @@
 
 import Foundation
 
-public protocol APIObjectValue: Codable {
+public protocol Identifiable {
+    associatedtype Identifier: CustomStringConvertible
+    var id: Identifier { get }
+}
+
+public protocol APIObjectValue: Codable, Identifiable {
     associatedtype Endpoint: APIEndpoint
     associatedtype API: Sweeft.API
-    associatedtype Identifier: CustomStringConvertible
     
     static var endpoint: API.Endpoint { get }
     
@@ -18,8 +22,6 @@ public protocol APIObjectValue: Codable {
     static var dataEncodingStrategy: JSONEncoder.DataEncodingStrategy { get }
     static var dateDecodingStrategy: JSONDecoder.DateDecodingStrategy { get }
     static var dataDecodingStrategy: JSONDecoder.DataDecodingStrategy { get }
-    
-    var id: Identifier { get }
 }
 
 extension APIObjectValue {
