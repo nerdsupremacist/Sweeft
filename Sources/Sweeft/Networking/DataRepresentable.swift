@@ -53,7 +53,7 @@ public extension DataSerializable {
                      arguments: [String:CustomStringConvertible] = .empty,
                      headers: [String:CustomStringConvertible] = .empty,
                      queries: [String:CustomStringConvertible] = .empty,
-                     auth: Auth = NoAuth.standard) -> Response<R> {
+                     auth: Auth? = nil) -> Response<R> {
         
         return api.doRepresentedRequest(with: method, to: endpoint, arguments: arguments, headers: headers, queries: queries, auth: auth, body: self)
     }
@@ -63,7 +63,7 @@ public extension DataSerializable {
                     arguments: [String:CustomStringConvertible] = .empty,
                     headers: [String:CustomStringConvertible] = .empty,
                     queries: [String:CustomStringConvertible] = .empty,
-                    auth: Auth = NoAuth.standard) -> Response<R> {
+                    auth: Auth? = nil) -> Response<R> {
         
         return send(using: api, method: .put, at: endpoint, arguments: arguments, headers: headers, queries: queries, auth: auth)
     }
@@ -73,7 +73,7 @@ public extension DataSerializable {
                      arguments: [String:CustomStringConvertible] = .empty,
                      headers: [String:CustomStringConvertible] = .empty,
                      queries: [String:CustomStringConvertible] = .empty,
-                     auth: Auth = NoAuth.standard) -> Response<R> {
+                     auth: Auth? = nil) -> Response<R> {
         
         return send(using: api, method: .post, at: endpoint, arguments: arguments, headers: headers, queries: queries, auth: auth)
     }
