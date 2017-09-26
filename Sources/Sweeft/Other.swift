@@ -101,7 +101,10 @@ public func add<V, T>(starting argument: T) -> (V) -> (T, V) {
  
  - Returns: mapping function
  */
-public func partialMap<V, T, O, R>(partial: @escaping (V) -> (T), map: @escaping (T) -> (O), cleanup: @escaping (V, O) -> R) -> (V) -> (R) {
+public func partialMap<V, T, O, R>(partial: @escaping (V) -> (T),
+                                   map: @escaping (T) -> (O),
+                                   cleanup: @escaping (V, O) -> R) -> (V) -> (R) {
+    
     return { $0 | partial >>> map >>> add(starting: $0) >>> cleanup }
 }
 

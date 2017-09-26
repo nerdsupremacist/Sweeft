@@ -60,9 +60,7 @@ extension GraphNode {
 }
 
 
-public protocol HashableNode: GraphNode, Hashable {
-    func neighbours() -> ResultPromise<[Connection<Self>]>
-}
+public protocol HashableNode: GraphNode where Identifier == Self { }
 
 public extension HashableNode {
     
