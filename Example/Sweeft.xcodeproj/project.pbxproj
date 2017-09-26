@@ -10,7 +10,6 @@
 		063581C800872D52CBA16A34 /* Pods_Sweeft_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8BE4A50210A64AF4DBAB641 /* Pods_Sweeft_Example.framework */; };
 		0E1E2FD21E47CEAA002FFFFA /* SearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E1E2FD11E47CEAA002FFFFA /* SearchResult.swift */; };
 		0E2B76471F2CCC8D0018937D /* DependecyGraph.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E2B76461F2CCC8D0018937D /* DependecyGraph.swift */; };
-		0E3D4E291E609234004C1042 /* SixDegrees.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E3D4E281E609234004C1042 /* SixDegrees.swift */; };
 		0E5365DC1E1187CB002F82DE /* MoviesAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E5365DB1E1187CB002F82DE /* MoviesAPI.swift */; };
 		0E5365DE1E1187D4002F82DE /* MoviesEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E5365DD1E1187D4002F82DE /* MoviesEndpoint.swift */; };
 		0E5365E01E118986002F82DE /* Movie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E5365DF1E118986002F82DE /* Movie.swift */; };
@@ -22,7 +21,6 @@
 		0E63EB9D1E14743000A0084B /* Role.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E63EB9C1E14743000A0084B /* Role.swift */; };
 		0E88DFA21DFDB06A00F00AD4 /* LastDateOpened.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E88DFA11DFDB06A00F00AD4 /* LastDateOpened.swift */; };
 		0E88DFA41DFDB86200F00AD4 /* Demo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E88DFA31DFDB86200F00AD4 /* Demo.swift */; };
-		0E9B0C791E64D76600905304 /* Maze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E9B0C781E64D76600905304 /* Maze.swift */; };
 		0E9CECE81E4BA9DB00D81892 /* MapColoring.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E9CECE71E4BA9DB00D81892 /* MapColoring.swift */; };
 		0E9CECEA1E4BB74A00D81892 /* QueensProblem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E9CECE91E4BB74A00D81892 /* QueensProblem.swift */; };
 		0EC168F61E157F2D0007138F /* PersonDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EC168F51E157F2D0007138F /* PersonDetailTableViewController.swift */; };
@@ -494,7 +492,6 @@
 				0E88DFA41DFDB86200F00AD4 /* Demo.swift in Sources */,
 				0E5365DC1E1187CB002F82DE /* MoviesAPI.swift in Sources */,
 				0E63EB9B1E1470AF00A0084B /* Person.swift in Sources */,
-				0E3D4E291E609234004C1042 /* SixDegrees.swift in Sources */,
 				0ED94DAF1E15617600FEC746 /* RoleTableViewCell.swift in Sources */,
 				0E2B76471F2CCC8D0018937D /* DependecyGraph.swift in Sources */,
 				0E5365EF1E11A1FE002F82DE /* MovieImageAPI.swift in Sources */,
@@ -505,7 +502,6 @@
 				0E5365ED1E11A1F1002F82DE /* MovieImageEndpoint.swift in Sources */,
 				0E1E2FD21E47CEAA002FFFFA /* SearchResult.swift in Sources */,
 				0E9CECE81E4BA9DB00D81892 /* MapColoring.swift in Sources */,
-				0E9B0C791E64D76600905304 /* Maze.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

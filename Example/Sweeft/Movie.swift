@@ -93,9 +93,9 @@ extension Movie {
     static func featured(using api: MoviesAPI = .shared) -> Movie.Results {
         return api.doFlatBulkObjectRequest(to: [.nowPlaying, .upcoming, .popular],
                                            at: ["results"])
-                    .nested { $0 |> { $0.vote >= 5.0 } }
-                    .nested { $0 |> Movie.isRelevant ** .now }
-                    .nested { $0.noDuplicates }
+                    .map { $0 |> { $0.vote >= 5.0 } }
+                    .map { $0 |> Movie.isRelevant ** .now }
+                    .map { $0.noDuplicates }
     }
     
 }
