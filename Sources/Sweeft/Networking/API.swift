@@ -88,9 +88,9 @@ public extension API {
             return string.replacingOccurrences(of: "{\(argument.key)}", with: argument.value.description)
         }
         
-        let finalString = pathComponent.map { requestString + $0 } ?? requestString
+        let base = self.base.appendingPathComponent(requestString).appendingPathComponent(pathComponent.?)
         
-        return (baseQueries + queries >>= { $0.description }) ==> base.appendingPathComponent(finalString) ** { url, query in
+        return (baseQueries + queries >>= { $0.description }) ==> base ** { url, query in
             return url.appendingQuery(key: query.key, value: query.value)
         }
     }
@@ -529,10 +529,11 @@ public extension API {
                                 let decoder = JSONDecoder()
                                 decoder.dateDecodingStrategy = dateDecodingStrategy
                                 decoder.dataDecodingStrategy = dataDecodingStrategy
-                                guard let item = try? decoder.decode(T.self, from: data) else {
-                                    return .errored(with: .noData)
+                                do {
+                                    return .successful(with: try decoder.decode(T.self, from: data))
+                                } catch {
+                                    return .errored(with: .unknown(error: error))
                                 }
-                                return .successful(with: item)
         }
     }
     

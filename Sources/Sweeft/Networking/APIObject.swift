@@ -103,7 +103,120 @@ extension APIObjectValue {
     
 }
 
+extension APIObjectValue {
+    
+    public static func doDecodableRequest<T: Decodable>(using api: API,
+                                                        id: Identifier,
+                                                        with method: HTTPMethod = .get,
+                                                        to endpoint: Endpoint?,
+                                                        arguments: [String:CustomStringConvertible] = .empty,
+                                                        headers: [String:CustomStringConvertible] = .empty,
+                                                        queries: [String:CustomStringConvertible] = .empty,
+                                                        auth: Auth? = nil,
+                                                        body: Encodable? = nil,
+                                                        acceptableStatusCodes: [Int] = [200],
+                                                        completionQueue: DispatchQueue = .global(),
+                                                        maxCacheTime: CacheTime = .no) -> Response<T> {
+        
+        let pathComponent = endpoint.map { "\(id)/\($0.rawValue)" } ?? id.description
+        
+        return api.doDecodableRequest(with: method,
+                                      to: Self.endpoint,
+                                      appending: pathComponent,
+                                      arguments: arguments,
+                                      headers: headers,
+                                      queries: queries,
+                                      auth: auth,
+                                      body: body,
+                                      acceptableStatusCodes: acceptableStatusCodes,
+                                      completionQueue: completionQueue,
+                                      maxCacheTime: maxCacheTime)
+    }
+    
+    public static func doRequest<T: APIObjectValue>(using api: API,
+                                                    id: Identifier,
+                                                    with method: HTTPMethod = .get,
+                                                    to endpoint: Endpoint?,
+                                                    arguments: [String:CustomStringConvertible] = .empty,
+                                                    headers: [String:CustomStringConvertible] = .empty,
+                                                    queries: [String:CustomStringConvertible] = .empty,
+                                                    auth: Auth? = nil,
+                                                    body: Encodable? = nil,
+                                                    acceptableStatusCodes: [Int] = [200],
+                                                    completionQueue: DispatchQueue = .global(),
+                                                    maxCacheTime: CacheTime = .no) -> Response<APIObject<T>> where T.API == API {
+        
+        let pathComponent = endpoint.map { "\(id)/\($0.rawValue)" } ?? id.description
+        
+        return api.doAPIObjectRequest(with: method,
+                                      endpoint: Self.endpoint,
+                                      appending: pathComponent,
+                                      arguments: arguments,
+                                      headers: headers,
+                                      queries: queries,
+                                      auth: auth,
+                                      body: body,
+                                      acceptableStatusCodes: acceptableStatusCodes,
+                                      completionQueue: completionQueue,
+                                      maxCacheTime: maxCacheTime)
+    }
+    
+    public static func doRequest<T: APIObjectValue>(using api: API,
+                                                    id: Identifier,
+                                                    with method: HTTPMethod = .get,
+                                                    to endpoint: Endpoint?,
+                                                    arguments: [String:CustomStringConvertible] = .empty,
+                                                    headers: [String:CustomStringConvertible] = .empty,
+                                                    queries: [String:CustomStringConvertible] = .empty,
+                                                    auth: Auth? = nil,
+                                                    body: Encodable? = nil,
+                                                    acceptableStatusCodes: [Int] = [200],
+                                                    completionQueue: DispatchQueue = .global(),
+                                                    maxCacheTime: CacheTime = .no) -> Response<[APIObject<T>]> where T.API == API {
+        
+        let pathComponent = endpoint.map { "\(id)/\($0.rawValue)" } ?? id.description
+        
+        return api.doAPIObjectsRequest(with: method,
+                                       endpoint: Self.endpoint,
+                                       appending: pathComponent,
+                                       arguments: arguments,
+                                       headers: headers,
+                                       queries: queries,
+                                       auth: auth,
+                                       body: body,
+                                       acceptableStatusCodes: acceptableStatusCodes,
+                                       completionQueue: completionQueue,
+                                       maxCacheTime: maxCacheTime)
+    }
+    
+}
+
 extension APIObject {
+    
+    public func doDecodableRequest<T: Decodable>(with method: HTTPMethod = .get,
+                                                 to endpoint: Value.Endpoint?,
+                                                 arguments: [String:CustomStringConvertible] = .empty,
+                                                 headers: [String:CustomStringConvertible] = .empty,
+                                                 queries: [String:CustomStringConvertible] = .empty,
+                                                 auth: Auth? = nil,
+                                                 body: Encodable? = nil,
+                                                 acceptableStatusCodes: [Int] = [200],
+                                                 completionQueue: DispatchQueue = .global(),
+                                                 maxCacheTime: CacheTime = .no) -> Response<T> {
+        
+        return Value.doDecodableRequest(using: api,
+                                        id: value.id,
+                                        with: method,
+                                        to: nil,
+                                        arguments: arguments,
+                                        headers: headers,
+                                        queries: queries,
+                                        auth: auth,
+                                        body: body,
+                                        acceptableStatusCodes: acceptableStatusCodes,
+                                        completionQueue: completionQueue,
+                                        maxCacheTime: maxCacheTime)
+    }
     
     public func doRequest<T: APIObjectValue>(with method: HTTPMethod = .get,
                                              to endpoint: Value.Endpoint?,
@@ -116,19 +229,18 @@ extension APIObject {
                                              completionQueue: DispatchQueue = .global(),
                                              maxCacheTime: CacheTime = .no) -> Response<APIObject<T>> where T.API == Value.API {
         
-        let pathComponent = endpoint.map { "\(value.id)/\($0.rawValue)" } ?? value.id.description
-        
-        return api.doAPIObjectRequest(with: method,
-                                      endpoint: Value.endpoint,
-                                      appending: pathComponent,
-                                      arguments: arguments,
-                                      headers: headers,
-                                      queries: queries,
-                                      auth: auth,
-                                      body: body,
-                                      acceptableStatusCodes: acceptableStatusCodes,
-                                      completionQueue: completionQueue,
-                                      maxCacheTime: maxCacheTime)
+        return Value.doRequest(using: api,
+                               id: value.id,
+                               with: method,
+                               to: nil,
+                               arguments: arguments,
+                               headers: headers,
+                               queries: queries,
+                               auth: auth,
+                               body: body,
+                               acceptableStatusCodes: acceptableStatusCodes,
+                               completionQueue: completionQueue,
+                               maxCacheTime: maxCacheTime)
     }
     
     public func doRequest<T: APIObjectValue>(with method: HTTPMethod = .get,
@@ -142,19 +254,18 @@ extension APIObject {
                                              completionQueue: DispatchQueue = .global(),
                                              maxCacheTime: CacheTime = .no) -> Response<[APIObject<T>]> where T.API == Value.API {
         
-        let pathComponent = endpoint.map { "\(value.id)/\($0.rawValue)" } ?? value.id.description
-        
-        return api.doAPIObjectsRequest(with: method,
-                                       endpoint: Value.endpoint,
-                                       appending: pathComponent,
-                                       arguments: arguments,
-                                       headers: headers,
-                                       queries: queries,
-                                       auth: auth,
-                                       body: body,
-                                       acceptableStatusCodes: acceptableStatusCodes,
-                                       completionQueue: completionQueue,
-                                       maxCacheTime: maxCacheTime)
+        return Value.doRequest(using: api,
+                               id: value.id,
+                               with: method,
+                               to: endpoint,
+                               arguments: arguments,
+                               headers: headers,
+                               queries: queries,
+                               auth: auth,
+                               body: body,
+                               acceptableStatusCodes: acceptableStatusCodes,
+                               completionQueue: completionQueue,
+                               maxCacheTime: maxCacheTime)
     }
     
 }
