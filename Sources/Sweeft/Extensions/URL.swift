@@ -25,3 +25,14 @@ public extension URL {
     }
     
 }
+
+extension URL: Deserializable {
+    
+    public init?(from json: JSON) {
+        guard let url = json.string else {
+            return nil
+        }
+        self.init(string: url)
+    }
+    
+}
