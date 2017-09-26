@@ -536,8 +536,8 @@ public extension API {
         }
     }
     
-    func doObjectRequest<T: APIObjectValue>(with method: HTTPMethod = .get,
-                                            endpoint: Endpoint? = nil,
+    func doAPIObjectRequest<T: APIObjectValue>(with method: HTTPMethod = .get,
+                                            endpoint: Endpoint = T.endpoint,
                                             appending pathComponent: String? = nil,
                                             arguments: [String:CustomStringConvertible] = .empty,
                                             headers: [String:CustomStringConvertible] = .empty,
@@ -567,7 +567,7 @@ public extension API {
         }
     }
     
-    func doObjectsRequest<T: APIObjectValue>(with method: HTTPMethod = .get,
+    func doAPIObjectsRequest<T: APIObjectValue>(with method: HTTPMethod = .get,
                                              endpoint: Endpoint? = nil,
                                              appending pathComponent: String? = nil,
                                              arguments: [String:CustomStringConvertible] = .empty,

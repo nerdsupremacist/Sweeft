@@ -68,16 +68,16 @@ extension APIObjectValue {
                             completionQueue: DispatchQueue = .global(),
                             maxCacheTime: CacheTime = .no) -> Response<APIObject<Self>> {
         
-        return api.doObjectRequest(with: .get,
-                                   appending: id.description,
-                                   arguments: arguments,
-                                   headers: headers,
-                                   queries: queries,
-                                   auth: auth,
-                                   body: body,
-                                   acceptableStatusCodes: acceptableStatusCodes,
-                                   completionQueue: completionQueue,
-                                   maxCacheTime: maxCacheTime)
+        return api.doAPIObjectRequest(with: .get,
+                                      appending: id.description,
+                                      arguments: arguments,
+                                      headers: headers,
+                                      queries: queries,
+                                      auth: auth,
+                                      body: body,
+                                      acceptableStatusCodes: acceptableStatusCodes,
+                                      completionQueue: completionQueue,
+                                      maxCacheTime: maxCacheTime)
     }
     
     public static func all(using api: API,
@@ -90,15 +90,15 @@ extension APIObjectValue {
                            completionQueue: DispatchQueue = .global(),
                            maxCacheTime: CacheTime = .no) -> Response<[APIObject<Self>]> {
         
-        return api.doObjectsRequest(with: .get,
-                                   arguments: arguments,
-                                   headers: headers,
-                                   queries: queries,
-                                   auth: auth,
-                                   body: body,
-                                   acceptableStatusCodes: acceptableStatusCodes,
-                                   completionQueue: completionQueue,
-                                   maxCacheTime: maxCacheTime)
+        return api.doAPIObjectsRequest(with: .get,
+                                       arguments: arguments,
+                                       headers: headers,
+                                       queries: queries,
+                                       auth: auth,
+                                       body: body,
+                                       acceptableStatusCodes: acceptableStatusCodes,
+                                       completionQueue: completionQueue,
+                                       maxCacheTime: maxCacheTime)
     }
     
 }
@@ -106,7 +106,7 @@ extension APIObjectValue {
 extension APIObject {
     
     public func doRequest<T: APIObjectValue>(with method: HTTPMethod = .get,
-                                             to endpoint: Value.Endpoint? = nil,
+                                             to endpoint: Value.Endpoint?,
                                              arguments: [String:CustomStringConvertible] = .empty,
                                              headers: [String:CustomStringConvertible] = .empty,
                                              queries: [String:CustomStringConvertible] = .empty,
@@ -114,25 +114,25 @@ extension APIObject {
                                              body: Encodable? = nil,
                                              acceptableStatusCodes: [Int] = [200],
                                              completionQueue: DispatchQueue = .global(),
-                                             maxCacheTime: CacheTime = .no) -> Response<APIObject<T>> {
+                                             maxCacheTime: CacheTime = .no) -> Response<APIObject<T>> where T.API == Value.API {
         
         let pathComponent = endpoint.map { "\(value.id)/\($0.rawValue)" } ?? value.id.description
         
-        return api.doObjectRequest(with: method,
-                                   endpoint: Value.endpoint,
-                                   appending: pathComponent,
-                                   arguments: arguments,
-                                   headers: headers,
-                                   queries: queries,
-                                   auth: auth,
-                                   body: body,
-                                   acceptableStatusCodes: acceptableStatusCodes,
-                                   completionQueue: completionQueue,
-                                   maxCacheTime: maxCacheTime)
+        return api.doAPIObjectRequest(with: method,
+                                      endpoint: Value.endpoint,
+                                      appending: pathComponent,
+                                      arguments: arguments,
+                                      headers: headers,
+                                      queries: queries,
+                                      auth: auth,
+                                      body: body,
+                                      acceptableStatusCodes: acceptableStatusCodes,
+                                      completionQueue: completionQueue,
+                                      maxCacheTime: maxCacheTime)
     }
     
     public func doRequest<T: APIObjectValue>(with method: HTTPMethod = .get,
-                                             to endpoint: Value.Endpoint? = nil,
+                                             to endpoint: Value.Endpoint?,
                                              arguments: [String:CustomStringConvertible] = .empty,
                                              headers: [String:CustomStringConvertible] = .empty,
                                              queries: [String:CustomStringConvertible] = .empty,
@@ -140,21 +140,21 @@ extension APIObject {
                                              body: Encodable? = nil,
                                              acceptableStatusCodes: [Int] = [200],
                                              completionQueue: DispatchQueue = .global(),
-                                             maxCacheTime: CacheTime = .no) -> Response<[APIObject<T>]> {
+                                             maxCacheTime: CacheTime = .no) -> Response<[APIObject<T>]> where T.API == Value.API {
         
         let pathComponent = endpoint.map { "\(value.id)/\($0.rawValue)" } ?? value.id.description
         
-        return api.doObjectsRequest(with: method,
-                                    endpoint: Value.endpoint,
-                                    appending: pathComponent,
-                                    arguments: arguments,
-                                    headers: headers,
-                                    queries: queries,
-                                    auth: auth,
-                                    body: body,
-                                    acceptableStatusCodes: acceptableStatusCodes,
-                                    completionQueue: completionQueue,
-                                    maxCacheTime: maxCacheTime)
+        return api.doAPIObjectsRequest(with: method,
+                                       endpoint: Value.endpoint,
+                                       appending: pathComponent,
+                                       arguments: arguments,
+                                       headers: headers,
+                                       queries: queries,
+                                       auth: auth,
+                                       body: body,
+                                       acceptableStatusCodes: acceptableStatusCodes,
+                                       completionQueue: completionQueue,
+                                       maxCacheTime: maxCacheTime)
     }
     
 }
@@ -173,6 +173,7 @@ extension APIObject {
         let newValue = newValue ?? value
         
         return doRequest(with: .put,
+                         to: nil,
                          headers: headers,
                          queries: queries,
                          auth: auth,
@@ -190,14 +191,14 @@ extension APIObject {
                        completionQueue: DispatchQueue = .global(),
                        maxCacheTime: CacheTime = .no) -> Response<APIObject<Value>> {
         
-        return api.doObjectRequest(with: .post,
-                                   headers: headers,
-                                   queries: queries,
-                                   auth: auth,
-                                   body: value,
-                                   acceptableStatusCodes: acceptableStatusCodes,
-                                   completionQueue: completionQueue,
-                                   maxCacheTime: maxCacheTime)
+        return api.doAPIObjectRequest(with: .post,
+                                      headers: headers,
+                                      queries: queries,
+                                      auth: auth,
+                                      body: value,
+                                      acceptableStatusCodes: acceptableStatusCodes,
+                                      completionQueue: completionQueue,
+                                      maxCacheTime: maxCacheTime)
     }
     
 }
