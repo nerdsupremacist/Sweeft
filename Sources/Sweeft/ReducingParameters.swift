@@ -50,26 +50,3 @@ public struct RegularReducingParameters<I, R>: ReducingParameters {
     }
     
 }
-
-/// Wrapper for the reduce with index
-public struct ReducingParametersWithIndex<I, R>: ReducingParameters {
-    
-    /// Input of the collection
-    public typealias Input = I
-    /// Result of the reducing function
-    public typealias Result = R
-    /// Format of the nextPartialResult handler
-    public typealias NextPartialResultHandler = (Result, Input, Int) -> (Result)
-    
-    /// Initial value given to the result
-    public let initialResult: Result
-    /// Reducing function
-    public let nextPartialResult: NextPartialResultHandler
-    
-    /// Initializer
-    public init(initialResult: Result, nextPartialResult: @escaping NextPartialResultHandler) {
-        self.initialResult = initialResult
-        self.nextPartialResult = nextPartialResult
-    }
-    
-}

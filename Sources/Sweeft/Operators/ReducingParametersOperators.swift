@@ -45,18 +45,6 @@ public func ==><C: Collection, R>(_ items: C, _ reducingParameters: RegularReduc
     return items.reduce(reducingParameters.initialResult, reducingParameters.nextPartialResult)
 }
 
-/**
- Reduce with index
- 
- - Parameter items: collection
- - Parameter reducingParameters: Reducing Parameters with index
- 
- - Returns: Result of reduce
- */
-public func ==><I, R>(_ items: [I], _ reducingParameters: ReducingParametersWithIndex<I, R>) -> R {
-    return items.reduce(reducingParameters.initialResult, reducingParameters.nextPartialResult)
-}
-
 prefix operator >
 
 /**

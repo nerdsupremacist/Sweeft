@@ -89,18 +89,6 @@ infix operator =>: AdditionPrecedence
     return (items?.map(handler)).?
 }
 
-/**
- Map With Index
- 
- - Parameter items: array
- - Parameter handler: mapping function
- 
- - Returns: result of mapping the array with the function
- */
-@discardableResult public func =><T, V>(_ items: [T]?, _ handler: (T, Int) -> (V)) -> [V] {
-    return (items?.map(handler)).?
-}
-
 
 /**
  For each from number
@@ -151,18 +139,6 @@ public func ==><T>(_ items: [T]?, _ handler: @escaping (T, T) -> (T)) -> T? {
     return items?.reduce(handler)
 }
 
-/**
- Reduce with index
- 
- - Parameter items: array
- - Parameter handler: next partial result function with index
- 
- - Returns: result of reduce
- */
-public func ==><T>(_ items: [T]?, _ handler: @escaping (T, T, Int) -> (T)) -> T? {
-    return items?.reduce(handler)
-}
-
 infix operator |>: AdditionPrecedence
 
 /**
@@ -178,18 +154,6 @@ public func |><C: Collection>(_ items: C?, _ handler: (C.Iterator.Element) -> Bo
 }
 
 /**
- Filter with index
- 
- - Parameter items: array
- - Parameter handler: includes function
- 
- - Returns: filtered array
- */
-public func |><V>(_ items: [V]?, _ handler: (V, Int) -> Bool) -> [V] {
-    return (items?.filter(handler)).?
-}
-
-/**
  Filter
  
  - Parameter items: collection
@@ -198,18 +162,6 @@ public func |><V>(_ items: [V]?, _ handler: (V, Int) -> Bool) -> [V] {
  - Returns: filtered array
  */
 public func |><C: Collection>(_ items: C?, _ handler: @escaping (C.Iterator.Element) -> Bool?) -> [C.Iterator.Element] {
-    return items |> handler.?
-}
-
-/**
- Filter with index
- 
- - Parameter items: array
- - Parameter handler: includes function
- 
- - Returns: filtered array
- */
-public func |><V>(_ items: [V]?, _ handler: @escaping (V, Int) -> Bool?) -> [V] {
     return items |> handler.?
 }
 
@@ -228,18 +180,6 @@ public func !|><C: Collection>(_ items: C?, _ handler: (C.Iterator.Element) -> B
 }
 
 /**
- Anti-Filter with index
- 
- - Parameter items: array
- - Parameter handler: includes function
- 
- - Returns: filtered array
- */
-public func !|><V>(_ items: [V]?, _ handler: (V, Int) -> Bool) -> [V] {
-    return items |> { !handler($0, $1) }
-}
-
-/**
  Dictionary
  
  - Parameter items: collection
@@ -249,18 +189,6 @@ public func !|><V>(_ items: [V]?, _ handler: (V, Int) -> Bool) -> [V] {
  */
 public func >>=<C: Collection, K, V>(_ items: C?, _ handler: @escaping (C.Iterator.Element) -> (K, V)) -> [K:V] {
     return (items?.dictionary(byDividingWith: handler)).?
-}
-
-/**
- Dictionary with index
- 
- - Parameter items: array
- - Parameter handler: dividing function with index
- 
- - Returns: dictionary
- */
-public func >>=<T, K, V>(_ items: [T], _ handler: @escaping (T, Int) -> (K, V)) -> [K:V] {
-    return items.dictionary(byDividingWith: handler)
 }
 
 /**

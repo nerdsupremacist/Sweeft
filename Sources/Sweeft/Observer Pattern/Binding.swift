@@ -79,7 +79,7 @@ public func >>><T: Observable>(_ items: [T], _ handlers: [(T) -> ()]) {
     guard items.count == handlers.count else {
         return
     }
-    handlers => {
+    handlers.withIndex => {
         (items | $1) >>> $0
     }
 }

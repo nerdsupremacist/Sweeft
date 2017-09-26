@@ -23,7 +23,7 @@ public final class BulkPromise<T, O: Error>: Promise<[T], O> {
     public init(promises: [Promise<T,O>], completionQueue: DispatchQueue = .global()) {
         count = promises.count
         super.init(completionQueue: completionQueue)
-        promises => { promise, index in
+        promises.withIndex => { promise, index in
             promise.nest(to: self) { result in
                 self.results.append((index, result))
             }

@@ -29,49 +29,6 @@ public extension Array {
     }
     
     /**
-     Map with index
-     
-     - Parameter transform: tranform function with index
-     
-     - Returns: transformed array
-     */
-    func map<T>(_ transform: (Element, Int) -> T) -> [T] {
-        return withIndex => transform
-    }
-    
-    /**
-     For each with index
-     
-     - Parameter body: body function with index
-     */
-    func forEach(_ body: (Element, Int) -> Void) {
-        withIndex => body
-    }
-    
-    /**
-     Filter with index
-     
-     - Parameter isIncluded: isIncluded function with index
-     
-     - Returns: filtered array
-     */
-    func filter(_ isIncluded: (Element, Int) -> Bool) -> [Element] {
-        return withIndex |> isIncluded => firstArgument
-    }
-    
-    /**
-     Reduce with index
-     
-     - Parameter initialResult: Accumulator
-     - Parameter nextPartialResult: resulthandler with index
-     
-     - Returns: Result
-     */
-    func reduce<Result>(_ initialResult: Result, _ nextPartialResult: @escaping (Result, Element, Int) -> Result) -> Result {
-        return withIndex ==> initialResult ** { nextPartialResult($0, $1.0, $1.1) }
-    }
-    
-    /**
      Reduce with first item as partial result
      
      - Parameter nextPartialResult: resulthandler
@@ -79,20 +36,6 @@ public extension Array {
      - Returns: Result
      */
     func reduce(_ nextPartialResult: @escaping (Element, Element) -> Element) -> Element? {
-        guard let first = first else {
-            return nil
-        }
-        return array(withLast: count - 1) ==> first ** nextPartialResult
-    }
-    
-    /**
-     Reduce with first item as partial result and with index
-     
-     - Parameter nextPartialResult: resulthandler with index
-     
-     - Returns: Result
-     */
-    func reduce(_ nextPartialResult: @escaping (Element, Element, Int) -> Element) -> Element? {
         guard let first = first else {
             return nil
         }

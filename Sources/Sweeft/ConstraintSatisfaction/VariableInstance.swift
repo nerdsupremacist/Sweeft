@@ -71,7 +71,7 @@ extension VariableInstance {
         
         let name = self.variable
         let values = self.values.filter {
-            let solved = VariableInstance.solved(variable: name, value: $0.0)
+            let solved = VariableInstance.solved(variable: name, value: $0)
             let instances = instances |> { $0 != solved } + solved
             return constraints.and { $0.works(with: instances) }
         }
