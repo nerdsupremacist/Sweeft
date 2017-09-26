@@ -29,9 +29,17 @@ extension APIObjectWithDetail {
 
 extension APIObjectWithDetail {
     
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
+        
+        let detail: Detail?
+        do {
+            detail = try .init(from: decoder)
+        } catch DecodingError.keyNotFound {
+            detail = nil
+        }
+        
         self.init(basic: try .init(from: decoder),
-                  detail: try .init(from: decoder))
+                  detail: detail)
     }
     
     public func encode(to encoder: Encoder) throws {

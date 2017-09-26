@@ -88,7 +88,7 @@ public extension API {
             return string.replacingOccurrences(of: "{\(argument.key)}", with: argument.value.description)
         }
         
-        let base = self.base.appendingPathComponent(requestString).appendingPathComponent(pathComponent.?)
+        let base = self.base.appendingPathComponent(requestString).appendingPathComponent(pathComponent)
         
         return (baseQueries + queries >>= { $0.description }) ==> base ** { url, query in
             return url.appendingQuery(key: query.key, value: query.value)
