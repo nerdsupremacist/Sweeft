@@ -50,3 +50,29 @@ extension Result {
     }
     
 }
+
+extension Result {
+    
+    public func map<V>(_ transform: (T) throws -> V) rethrows -> Result<V, E> {
+        
+        switch self {
+        case .value(let value):
+            return .value(try transform(value))
+            
+        case .error(let error):
+            return .error(error)
+        }
+        
+    }
+    
+    public func flatMap<V>(_ transform: (T) throws -> Result<V, E>) rethrows -> Result<V, E> {
+        
+        switch try self.map(transform) {
+        case .value(let result):
+            return result
+        case .error(let error):
+            return .error(error)
+        }
+    }
+    
+}
