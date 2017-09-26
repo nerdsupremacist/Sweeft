@@ -21,6 +21,8 @@ public protocol API {
     var baseHeaders: [String:String] { get }
     /// Queries that should be included into every single request
     var baseQueries: [String:String] { get }
+    /// Holds the authentication related to the entire API
+    var auth: Auth { get }
     /// Will be called before performing a Request for people who like to go deep into the metal
     func willPerform(request: inout URLRequest)
     
@@ -48,6 +50,10 @@ public extension API {
     /// Default is empty
     var baseQueries: [String:String] {
         return .empty
+    }
+    
+    var auth: Auth {
+        return NoAuth.standard
     }
     
     /// Default does nothing
@@ -182,13 +188,15 @@ public extension API {
                           arguments: [String:CustomStringConvertible] = .empty,
                           headers: [String:CustomStringConvertible] = .empty,
                           queries: [String:CustomStringConvertible] = .empty,
-                          auth: Auth = NoAuth.standard,
+                          auth: Auth? = nil,
                           body: Data? = nil,
                           acceptableStatusCodes: [Int] = [200],
                           completionQueue: DispatchQueue = .global()) -> Response<APIResponse> {
         
         let url = self.url(for: endpoint, arguments: arguments, queries: queries)
         let request = self.request(with: method, to: url, headers: headers, body: body)
+        
+        let auth = auth ?? self.auth
         
         return auth.apply(to: request).next(completionQueue: completionQueue) { request in
             return self.perform(request: request,
@@ -218,7 +226,7 @@ public extension API {
                               arguments: [String:CustomStringConvertible] = .empty,
                               headers: [String:CustomStringConvertible] = .empty,
                               queries: [String:CustomStringConvertible] = .empty,
-                              auth: Auth = NoAuth.standard,
+                              auth: Auth? = nil,
                               body: Data? = nil,
                               acceptableStatusCodes: [Int] = [200],
                               completionQueue: DispatchQueue = .global(),
@@ -271,7 +279,7 @@ public extension API {
                                                            arguments: [String:CustomStringConvertible] = .empty,
                                                            headers: [String:CustomStringConvertible] = .empty,
                                                            queries: [String:CustomStringConvertible] = .empty,
-                                                           auth: Auth = NoAuth.standard,
+                                                           auth: Auth? = nil,
                                                            body: DataSerializable? = nil,
                                                            acceptableStatusCodes: [Int] = [200],
                                                            completionQueue: DispatchQueue = .global(),
@@ -319,7 +327,7 @@ public extension API {
                               arguments: [String:CustomStringConvertible] = .empty,
                               headers: [String:CustomStringConvertible] = .empty,
                               queries: [String:CustomStringConvertible] = .empty,
-                              auth: Auth = NoAuth.standard,
+                              auth: Auth? = nil,
                               body: JSON? = nil,
                               acceptableStatusCodes: [Int] = [200],
                               completionQueue: DispatchQueue = .global(),
@@ -358,7 +366,7 @@ public extension API {
                                                    arguments: [String:CustomStringConvertible] = .empty,
                                                    headers: [String:CustomStringConvertible] = .empty,
                                                    queries: [String:CustomStringConvertible] = .empty,
-                                                   auth: Auth = NoAuth.standard,
+                                                   auth: Auth? = nil,
                                                    body: JSON? = nil,
                                                    acceptableStatusCodes: [Int] = [200],
                                                    completionQueue: DispatchQueue = .global(),
@@ -404,7 +412,7 @@ public extension API {
                                                       arguments: [String:CustomStringConvertible] = .empty,
                                                       headers: [String:CustomStringConvertible] = .empty,
                                                       queries: [String:CustomStringConvertible] = .empty,
-                                                      auth: Auth = NoAuth.standard,
+                                                      auth: Auth? = nil,
                                                       body: JSON? = nil,
                                                       acceptableStatusCodes: [Int] = [200],
                                                       completionQueue: DispatchQueue = .global(),
@@ -451,7 +459,7 @@ public extension API {
                                                     arguments: [String:CustomStringConvertible] = .empty,
                                                     headers: [String:CustomStringConvertible] = .empty,
                                                     queries: [String:CustomStringConvertible] = .empty,
-                                                    auth: Auth = NoAuth.standard,
+                                                    auth: Auth? = nil,
                                                     body: JSON? = nil,
                                                     acceptableStatusCodes: [Int] = [200],
                                                     completionQueue: DispatchQueue = .global(),
@@ -500,7 +508,7 @@ public extension API {
                                                     arguments: [String:CustomStringConvertible] = .empty,
                                                     headers: [String:CustomStringConvertible] = .empty,
                                                     queries: [String:CustomStringConvertible] = .empty,
-                                                    auth: Auth = NoAuth.standard,
+                                                    auth: Auth? = nil,
                                                     body: JSON? = nil,
                                                     acceptableStatusCodes: [Int] = [200],
                                                     completionQueue: DispatchQueue = .global(),
@@ -549,7 +557,7 @@ public extension API {
                                                            arguments: [[String:CustomStringConvertible]] = .empty,
                                                            headers: [String:CustomStringConvertible] = .empty,
                                                            queries: [String:CustomStringConvertible] = .empty,
-                                                           auth: Auth = NoAuth.standard,
+                                                           auth: Auth? = nil,
                                                            bodies: [JSON?] = .empty,
                                                            acceptableStatusCodes: [Int] = [200],
                                                            completionQueue: DispatchQueue = .global(),
@@ -557,7 +565,7 @@ public extension API {
                                                            with internalPath: [String] = .empty,
                                                            maxCacheTime: CacheTime = .no) -> Response<[T]> {
         
-        return BulkPromise<[T], APIError>(promises: endpoints => { endpoint, index in
+        return BulkPromise<[T], APIError>(promises: endpoints.withIndex => { endpoint, index in
             
             let arguments = arguments | index
             let body = bodies | index ?? nil
@@ -597,14 +605,14 @@ public extension API {
                                                        arguments: [[String:CustomStringConvertible]] = .empty,
                                                        headers: [String:CustomStringConvertible] = .empty,
                                                        queries: [String:CustomStringConvertible] = .empty,
-                                                       auth: Auth = NoAuth.standard,
+                                                       auth: Auth? = nil,
                                                        bodies: [JSON?] = .empty,
                                                        acceptableStatusCodes: [Int] = [200],
                                                        completionQueue: DispatchQueue = .global(),
                                                        at path: [String] = .empty,
                                                        maxCacheTime: CacheTime = .no) -> Response<[T]> {
         
-        return BulkPromise(promises: endpoints => { endpoint, index in
+        return BulkPromise(promises: endpoints.withIndex => { endpoint, index in
             
             let arguments = arguments | index
             let body = bodies | index ?? nil
@@ -643,7 +651,7 @@ public extension API {
                                                        arguments: [[String:CustomStringConvertible]] = .empty,
                                                        headers: [String:CustomStringConvertible] = .empty,
                                                        queries: [String:CustomStringConvertible] = .empty,
-                                                       auth: Auth = NoAuth.standard,
+                                                       auth: Auth? = nil,
                                                        bodies: [JSON?] = .empty,
                                                        acceptableStatusCodes: [Int] = [200],
                                                        completionQueue: DispatchQueue = .global(),
@@ -682,7 +690,7 @@ public extension API {
                     arguments: [String:CustomStringConvertible] = .empty,
                     headers: [String:CustomStringConvertible] = .empty,
                     queries: [String:CustomStringConvertible] = .empty,
-                    auth: Auth = NoAuth.standard,
+                    auth: Auth? = nil,
                     body: JSON? = nil,
                     acceptableStatusCodes: [Int] = [200],
                     completionQueue: DispatchQueue = .global(),
@@ -718,7 +726,7 @@ public extension API {
                        arguments: [String:CustomStringConvertible] = .empty,
                        headers: [String:CustomStringConvertible] = .empty,
                        queries: [String:CustomStringConvertible] = .empty,
-                       auth: Auth = NoAuth.standard,
+                       auth: Auth? = nil,
                        body: JSON? = nil,
                        acceptableStatusCodes: [Int] = [200],
                        completionQueue: DispatchQueue = .global(),
@@ -755,7 +763,7 @@ public extension API {
                      arguments: [String:CustomStringConvertible] = .empty,
                      headers: [String:CustomStringConvertible] = .empty,
                      queries: [String:CustomStringConvertible] = .empty,
-                     auth: Auth = NoAuth.standard,
+                     auth: Auth? = nil,
                      acceptableStatusCodes: [Int] = [200],
                      completionQueue: DispatchQueue = .global(),
                      maxCacheTime: CacheTime = .no) -> JSON.Result {
@@ -791,7 +799,7 @@ public extension API {
                     arguments: [String:CustomStringConvertible] = .empty,
                     headers: [String:CustomStringConvertible] = .empty,
                     queries: [String:CustomStringConvertible] = .empty,
-                    auth: Auth = NoAuth.standard,
+                    auth: Auth? = nil,
                     acceptableStatusCodes: [Int] = [200],
                     completionQueue: DispatchQueue = .global(),
                     maxCacheTime: CacheTime = .no) -> JSON.Result {

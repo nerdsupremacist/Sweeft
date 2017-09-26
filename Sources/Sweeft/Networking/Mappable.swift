@@ -49,7 +49,7 @@ extension Deserializable {
                            arguments: [String:CustomStringConvertible] = .empty,
                            headers: [String:CustomStringConvertible] = .empty,
                            queries: [String:CustomStringConvertible] = .empty,
-                           auth: Auth = NoAuth.standard,
+                           auth: Auth? = nil,
                            for path: String...,
                            maxCacheTime: CacheTime = .no) -> Result {
         
@@ -70,7 +70,7 @@ extension Deserializable {
                               arguments: [String:CustomStringConvertible] = .empty,
                               headers: [String:CustomStringConvertible] = .empty,
                               queries: [String:CustomStringConvertible] = .empty,
-                              auth: Auth = NoAuth.standard,
+                              auth: Auth? = nil,
                               for path: String...,
                               using internalPath: [String] = .empty,
                               maxCacheTime: CacheTime = .no) -> Results {
@@ -100,7 +100,7 @@ extension Serializable {
                             arguments: [String:CustomStringConvertible] = .empty,
                             headers: [String:CustomStringConvertible] = .empty,
                             queries: [String:CustomStringConvertible] = .empty,
-                            auth: Auth = NoAuth.standard) -> JSON.Result {
+                            auth: Auth? = nil) -> JSON.Result {
         
         return api.doJSONRequest(with: method,
                                  to: endpoint,
@@ -116,7 +116,7 @@ extension Serializable {
                             arguments: [String:CustomStringConvertible] = .empty,
                             headers: [String:CustomStringConvertible] = .empty,
                             queries: [String:CustomStringConvertible] = .empty,
-                            auth: Auth = NoAuth.standard) -> JSON.Result {
+                            auth: Auth? = nil) -> JSON.Result {
         
         return send(using: api,
                     method: .put,
@@ -132,7 +132,7 @@ extension Serializable {
                     arguments: [String:CustomStringConvertible] = .empty,
                     headers: [String:CustomStringConvertible] = .empty,
                     queries: [String:CustomStringConvertible] = .empty,
-                    auth: Auth = NoAuth.standard) -> JSON.Result {
+                    auth: Auth? = nil) -> JSON.Result {
         
         return send(using: api,
                     method: .post,
