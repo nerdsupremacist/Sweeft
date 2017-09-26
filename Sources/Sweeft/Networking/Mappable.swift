@@ -8,6 +8,8 @@
 
 import Foundation
 
+
+@available(*, deprecated, message: "Deserializable is deprecated and will soon no longer be supported")
 public protocol Deserializable: DataRepresentable {
 
     /// Initialize from json

@@ -361,6 +361,7 @@ public extension API {
      
      - Returns: Promise of the Object
      */
+    @available(*, deprecated, message:  "Deserializable is deprecated and will soon no longer be supported")
     public func doObjectRequest<T: Deserializable>(with method: HTTPMethod = .get,
                                                    to endpoint: Endpoint,
                                                    arguments: [String:CustomStringConvertible] = .empty,
@@ -454,6 +455,8 @@ public extension API {
      
      - Returns: Promise of Object Array
      */
+    
+    @available(*, deprecated, message: "Deserializable is deprecated and will soon no longer be supported")
     public func doObjectsRequest<T: Deserializable>(with method: HTTPMethod = .get,
                                                     to endpoint: Endpoint,
                                                     arguments: [String:CustomStringConvertible] = .empty,
@@ -583,6 +586,42 @@ public extension API {
             
             }, completionQueue: completionQueue).flattened
     }
+    
+//    func doDecodableRequest<T: Decodable>(with method: HTTPMethod = .get,
+//                                          to endpoint: Endpoint,
+//                                          arguments: [String:CustomStringConvertible] = .empty,
+//                                          headers: [String:CustomStringConvertible] = .empty,
+//                                          queries: [String:CustomStringConvertible] = .empty,
+//                                          auth: Auth? = nil,
+//                                          body: Encodable? = nil,
+//                                          acceptableStatusCodes: [Int] = [200],
+//                                          completionQueue: DispatchQueue = .global(),
+//                                          at path: [String] = .empty,
+//                                          maxCacheTime: CacheTime = .no,
+//                                          dateDecodingStrategy: JSONDecoder.DateDecodingStrategy = .iso8601,
+//                                          dataDecodingStrategy: JSONDecoder.DataDecodingStrategy = .base64) -> Response<T> {
+//        
+//        let body = body.flatMap { try? JSONEncoder().encode($0) }
+//        
+//        return doDataRequest(with: method,
+//                             to: endpoint,
+//                             arguments: arguments,
+//                             headers: headers,
+//                             queries: queries,
+//                             auth: auth,
+//                             body: body,
+//                             acceptableStatusCodes: acceptableStatusCodes,
+//                             maxCacheTime: maxCacheTime).nested(completionQueue: completionQueue) { data in
+//                                
+//                                let decoder = JSONDecoder()
+//                                decoder.dataDecodingStrategy = dataDecodingStrategy
+//                                decoder.dateDecodingStrategy = dateDecodingStrategy
+//                                guard let item = decoder.decode(T.self, from: data) else {
+//                                    return
+//                                }
+//                                return
+//        }
+//    }
     
     /**
      Will do a series of requests for objects asynchounously and return an array with all the responses
