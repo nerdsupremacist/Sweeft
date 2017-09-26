@@ -9,6 +9,7 @@
 import Sweeft
 
 enum SixDegreesNode: HashableNode, SimpleNode {
+    
     case actor(id: Int)
     case movie(id: Int)
     

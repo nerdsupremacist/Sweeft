@@ -63,7 +63,7 @@ enum Demo {
         
         let even = !array |> { $0 & 1 == 0 }
         
-        array => { item, index in
+        array?.withIndex => { item, index in
             // Do Stuff
         }
         
