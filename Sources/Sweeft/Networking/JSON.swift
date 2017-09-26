@@ -100,12 +100,6 @@ public extension JSON {
     }
     
     /// Get Deserializable Object in Path
-    public func get<T: APIResponseObject>(in path: [String], with api: T.API) -> T? {
-        return get(in: path, using: T.init ** api)
-    }
-    
-    
-    /// Get Deserializable Object in Path
     public func get<T: Deserializable>(in path: String...) -> T? {
         return get(in: path)
     }
@@ -124,14 +118,6 @@ public extension JSON {
     /// Get Array of Deserializable Object in Path with internal Path inside array
     public func getAll<T: Deserializable>(in path: [String], for internalPath: [String] = .empty) -> [T]? {
         return getAll(in: path, using: T.initializer(for: internalPath))
-    }
-    
-    /// Get Array of Deserializable Object in Path with internal Path inside array
-    public func getAll<T: APIResponseObject>(in path: [String],
-                                             for internalPath: [String] = .empty,
-                                             using api: T.API) -> [T]? {
-        
-        return getAll(in: path, using: T.initializer(for: internalPath, using: api))
     }
     
     /// Get Array of Deserializable Object in Path

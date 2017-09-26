@@ -80,6 +80,7 @@ public extension API {
      - Returns: resulting URL
      */
     public func url(for endpoint: Endpoint,
+                    appending pathComponent: String? = nil,
                     arguments: [String:CustomStringConvertible] = .empty,
                     queries: [String:CustomStringConvertible] = .empty) -> URL {
         
@@ -87,7 +88,9 @@ public extension API {
             return string.replacingOccurrences(of: "{\(argument.key)}", with: argument.value.description)
         }
         
-        return (baseQueries + queries >>= { $0.description }) ==> base.appendingPathComponent(requestString) ** { url, query in
+        let finalString = pathComponent.map { requestString + $0 } ?? requestString
+        
+        return (baseQueries + queries >>= { $0.description }) ==> base.appendingPathComponent(finalString) ** { url, query in
             return url.appendingQuery(key: query.key, value: query.value)
         }
     }
@@ -185,6 +188,7 @@ public extension API {
     
     public func doRequest(with method: HTTPMethod = .get,
                           to endpoint: Endpoint,
+                          appending pathComponent: String? = nil,
                           arguments: [String:CustomStringConvertible] = .empty,
                           headers: [String:CustomStringConvertible] = .empty,
                           queries: [String:CustomStringConvertible] = .empty,
@@ -193,7 +197,7 @@ public extension API {
                           acceptableStatusCodes: [Int] = [200],
                           completionQueue: DispatchQueue = .global()) -> Response<APIResponse> {
         
-        let url = self.url(for: endpoint, arguments: arguments, queries: queries)
+        let url = self.url(for: endpoint, appending: pathComponent, arguments: arguments, queries: queries)
         let request = self.request(with: method, to: url, headers: headers, body: body)
         
         let auth = auth ?? self.auth
@@ -223,6 +227,7 @@ public extension API {
      */
     public func doDataRequest(with method: HTTPMethod = .get,
                               to endpoint: Endpoint,
+                              appending pathComponent: String? = nil,
                               arguments: [String:CustomStringConvertible] = .empty,
                               headers: [String:CustomStringConvertible] = .empty,
                               queries: [String:CustomStringConvertible] = .empty,
@@ -241,6 +246,7 @@ public extension API {
         
         return doRequest(with: method,
                          to: endpoint,
+                         appending: pathComponent,
                          arguments: arguments,
                          headers: headers,
                          queries: queries,
@@ -323,9 +329,9 @@ public extension API {
      */
     public func doJSONRequest(with method: HTTPMethod = .get,
                               to endpoint: Endpoint,
-                              arguments: [String:CustomStringConvertible] = .empty,
-                              headers: [String:CustomStringConvertible] = .empty,
-                              queries: [String:CustomStringConvertible] = .empty,
+                              arguments: [String : CustomStringConvertible] = .empty,
+                              headers: [String : CustomStringConvertible] = .empty,
+                              queries: [String : CustomStringConvertible] = .empty,
                               auth: Auth? = nil,
                               body: JSON? = nil,
                               acceptableStatusCodes: [Int] = [200],
@@ -391,51 +397,6 @@ public extension API {
     }
     
     /**
-     Will do a simple Request for an APIResponseObject
-     
-     - Parameter method: HTTP Method
-     - Parameter endpoint: endpoint of the API it should be sent to
-     - Parameter arguments: arguments encoded into the endpoint string
-     - Parameter headers: HTTP Headers that should be added to the request
-     - Parameter auth: Authentication Manager for the request
-     - Parameter body: JSON Object that should be sent in the HTTP Body
-     - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
-     - Parameter completionQueue: Queue in which the promise should be run
-     - Parameter path: path of the object inside the json response
-     - Parameter maxCacheTime: Time the response should be cached
-     
-     - Returns: Promise of the Object
-     */
-    public func doObjectRequest<T: APIResponseObject>(with method: HTTPMethod = .get,
-                                                      to endpoint: Endpoint,
-                                                      arguments: [String:CustomStringConvertible] = .empty,
-                                                      headers: [String:CustomStringConvertible] = .empty,
-                                                      queries: [String:CustomStringConvertible] = .empty,
-                                                      auth: Auth? = nil,
-                                                      body: JSON? = nil,
-                                                      acceptableStatusCodes: [Int] = [200],
-                                                      completionQueue: DispatchQueue = .global(),
-                                                      at path: [String] = .empty,
-                                                      maxCacheTime: CacheTime = .no) -> Response<T> where T.API == Self {
-        
-        return doJSONRequest(with: method,
-                             to: endpoint,
-                             arguments: arguments,
-                             headers: headers,
-                             queries: queries,
-                             auth: auth,
-                             body: body,
-                             acceptableStatusCodes: acceptableStatusCodes,
-                             maxCacheTime: maxCacheTime).flatMap(completionQueue: completionQueue) { json in
-                                
-                                guard let item: T = json.get(in: path, with: self) else {
-                                    return .errored(with: .mappingError(json: json))
-                                }
-                                return .successful(with: item)
-        }
-    }
-    
-    /**
      Will do a simple Request for an array of Deserializable Objects
      
      - Parameter method: HTTP Method
@@ -479,54 +440,6 @@ public extension API {
                              maxCacheTime: maxCacheTime).flatMap(completionQueue: completionQueue) { json in
                                 
                                 guard let items: [T] = json.getAll(in: path, for: internalPath) else {
-                                    return .errored(with: .mappingError(json: json))
-                                }
-                                return .successful(with: items)
-        }
-    }
-    
-    /**
-     Will do a simple Request for an array of Deserializable Objects
-     
-     - Parameter method: HTTP Method
-     - Parameter endpoint: endpoint of the API it should be sent to
-     - Parameter arguments: arguments encoded into the endpoint string
-     - Parameter headers: HTTP Headers that should be added to the request
-     - Parameter auth: Authentication Manager for the request
-     - Parameter body: JSON Object that should be sent in the HTTP Body
-     - Parameter acceptableStatusCodes: HTTP Status Codes that mean a succesfull request was done
-     - Parameter completionQueue: Queue in which the promise should be run
-     - Parameter path: path of the array inside the json object
-     - Parameter internalPath: path of the object inside the individual objects inside the array
-     - Parameter maxCacheTime: Time the response should be cached
-     
-     - Returns: Promise of Object Array
-     */
-    public func doObjectsRequest<T: APIResponseObject>(with method: HTTPMethod = .get,
-                                                    to endpoint: Endpoint,
-                                                    arguments: [String:CustomStringConvertible] = .empty,
-                                                    headers: [String:CustomStringConvertible] = .empty,
-                                                    queries: [String:CustomStringConvertible] = .empty,
-                                                    auth: Auth? = nil,
-                                                    body: JSON? = nil,
-                                                    acceptableStatusCodes: [Int] = [200],
-                                                    completionQueue: DispatchQueue = .global(),
-                                                    at path: [String] = .empty,
-                                                    with internalPath: [String] = .empty,
-                                                    maxCacheTime: CacheTime = .no) -> Response<[T]> where T.API == Self {
-        
-        
-        return doJSONRequest(with: method,
-                             to: endpoint,
-                             arguments: arguments,
-                             headers: headers,
-                             queries: queries,
-                             auth: auth,
-                             body: body,
-                             acceptableStatusCodes: acceptableStatusCodes,
-                             maxCacheTime: maxCacheTime).flatMap(completionQueue: completionQueue) { json in
-                                
-                                guard let items: [T] = json.getAll(in: path, for: internalPath, using: self) else {
                                     return .errored(with: .mappingError(json: json))
                                 }
                                 return .successful(with: items)
@@ -582,41 +495,109 @@ public extension API {
             }, completionQueue: completionQueue).flattened
     }
     
-//    func doDecodableRequest<T: Decodable>(with method: HTTPMethod = .get,
-//                                          to endpoint: Endpoint,
-//                                          arguments: [String:CustomStringConvertible] = .empty,
-//                                          headers: [String:CustomStringConvertible] = .empty,
-//                                          queries: [String:CustomStringConvertible] = .empty,
-//                                          auth: Auth? = nil,
-//                                          body: Encodable? = nil,
-//                                          acceptableStatusCodes: [Int] = [200],
-//                                          completionQueue: DispatchQueue = .global(),
-//                                          at path: [String] = .empty,
-//                                          maxCacheTime: CacheTime = .no,
-//                                          dateDecodingStrategy: JSONDecoder.DateDecodingStrategy = .iso8601,
-//                                          dataDecodingStrategy: JSONDecoder.DataDecodingStrategy = .base64) -> Response<T> {
-//
-//        let body = body.flatMap { try? JSONEncoder().encode($0) }
-//
-//        return doDataRequest(with: method,
-//                             to: endpoint,
-//                             arguments: arguments,
-//                             headers: headers,
-//                             queries: queries,
-//                             auth: auth,
-//                             body: body,
-//                             acceptableStatusCodes: acceptableStatusCodes,
-//                             maxCacheTime: maxCacheTime).nested(completionQueue: completionQueue) { data in
-//
-//                                let decoder = JSONDecoder()
-//                                decoder.dataDecodingStrategy = dataDecodingStrategy
-//                                decoder.dateDecodingStrategy = dateDecodingStrategy
-//                                guard let item = decoder.decode(T.self, from: data) else {
-//                                    return
-//                                }
-//                                return
-//        }
-//    }
+    func doDecodableRequest<T: Decodable>(with method: HTTPMethod = .get,
+                                          to endpoint: Endpoint,
+                                          appending pathComponent: String? = nil,
+                                          arguments: [String:CustomStringConvertible] = .empty,
+                                          headers: [String:CustomStringConvertible] = .empty,
+                                          queries: [String:CustomStringConvertible] = .empty,
+                                          auth: Auth? = nil,
+                                          body: Encodable? = nil,
+                                          acceptableStatusCodes: [Int] = [200],
+                                          completionQueue: DispatchQueue = .global(),
+                                          maxCacheTime: CacheTime = .no,
+                                          dateEncodingStrategy: JSONEncoder.DateEncodingStrategy = .iso8601,
+                                          dataEncodingStrategy: JSONEncoder.DataEncodingStrategy = .base64,
+                                          dateDecodingStrategy: JSONDecoder.DateDecodingStrategy = .iso8601,
+                                          dataDecodingStrategy: JSONDecoder.DataDecodingStrategy = .base64) -> Response<T> {
+
+        let body = body.flatMap {
+            $0.encoded(dateEncodingStrategy: dateEncodingStrategy, dataEncodingStrategy: dataEncodingStrategy)
+        }
+
+        return doDataRequest(with: method,
+                             to: endpoint,
+                             appending: pathComponent,
+                             arguments: arguments,
+                             headers: headers,
+                             queries: queries,
+                             auth: auth,
+                             body: body,
+                             acceptableStatusCodes: acceptableStatusCodes,
+                             maxCacheTime: maxCacheTime).flatMap(completionQueue: completionQueue) { data in
+
+                                let decoder = JSONDecoder()
+                                decoder.dateDecodingStrategy = dateDecodingStrategy
+                                decoder.dataDecodingStrategy = dataDecodingStrategy
+                                guard let item = try? decoder.decode(T.self, from: data) else {
+                                    return .errored(with: .noData)
+                                }
+                                return .successful(with: item)
+        }
+    }
+    
+    func doObjectRequest<T: APIObjectValue>(with method: HTTPMethod = .get,
+                                            endpoint: Endpoint? = nil,
+                                            appending pathComponent: String? = nil,
+                                            arguments: [String:CustomStringConvertible] = .empty,
+                                            headers: [String:CustomStringConvertible] = .empty,
+                                            queries: [String:CustomStringConvertible] = .empty,
+                                            auth: Auth? = nil,
+                                            body: Encodable? = nil,
+                                            acceptableStatusCodes: [Int] = [200],
+                                            completionQueue: DispatchQueue = .global(),
+                                            maxCacheTime: CacheTime = .no) -> Response<APIObject<T>> where T.API == Self {
+        
+        return doDecodableRequest(with: method,
+                                  to: endpoint ?? T.endpoint,
+                                  appending: pathComponent,
+                                  arguments: arguments,
+                                  headers: headers,
+                                  queries: queries,
+                                  auth: auth,
+                                  body: body,
+                                  acceptableStatusCodes: acceptableStatusCodes,
+                                  maxCacheTime: maxCacheTime,
+                                  dateEncodingStrategy: T.dateEncodingStrategy,
+                                  dataEncodingStrategy: T.dataEncodingStrategy,
+                                  dateDecodingStrategy: T.dateDecodingStrategy,
+                                  dataDecodingStrategy: T.dataDecodingStrategy).map(completionQueue: completionQueue) { value in
+                                    
+            return APIObject(api: self, value: value)
+        }
+    }
+    
+    func doObjectsRequest<T: APIObjectValue>(with method: HTTPMethod = .get,
+                                             endpoint: Endpoint? = nil,
+                                             appending pathComponent: String? = nil,
+                                             arguments: [String:CustomStringConvertible] = .empty,
+                                             headers: [String:CustomStringConvertible] = .empty,
+                                             queries: [String:CustomStringConvertible] = .empty,
+                                             auth: Auth? = nil,
+                                             body: Encodable? = nil,
+                                             acceptableStatusCodes: [Int] = [200],
+                                             completionQueue: DispatchQueue = .global(),
+                                             at path: [String] = .empty,
+                                             maxCacheTime: CacheTime = .no) -> Response<[APIObject<T>]> where T.API == Self {
+        
+        return doDecodableRequest(with: method,
+                                  to: endpoint ?? T.endpoint,
+                                  appending: pathComponent,
+                                  arguments: arguments,
+                                  headers: headers,
+                                  queries: queries,
+                                  auth: auth,
+                                  body: body,
+                                  acceptableStatusCodes: acceptableStatusCodes,
+                                  maxCacheTime: maxCacheTime,
+                                  dateEncodingStrategy: T.dateEncodingStrategy,
+                                  dataEncodingStrategy: T.dataEncodingStrategy,
+                                  dateDecodingStrategy: T.dateDecodingStrategy,
+                                  dataDecodingStrategy: T.dataDecodingStrategy).map(completionQueue: completionQueue) { (value: [T]) in
+                                    
+            return value.map { APIObject(api: self, value: $0) }
+        }
+    }
     
     /**
      Will do a series of requests for objects asynchounously and return an array with all the responses
@@ -704,6 +685,19 @@ public extension API {
                                    completionQueue: completionQueue,
                                    at: path,
                                    maxCacheTime: maxCacheTime)
+    }
+    
+}
+
+extension Encodable {
+    
+    fileprivate func encoded(dateEncodingStrategy: JSONEncoder.DateEncodingStrategy = .iso8601,
+                 dataEncodingStrategy: JSONEncoder.DataEncodingStrategy = .base64) -> Data? {
+        
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = dateEncodingStrategy
+        encoder.dataEncodingStrategy = dataEncodingStrategy
+        return try? encoder.encode(self)
     }
     
 }
