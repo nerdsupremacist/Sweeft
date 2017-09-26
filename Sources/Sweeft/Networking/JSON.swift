@@ -210,6 +210,10 @@ extension JSON {
         return double | Date.init(timeIntervalSinceNow:)
     }
     
+    public var url: URL? {
+        return URL(from: self)
+    }
+    
     /// Get underlying Date
     public func date(using format: String = "dd.MM.yyyy hh:mm:ss a") -> Date? {
         return string?.date(using: format) ?? double | Date.init(timeIntervalSince1970:)
