@@ -9,10 +9,13 @@ import Foundation
 
 public protocol APIResponseObject {
     associatedtype API: Sweeft.API
-    init(api: API, json: JSON)
+    init?(api: API, json: JSON)
 }
 
 extension APIResponseObject {
+    
+    public typealias Result = Response<Self>
+    public typealias Results = Response<[Self]>
     
     /// Create an Initializer by using a path
     public static func initializer(for path: [String], using api: API) -> (JSON) -> Self? {
