@@ -7,14 +7,6 @@
 
 import Foundation
 
-extension API where Self: URLSessionDataDelegate {
-    
-    public func session(for method: HTTPMethod, at endpoint: Endpoint) -> URLSession {
-        return URLSession(configuration: .default, delegate: self, delegateQueue: nil)
-    }
-    
-}
-
 public protocol CustomAPI: API, URLSessionDataDelegate {
     func configuration(for method: HTTPMethod, at endpoint: Endpoint) -> URLSessionConfiguration
 }
