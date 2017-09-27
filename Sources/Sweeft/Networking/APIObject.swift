@@ -209,7 +209,7 @@ extension APIObject {
         return Value.doDecodableRequest(using: api,
                                         id: value.id,
                                         with: method,
-                                        to: nil,
+                                        to: endpoint,
                                         arguments: arguments,
                                         headers: headers,
                                         queries: queries,
