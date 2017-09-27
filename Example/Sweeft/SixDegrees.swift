@@ -44,7 +44,7 @@ enum SixDegreesNode: HashableNode, SimpleNode {
         let api = MoviesAPI.shared
         return api.get(endpoint, arguments: ["id": id])
             .generalizeError()
-            .nested { json -> [SixDegreesNode] in
+            .map { json -> [SixDegreesNode] in
                 let ids = json["cast"].array ==> { $0["id"].int }
                 return ids => self.other
         }

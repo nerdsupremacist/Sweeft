@@ -60,7 +60,9 @@ public class Promise<T, E: Error>: PromiseBody {
     var successHandlers = [SuccessHandler]()
     var errorHandlers = [ErrorHandler]()
     var resultHandlers = [ResultHandler]()
+    
     var state: PromiseState<T, E> = .waiting
+    
     let completionQueue: DispatchQueue
     
     /// Initializer
@@ -100,7 +102,7 @@ public class Promise<T, E: Error>: PromiseBody {
      */
     @discardableResult public final func onSuccess(call handler: @escaping (T) -> ()) -> Promise<T, E> {
         if let result = state.value {
-            _ = handler(result)
+            completionQueue >>> handler ** result
         } else {
             successHandlers.append(handler)
         }
@@ -110,7 +112,7 @@ public class Promise<T, E: Error>: PromiseBody {
     /// Add an error Handler
     @discardableResult public final func onError(call handler: @escaping (E) -> ()) -> Promise<T, E> {
         if let error = state.error {
-            _ = handler(error)
+            completionQueue >>> handler ** error
         } else {
             errorHandlers.append(handler)
         }
@@ -120,7 +122,7 @@ public class Promise<T, E: Error>: PromiseBody {
     /// Add a
     @discardableResult public func onResult(call handler: @escaping ResultHandler) -> Promise<T, E> {
         if let result = state.result {
-            handler(result)
+            completionQueue >>> handler ** result
         } else {
             resultHandlers.append(handler)
         }
@@ -159,8 +161,7 @@ public class Promise<T, E: Error>: PromiseBody {
     
     /// Will nest a promise inside another one
     public func nest<V>(to promise: Promise<V, E>, using mapper: @escaping (T) -> (V)) {
-        onSuccess(call: mapper >>> promise.success)
-        onError(call: promise.error)
+        nest(to: promise, using: mapper >>> promise.success**)
     }
     
     /// Will nest a promise inside another one
@@ -194,6 +195,7 @@ public class Promise<T, E: Error>: PromiseBody {
     }
     
     public func generalizeError(completionQueue: DispatchQueue = .global()) -> Promise<T, AnyError> {
+        
         return .new(completionQueue: completionQueue) { promise in
             onSuccess(call: promise.success)
             onError(call: AnyError.error >>> promise.error)

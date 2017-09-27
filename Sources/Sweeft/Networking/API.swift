@@ -23,6 +23,8 @@ public protocol API {
     var baseQueries: [String:String] { get }
     /// Holds the authentication related to the entire API
     var auth: Auth { get }
+    /// Cache where the requests will be stored
+    var cache: FileCache { get }
     /// Will be called before performing a Request for people who like to go deep into the metal
     func willPerform(request: inout URLRequest)
     
@@ -80,7 +82,6 @@ public extension API {
      - Returns: resulting URL
      */
     public func url(for endpoint: Endpoint,
-                    appending pathComponent: String? = nil,
                     arguments: [String:CustomStringConvertible] = .empty,
                     queries: [String:CustomStringConvertible] = .empty) -> URL {
         
@@ -88,7 +89,7 @@ public extension API {
             return string.replacingOccurrences(of: "{\(argument.key)}", with: argument.value.description)
         }
         
-        let base = self.base.appendingPathComponent(requestString).appendingPathComponent(pathComponent)
+        let base = self.base.appendingPathComponent(requestString)
         
         return (baseQueries + queries >>= { $0.description }) ==> base ** { url, query in
             return url.appendingQuery(key: query.key, value: query.value)
@@ -188,7 +189,6 @@ public extension API {
     
     public func doRequest(with method: HTTPMethod = .get,
                           to endpoint: Endpoint,
-                          appending pathComponent: String? = nil,
                           arguments: [String:CustomStringConvertible] = .empty,
                           headers: [String:CustomStringConvertible] = .empty,
                           queries: [String:CustomStringConvertible] = .empty,
@@ -197,7 +197,7 @@ public extension API {
                           acceptableStatusCodes: [Int] = [200],
                           completionQueue: DispatchQueue = .global()) -> Response<APIResponse> {
         
-        let url = self.url(for: endpoint, appending: pathComponent, arguments: arguments, queries: queries)
+        let url = self.url(for: endpoint, arguments: arguments, queries: queries)
         let request = self.request(with: method, to: url, headers: headers, body: body)
         
         let auth = auth ?? self.auth
@@ -227,7 +227,6 @@ public extension API {
      */
     public func doDataRequest(with method: HTTPMethod = .get,
                               to endpoint: Endpoint,
-                              appending pathComponent: String? = nil,
                               arguments: [String:CustomStringConvertible] = .empty,
                               headers: [String:CustomStringConvertible] = .empty,
                               queries: [String:CustomStringConvertible] = .empty,
@@ -237,7 +236,7 @@ public extension API {
                               completionQueue: DispatchQueue = .global(),
                               maxCacheTime: CacheTime = .no) -> Data.Result {
         
-        let url = self.url(for: endpoint, appending: pathComponent, arguments: arguments, queries: queries)
+        let url = self.url(for: endpoint, arguments: arguments, queries: queries)
         let cacheKey = url.relativePath.replacingOccurrences(of: "/", with: "_")
         
         if let cached = cache.get(with: cacheKey, maxTime: maxCacheTime) {
@@ -246,7 +245,6 @@ public extension API {
         
         return doRequest(with: method,
                          to: endpoint,
-                         appending: pathComponent,
                          arguments: arguments,
                          headers: headers,
                          queries: queries,
@@ -497,7 +495,6 @@ public extension API {
     
     func doDecodableRequest<T: Decodable>(with method: HTTPMethod = .get,
                                           to endpoint: Endpoint,
-                                          appending pathComponent: String? = nil,
                                           arguments: [String:CustomStringConvertible] = .empty,
                                           headers: [String:CustomStringConvertible] = .empty,
                                           queries: [String:CustomStringConvertible] = .empty,
@@ -517,7 +514,6 @@ public extension API {
 
         return doDataRequest(with: method,
                              to: endpoint,
-                             appending: pathComponent,
                              arguments: arguments,
                              headers: headers,
                              queries: queries,
@@ -539,7 +535,6 @@ public extension API {
     
     func doAPIObjectRequest<T: APIObjectValue>(with method: HTTPMethod = .get,
                                             endpoint: Endpoint = T.endpoint,
-                                            appending pathComponent: String? = nil,
                                             arguments: [String:CustomStringConvertible] = .empty,
                                             headers: [String:CustomStringConvertible] = .empty,
                                             queries: [String:CustomStringConvertible] = .empty,
@@ -550,8 +545,7 @@ public extension API {
                                             maxCacheTime: CacheTime = .no) -> Response<APIObject<T>> where T.API == Self {
         
         return doDecodableRequest(with: method,
-                                  to: endpoint ?? T.endpoint,
-                                  appending: pathComponent,
+                                  to: endpoint,
                                   arguments: arguments,
                                   headers: headers,
                                   queries: queries,
@@ -569,22 +563,18 @@ public extension API {
     }
     
     func doAPIObjectsRequest<T: APIObjectValue>(with method: HTTPMethod = .get,
-                                             endpoint: Endpoint? = nil,
-                                             appending pathComponent: String? = nil,
-                                             arguments: [String:CustomStringConvertible] = .empty,
-                                             headers: [String:CustomStringConvertible] = .empty,
-                                             queries: [String:CustomStringConvertible] = .empty,
-                                             auth: Auth? = nil,
-                                             body: Encodable? = nil,
-                                             acceptableStatusCodes: [Int] = [200],
-                                             completionQueue: DispatchQueue = .global(),
-                                             at path: [String] = .empty,
-                                             maxCacheTime: CacheTime = .no) -> Response<[APIObject<T>]> where T.API == Self {
+                                                endpoint: Endpoint = T.endpoint,
+                                                arguments: [String:CustomStringConvertible] = .empty,
+                                                headers: [String:CustomStringConvertible] = .empty,
+                                                queries: [String:CustomStringConvertible] = .empty,
+                                                auth: Auth? = nil,
+                                                body: Encodable? = nil,
+                                                acceptableStatusCodes: [Int] = [200],
+                                                completionQueue: DispatchQueue = .global(),
+                                                maxCacheTime: CacheTime = .no) -> Response<[APIObject<T>]> where T.API == Self {
         
         return doDecodableRequest(with: method,
-                                  to: endpoint ?? T.endpoint,
-                                  appending: pathComponent,
-                                  arguments: arguments,
+                                  to: endpoint,
                                   headers: headers,
                                   queries: queries,
                                   auth: auth,

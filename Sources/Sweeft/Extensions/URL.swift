@@ -36,11 +36,3 @@ extension URL: Deserializable {
     }
     
 }
-
-extension URL {
-    
-    public func appendingPathComponent(_ pathComponent: String?) -> URL {
-        return pathComponent.map { self.appendingPathComponent($0) } ?? self
-    }
-    
-}
