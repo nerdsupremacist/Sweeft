@@ -60,12 +60,12 @@ extension Person {
 extension Person {
     
     func getMovies(using api: MoviesAPI = .shared, limitedTo limit: Int = 25) -> Movie.Results {
-        return api.get(.moviesForPerson, arguments: ["id": id])
-            .onSuccess { json -> Response<[Movie]> in
+        return api.doJSONRequest(to: .moviesForPerson,
+                                 arguments: ["id": id]).flatMap { json -> Response<[Movie]> in
+                                    
                 let ids = json["cast"].array ==> { $0["id"].int }
                 return Movie.movies(with: ids.array(withFirst: limit), using: api)
             }
-            .future
     }
     
 }
