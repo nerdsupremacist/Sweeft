@@ -54,7 +54,7 @@ extension APIObjectValue {
 
 public struct APIObject<Value: APIObjectValue> {
     let api: Value.API
-    var value: Value
+    public var value: Value
 }
 
 extension APIObjectValue {
