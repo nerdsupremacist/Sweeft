@@ -237,7 +237,7 @@ public extension API {
                               completionQueue: DispatchQueue = .global(),
                               maxCacheTime: CacheTime = .no) -> Data.Result {
         
-        let url = self.url(for: endpoint, arguments: arguments, queries: queries)
+        let url = self.url(for: endpoint, appending: pathComponent, arguments: arguments, queries: queries)
         let cacheKey = url.relativePath.replacingOccurrences(of: "/", with: "_")
         
         if let cached = cache.get(with: cacheKey, maxTime: maxCacheTime) {

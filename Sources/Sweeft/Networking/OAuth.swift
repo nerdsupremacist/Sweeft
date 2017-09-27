@@ -58,12 +58,11 @@ public final class OAuth: Auth, Observable {
     public func apply(to request: URLRequest) -> Promise<URLRequest, APIError> {
         if isExpired {
             refreshPromise = self.refreshPromise ?? refresh()
-            return refreshPromise?.onSuccess { (auth: OAuth) -> Promise<URLRequest, APIError> in
+            return refreshPromise?.flatMap { (auth: OAuth) -> Promise<URLRequest, APIError> in
                 self.refreshPromise = nil
                 self.update(with: auth)
                 return self.apply(to: request)
-                }
-                .future ?? .errored(with: .cannotPerformRequest)
+            } ?? .errored(with: .cannotPerformRequest)
         }
         var request = request
         request.addValue("\(tokenType) \(token)", forHTTPHeaderField: "Authorization")

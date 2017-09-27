@@ -39,8 +39,8 @@ enum PromiseState<T, E: Error> {
 public protocol PromiseBody {
     associatedtype ResultType
     associatedtype ErrorType: Error
-    func onSuccess<O>(call handler: @escaping (ResultType) -> (O)) -> PromiseSuccessHandler<O, ResultType, ErrorType>
-    func onError<O>(call handler: @escaping (ErrorType) -> (O)) -> PromiseErrorHandler<O, ResultType, ErrorType>
+    func onSuccess(call handler: @escaping (ResultType) -> ()) -> Promise<ResultType, ErrorType>
+    func onError(call handler: @escaping (ErrorType) -> ()) -> Promise<ResultType, ErrorType>
     func nest<V>(to promise: Promise<V, ErrorType>, using mapper: @escaping (ResultType) -> (V))
     func nest<V>(to promise: Promise<V, ErrorType>, using mapper: @escaping (ResultType) -> ())
 }
@@ -98,13 +98,23 @@ public class Promise<T, E: Error>: PromiseBody {
      
      - Returns: PromiseHandler Object
      */
-    @discardableResult public func onSuccess<O>(call handler: @escaping (T) -> (O)) -> PromiseSuccessHandler<O, T, E> {
-        return PromiseSuccessHandler<O, T, E>(promise: self, handler: handler)
+    @discardableResult public final func onSuccess(call handler: @escaping (T) -> ()) -> Promise<T, E> {
+        if let result = state.value {
+            _ = handler(result)
+        } else {
+            successHandlers.append(handler)
+        }
+        return self
     }
     
     /// Add an error Handler
-    @discardableResult public func onError<O>(call handler: @escaping (E) -> (O)) -> PromiseErrorHandler<O, T, E> {
-        return PromiseErrorHandler<O, T, E>(promise: self, handler: handler)
+    @discardableResult public final func onError(call handler: @escaping (E) -> ()) -> Promise<T, E> {
+        if let error = state.error {
+            _ = handler(error)
+        } else {
+            errorHandlers.append(handler)
+        }
+        return self
     }
     
     /// Add a
@@ -172,7 +182,14 @@ public class Promise<T, E: Error>: PromiseBody {
                         _ mapper: @escaping (T) -> Promise<V, E>) -> Promise<V, E> {
         
         return .new(completionQueue: completionQueue) { promise in
-            self.onSuccess(call: mapper).future.nest(to: promise, using: id)
+            map(mapper).onResult { result in
+                switch result {
+                case .value(let resultPromise):
+                    resultPromise.nest(to: promise, using: id)
+                case .error(let error):
+                    promise.error(with: error)
+                }
+            }
         }
     }
     
