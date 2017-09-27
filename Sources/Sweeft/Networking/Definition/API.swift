@@ -507,11 +507,11 @@ public extension API {
                                           dataEncodingStrategy: JSONEncoder.DataEncodingStrategy = .base64,
                                           dateDecodingStrategy: JSONDecoder.DateDecodingStrategy = .iso8601,
                                           dataDecodingStrategy: JSONDecoder.DataDecodingStrategy = .base64) -> Response<T> {
-
+        
         let body = body.flatMap {
             $0.encoded(dateEncodingStrategy: dateEncodingStrategy, dataEncodingStrategy: dataEncodingStrategy)
         }
-
+        
         return doDataRequest(with: method,
                              to: endpoint,
                              arguments: arguments,
@@ -521,12 +521,14 @@ public extension API {
                              body: body,
                              acceptableStatusCodes: acceptableStatusCodes,
                              maxCacheTime: maxCacheTime).flatMap(completionQueue: completionQueue) { data in
-
+                                
                                 let decoder = JSONDecoder()
                                 decoder.dateDecodingStrategy = dateDecodingStrategy
                                 decoder.dataDecodingStrategy = dataDecodingStrategy
                                 do {
                                     return .successful(with: try decoder.decode(T.self, from: data))
+                                } catch let error as DecodingError {
+                                    return .errored(with: .decodingError(error: error))
                                 } catch {
                                     return .errored(with: .unknown(error: error))
                                 }
