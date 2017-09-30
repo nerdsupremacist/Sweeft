@@ -9,11 +9,11 @@ import Foundation
 
 class SelfSettingPromise<T, E: Error>: Promise<T, E> {
     
-    private(set) var setter: Setter!
+    private(set) var setter: Setter.Weak!
     
     init(completionQueue: DispatchQueue = .global()) {
-        var setter: Setter!
-        super.init(completionQueue: completionQueue) { setter = $0 }
+        var setter: Setter.Weak!
+        super.init(completionQueue: completionQueue) { setter = $0.weak() }
         self.setter = setter
     }
     
