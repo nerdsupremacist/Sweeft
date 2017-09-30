@@ -186,10 +186,7 @@ public class Promise<T, E: Error>: PromiseBody {
     }
     
     public func generalizeError(completionQueue: DispatchQueue = .global()) -> Promise<T, AnyError> {
-        
-        return .new(completionQueue: completionQueue) { setter in
-            self.apply(to: setter) { $0.map(AnyError.error) }
-        }
+        return map(completionQueue: completionQueue) { $0.map(AnyError.error) }
     }
     
     public func wait() -> Result {

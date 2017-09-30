@@ -21,7 +21,9 @@ class MoviesTableViewController: UITableViewController {
         let api = MoviesAPI.shared
         Movie.featured(using: api).onSuccess { movies in
             self.movies = <>movies.sorted()
-            movies >>> **self.tableView.reloadData
+            DispatchQueue.main >>> {
+                movies >>> **self.tableView.reloadData
+            }
         }
         .onError { error in
             print(error)

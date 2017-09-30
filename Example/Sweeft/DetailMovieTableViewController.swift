@@ -19,11 +19,15 @@ class DetailMovieTableViewController: UITableViewController {
             movie >>> **self.tableView.reloadData
             movie?.getSimilar().onSuccess { movies in
                 self.similar = movies
-                self.similar >>> **self.tableView.reloadData
+                DispatchQueue.main >>> {
+                    self.similar >>> **self.tableView.reloadData
+                }
             }
             movie?.getRoles().onSuccess { roles in
                 self.roles = roles
-                self.roles >>> **self.tableView.reloadData
+                DispatchQueue.main >>> {
+                    self.roles >>> **self.tableView.reloadData
+                }
             }
         }
     }
