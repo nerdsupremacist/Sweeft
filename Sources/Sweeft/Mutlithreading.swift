@@ -47,8 +47,8 @@ public func async<T, E: GenerizableError>(qos: DispatchQoS = .background,
 }
 
 public func async<I, T, E: GenerizableError>(qos: DispatchQoS = .background,
-                        completionQueue: DispatchQueue = .main,
-                        _ handle: @escaping (I) -> T) -> (I) -> Promise<T, E> {
+                                             completionQueue: DispatchQueue = .main,
+                                             _ handle: @escaping (I) -> T) -> (I) -> Promise<T, E> {
     
     return { async(qos: qos, completionQueue: completionQueue, handle ** $0) }
 }
