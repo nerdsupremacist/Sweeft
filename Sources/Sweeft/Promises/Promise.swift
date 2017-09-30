@@ -155,13 +155,19 @@ public class Promise<T, E: Error>: PromiseBody {
         onResult(call: transform >>> setter.write)
     }
     
-    /// Will create a Promise that is based on this promise but maps the result
-    public func map<V>(completionQueue: DispatchQueue = .global(),
-                          _ transform: @escaping (T) -> V) -> Promise<V, E> {
+    public func map<A, B>(completionQueue: DispatchQueue = .global(),
+                          _ transform: @escaping (Result) -> Promise<A, B>.Result) -> Promise<A, B> {
         
         return .new(completionQueue: completionQueue) { setter in
-            self.apply(to: setter) { $0.map(transform) }
+            self.apply(to: setter, transform: transform)
         }
+    }
+    
+    /// Will create a Promise that is based on this promise but maps the result
+    public func map<V>(completionQueue: DispatchQueue = .global(),
+                       _ transform: @escaping (T) -> V) -> Promise<V, E> {
+        
+        return map(completionQueue: completionQueue) { $0.map(transform) }
     }
     
     public func flatMap<V>(completionQueue: DispatchQueue = .global(),
