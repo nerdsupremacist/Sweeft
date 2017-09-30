@@ -87,6 +87,18 @@ public extension Array {
     }
     
     /**
+     Will separate the array into different chunks of the same size
+     
+     - Parameter size: Size of the chunks
+     
+     - Returns: Array of chunks
+     */
+    func chunks(of size: Int) -> [[Element]] {
+        guard !isEmpty else { return .empty }
+        return [array(withFirst: size)] + array(from: size).chunks(of: size)
+    }
+    
+    /**
      Will shift the index of an item to another inced
      
      - Parameter source: index of the item you want to move
