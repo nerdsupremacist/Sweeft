@@ -160,9 +160,10 @@ public extension API {
     public func perform(request: URLRequest,
                         method: HTTPMethod,
                         at endpoint: Endpoint,
-                        acceptableStatusCodes: [Int] = [200]) -> Response<APIResponse> {
+                        acceptableStatusCodes: [Int] = [200],
+                        completionQueue: DispatchQueue = .global()) -> Response<APIResponse> {
         
-        return .new { promise in
+        return .new(completionQueue: completionQueue) { promise in
             var request = request
             self.willPerform(request: &request)
             let session = self.session(for: method, at: endpoint)

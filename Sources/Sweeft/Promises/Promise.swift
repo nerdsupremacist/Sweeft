@@ -88,7 +88,9 @@ public class Promise<T, E: Error>: PromiseBody {
         return .with(result: .error(value))
     }
     
-    public static func new(completionQueue: DispatchQueue = .global(), _ handle: (Promise<T, E>.Setter) -> ()) -> Promise<T, E> {
+    public static func new(completionQueue: DispatchQueue = .global(),
+                           _ handle: (Promise<T, E>.Setter) -> ()) -> Promise<T, E> {
+        
         return Promise<T, E>(completionQueue: completionQueue, handle)
     }
     
