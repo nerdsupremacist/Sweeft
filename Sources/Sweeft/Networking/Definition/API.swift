@@ -163,26 +163,26 @@ public extension API {
                         acceptableStatusCodes: [Int] = [200],
                         completionQueue: DispatchQueue = .global()) -> Response<APIResponse> {
         
-        return .new(completionQueue: completionQueue) { promise in
+        return .new(completionQueue: completionQueue) { setter in
             var request = request
             self.willPerform(request: &request)
             let session = self.session(for: method, at: endpoint)
             let task = session.dataTask(with: request) { (data, response, error) in
                 if let error = error {
                     if let error = error as? URLError, error.code == .timedOut {
-                        promise.error(with: .timeout)
+                        setter.error(with: .timeout)
                     } else {
-                        promise.error(with: .unknown(error: error))
+                        setter.error(with: .unknown(error: error))
                     }
                     return
                 }
                 guard let response = response as? HTTPURLResponse else {
-                    return promise.error(with: .invalidResponse)
+                    return setter.error(with: .invalidResponse)
                 }
                 guard acceptableStatusCodes.contains(response.statusCode) else {
-                    return promise.error(with: .invalidStatus(code: response.statusCode, data: data))
+                    return setter.error(with: .invalidStatus(code: response.statusCode, data: data))
                 }
-                promise.success(with: APIResponse(response: response, data: data))
+                setter.success(with: APIResponse(response: response, data: data))
             }
             task.resume()
         }

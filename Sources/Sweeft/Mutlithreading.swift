@@ -22,25 +22,25 @@ public func after(_ time: TimeInterval = 0.0, in queue: DispatchQueue = .main, h
 
 
 public func async<T, E: GenerizableError>(runQueue: DispatchQueue,
-                     completionQueue: DispatchQueue = .main,
-                     _ handle: @escaping () throws -> T) -> Promise<T, E> {
+                                          completionQueue: DispatchQueue = .main,
+                                          _ handle: @escaping () throws -> T) -> Promise<T, E> {
     
-    return .new(completionQueue: completionQueue) { promise in
+    return .new(completionQueue: completionQueue) { setter in
         runQueue >>> {
             do {
                 let result = try handle()
-                promise.success(with: result)
+                setter.success(with: result)
             } catch let error {
                 let error = error as? E ?? E(error: error)
-                promise.error(with: error)
+                setter.error(with: error)
             }
         }
     }
 }
 
 public func async<T, E: GenerizableError>(qos: DispatchQoS = .background,
-                     completionQueue: DispatchQueue = .main,
-                     _ handle: @escaping () throws -> T) -> Promise<T, E> {
+                                          completionQueue: DispatchQueue = .main,
+                                          _ handle: @escaping () throws -> T) -> Promise<T, E> {
     
     let queue = DispatchQueue(label: String(describing: qos), qos: qos)
     return async(runQueue: queue, completionQueue: completionQueue, handle)

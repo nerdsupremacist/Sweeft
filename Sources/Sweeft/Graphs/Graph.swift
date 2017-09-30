@@ -58,10 +58,10 @@ extension Graph {
         var costs = costs
         var prevs = prevs
         
-        return .new { promise in
+        return .new { setter in
             if let current = queue.pop()?.item {
                 if isFinal(current.identifier) {
-                    promise.success(with: <>computePath(using: prevs, until: current.identifier))
+                    setter.success(with: <>computePath(using: prevs, until: current.identifier))
                 } else {
                     let cost = costs[current.identifier].?
                     current.neighbours(in: self).onSuccess { neighbours in
@@ -81,15 +81,15 @@ extension Graph {
                             }
                         }
                         self.iterate(queue: queue, prevs: prevs, costs: costs,
-                                     source: source, euristic: euristic, isFinal: isFinal).apply(to: promise, transform: id)
+                                     source: source, euristic: euristic, isFinal: isFinal).apply(to: setter, transform: id)
                         }
                         .onError { _ in
                             self.iterate(queue: queue, prevs: prevs, costs: costs,
-                                         source: source, euristic: euristic, isFinal: isFinal).apply(to: promise, transform: id)
+                                         source: source, euristic: euristic, isFinal: isFinal).apply(to: setter, transform: id)
                     }
                 }
             } else {
-                promise.success(with: nil)
+                setter.success(with: nil)
             }
         }
     }
@@ -117,13 +117,13 @@ extension Graph {
         var parents = parents
         var queue = queue
         
-        return .new { promise in
+        return .new { setter in
             if !queue.isEmpty {
                 let current = queue.remove(at: 0)
                 current.neighbours(in: self).onSuccess { neighbours in
                     if let item = neighbours.filter({ $0.0.identifier } >>> isFinal).first {
                         parents[item.0.identifier] = current.identifier
-                        promise.success(with: <>self.computePath(using: parents, until: item.0.identifier))
+                        setter.success(with: <>self.computePath(using: parents, until: item.0.identifier))
                     } else {
                         neighbours => { item in
                             if parents[item.0.identifier] == nil, source != item.0.identifier {
@@ -132,15 +132,15 @@ extension Graph {
                             }
                         }
                         self.iterate(queue: queue, parents: parents,
-                                     source: source, isFinal: isFinal).apply(to: promise, transform: id)
+                                     source: source, isFinal: isFinal).apply(to: setter, transform: id)
                     }
                     }
                     .onError { _ in
                         self.iterate(queue: queue, parents: parents,
-                                     source: source, isFinal: isFinal).apply(to: promise, transform: id)
+                                     source: source, isFinal: isFinal).apply(to: setter, transform: id)
                 }
             } else {
-                promise.success(with: nil)
+                setter.success(with: nil)
             }
         }
     }
@@ -168,14 +168,14 @@ extension Graph {
         var parents = parents
         var nodes = nodes
         
-        return .new { promise in
+        return .new { setter in
             if !nodes.isEmpty {
                 let current = nodes.remove(at: 0)
                 let neighbours = current.neighbours(in: self)
                 neighbours.onSuccess { neighbours in
                     if let item = neighbours.filter({ $0.0.identifier } >>> isFinal).first {
                         parents[item.0.identifier] = current.identifier
-                        promise.success(with: (parents, item.0.identifier))
+                        setter.success(with: (parents, item.0.identifier))
                     } else {
                         let neighbours = neighbours => { $0.0 } |> { parents[$0.identifier] == nil && source != $0.identifier }
                         neighbours => {
@@ -184,9 +184,9 @@ extension Graph {
                         self.iterate(nodes: neighbours, parents: parents, source: source, until: isFinal).onSuccess { result in
                             parents = result.0
                             if let result = result.1 {
-                                promise.success(with: (parents, result))
+                                setter.success(with: (parents, result))
                             } else {
-                                self.iterate(nodes: nodes, parents: parents, source: source, until: isFinal).apply(to: promise, transform: id)
+                                self.iterate(nodes: nodes, parents: parents, source: source, until: isFinal).apply(to: setter, transform: id)
                             }
                         }
                     }
@@ -195,7 +195,7 @@ extension Graph {
                     self.iterate(nodes: nodes, parents: parents, source: source, until: isFinal)
                 }
             } else {
-                promise.success(with: (parents, nil))
+                setter.success(with: (parents, nil))
             }
         }
     }
