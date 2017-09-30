@@ -9,18 +9,16 @@ import Foundation
 
 public class RetryPromise<I, V, E: Error>: SelfSettingPromise<V, E> {
     
-    public typealias Creator = (I) -> Promise<V, E>
+    public typealias Creator = () -> Promise<V, E>
     public typealias RetryHandler = (E?) -> ()
     public typealias RetryBehavior = (E, @escaping RetryHandler) -> ()
     
-    let input: I
     let creator: Creator
-    var retryBehavior: (E, @escaping RetryHandler) -> ()
+    let retryBehavior: RetryBehavior
     var stopped = false
     var lastError: E?
     
-    public init(input: I, creator: @escaping Creator, retryBehavior: @escaping RetryBehavior) {
-        self.input = input
+    public init(creator: @escaping Creator, retryBehavior: @escaping RetryBehavior) {
         self.creator = creator
         self.retryBehavior = retryBehavior
         super.init()
@@ -28,7 +26,7 @@ public class RetryPromise<I, V, E: Error>: SelfSettingPromise<V, E> {
     }
     
     func `try`() {
-        let promise = creator(input)
+        let promise = creator()
         promise.onSuccess(call: self.setter.success)
         promise.onError(call: self.handle(error:))
     }
@@ -57,8 +55,10 @@ public class RetryPromise<I, V, E: Error>: SelfSettingPromise<V, E> {
 
 extension RetryPromise {
     
-    static func new(retrying timeinterval: TimeInterval, with input: I, creator: @escaping Creator) -> RetryPromise<I, V, E> {
-        return RetryPromise(input: input, creator: creator) { error, completion in
+    static func new(retrying timeinterval: TimeInterval,
+                    creator: @escaping Creator) -> RetryPromise<I, V, E> {
+        
+        return RetryPromise(creator: creator) { error, completion in
             Timer.scheduledTimer(withTimeInterval: timeinterval, repeats: false) { _ in
                 completion(nil)
             }
