@@ -41,8 +41,7 @@ public protocol PromiseBody {
     associatedtype ErrorType: Error
     func onSuccess(call handler: @escaping (ResultType) -> ()) -> Promise<ResultType, ErrorType>
     func onError(call handler: @escaping (ErrorType) -> ()) -> Promise<ResultType, ErrorType>
-    func nest<V>(to setter: Promise<V, ErrorType>.Setter, using mapper: @escaping (ResultType) -> (V))
-    func nest<V>(to setter: Promise<V, ErrorType>.Setter, using mapper: @escaping (ResultType) -> ())
+    func onResult(call handler: @escaping (Result<ResultType, ErrorType>) -> ()) -> Promise<ResultType, ErrorType>
 }
 
 /// Promise Structs to prevent you from nesting callbacks over and over again
@@ -130,66 +129,51 @@ public class Promise<T, E: Error>: PromiseBody {
         return self
     }
     
-    /// Call this when the promise is fulfilled
-    fileprivate func success(with value: T) {
-        guard !state.isDone else {
-            return
+    fileprivate func write(result: Result) {
+        
+        guard !state.isDone else { return }
+        state = .done(result: result)
+        
+        switch result {
+        case .value(let value):
+            let handlers = successHandlers + (resultHandlers => calling)
+            completionQueue >>> {
+                handlers => { $0(value) }
+            }
+        case .error(let error):
+            let handlers = errorHandlers + (resultHandlers => calling)
+            completionQueue >>> {
+                handlers => { $0(error) }
+            }
         }
-        state = .done(result: .value(value))
-        let handlers = successHandlers + (resultHandlers => calling)
         successHandlers = []
         errorHandlers = []
         resultHandlers = []
-        completionQueue >>> {
-            handlers => apply(value: value)
-        }
     }
     
-    /// Call this when the promise has an error
-    fileprivate func error(with value: E) {
-        guard !state.isDone else {
-            return
-        }
-        state = .done(result: .error(value))
-        let handlers = errorHandlers + (resultHandlers => calling)
-        successHandlers = []
-        errorHandlers = []
-        resultHandlers = []
-        completionQueue >>> {
-            handlers => apply(value: value)
-        }
-    }
-    
-    /// Will nest a promise inside another one
-    public func nest<V>(to setter: Promise<V, E>.Setter, using mapper: @escaping (T) -> (V)) {
-        nest(to: setter, using: mapper >>> setter.success**)
-    }
-    
-    /// Will nest a promise inside another one
-    public func nest<V>(to setter: Promise<V, E>.Setter, using mapper: @escaping (T) -> ()) {
-        onSuccess(call: mapper)
-        onError(call: setter.error)
+    func apply<A, B>(to setter: Promise<A, B>.Setter, transform: @escaping (Result) -> Promise<A, B>.Result) {
+        onResult(call: transform >>> setter.write)
     }
     
     /// Will create a Promise that is based on this promise but maps the result
     public func map<V>(completionQueue: DispatchQueue = .global(),
-                          _ mapper: @escaping (T) -> V) -> Promise<V, E> {
+                          _ transform: @escaping (T) -> V) -> Promise<V, E> {
         
-        return .new(completionQueue: completionQueue) { promise in
-            self.nest(to: promise, using: mapper)
+        return .new(completionQueue: completionQueue) { setter in
+            self.apply(to: setter) { $0.map(transform) }
         }
     }
     
     public func flatMap<V>(completionQueue: DispatchQueue = .global(),
-                        _ mapper: @escaping (T) -> Promise<V, E>) -> Promise<V, E> {
+                           _ mapper: @escaping (T) -> Promise<V, E>) -> Promise<V, E> {
         
-        return .new(completionQueue: completionQueue) { promise in
+        return .new(completionQueue: completionQueue) { setter in
             map(mapper).onResult { result in
                 switch result {
                 case .value(let resultPromise):
-                    resultPromise.nest(to: promise, using: id)
+                    resultPromise.apply(to: setter, transform: id)
                 case .error(let error):
-                    promise.error(with: error)
+                    setter.error(with: error)
                 }
             }
         }
@@ -197,9 +181,8 @@ public class Promise<T, E: Error>: PromiseBody {
     
     public func generalizeError(completionQueue: DispatchQueue = .global()) -> Promise<T, AnyError> {
         
-        return .new(completionQueue: completionQueue) { promise in
-            onSuccess(call: promise.success)
-            onError(call: AnyError.error >>> promise.error)
+        return .new(completionQueue: completionQueue) { setter in
+            self.apply(to: setter) { $0.map(AnyError.error) }
         }
     }
     
@@ -220,7 +203,7 @@ public class Promise<T, E: Error>: PromiseBody {
 extension Promise {
     
     public class Setter {
-        weak fileprivate var promise: Promise<T, E>?
+        fileprivate let promise: Promise<T, E>
         
         fileprivate init(promise: Promise<T, E>) {
             self.promise = promise
@@ -231,15 +214,57 @@ extension Promise {
 
 extension Promise.Setter {
     
+    public func weak() -> Weak {
+        return Weak(promise: promise)
+    }
+    
+    /// Call this when promise status is done
+    public func write(result: Result<T, E>) {
+        promise.write(result: result)
+    }
+    
     /// Call this when the promise is fulfilled
     public func success(with value: T) {
-        promise?.success(with: value)
+        write(result: .value(value))
     }
     
     /// Call this when the promise has an error
-    public func error(with value: E) {
-        promise?.error(with: value)
+    public func error(with error: E) {
+        write(result: .error(error))
     }
     
+}
+
+extension Promise.Setter {
+
+    public class Weak {
+
+        fileprivate weak var promise: Promise<T, E>?
+
+        fileprivate init(promise: Promise<T, E>) {
+            self.promise = promise
+        }
+
+    }
+
+}
+
+extension Promise.Setter.Weak {
+
+    /// Call this when promise status is done
+    public func write(result: Result<T, E>) {
+        promise?.write(result: result)
+    }
+
+    /// Call this when the promise is fulfilled
+    public func success(with value: T) {
+        write(result: .value(value))
+    }
+
+    /// Call this when the promise has an error
+    public func error(with error: E) {
+        write(result: .error(error))
+    }
+
 }
 

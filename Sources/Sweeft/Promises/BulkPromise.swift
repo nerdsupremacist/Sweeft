@@ -25,7 +25,8 @@ public final class BulkPromise<T, O: Error>: SelfSettingPromise<[T], O> {
         count = promises.count
         super.init(completionQueue: completionQueue)
         promises.withIndex => { promise, index in
-            promise.nest(to: self.setter) { result in
+            promise.onError(call: self.setter.error)
+            promise.onSuccess { result in
                 self.results.append((index, result))
             }
         }

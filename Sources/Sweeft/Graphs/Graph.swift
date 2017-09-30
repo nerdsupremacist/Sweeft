@@ -81,11 +81,11 @@ extension Graph {
                             }
                         }
                         self.iterate(queue: queue, prevs: prevs, costs: costs,
-                                     source: source, euristic: euristic, isFinal: isFinal).nest(to: promise, using: id)
+                                     source: source, euristic: euristic, isFinal: isFinal).apply(to: promise, transform: id)
                         }
                         .onError { _ in
                             self.iterate(queue: queue, prevs: prevs, costs: costs,
-                                         source: source, euristic: euristic, isFinal: isFinal).nest(to: promise, using: id)
+                                         source: source, euristic: euristic, isFinal: isFinal).apply(to: promise, transform: id)
                     }
                 }
             } else {
@@ -132,12 +132,12 @@ extension Graph {
                             }
                         }
                         self.iterate(queue: queue, parents: parents,
-                                     source: source, isFinal: isFinal).nest(to: promise, using: id)
+                                     source: source, isFinal: isFinal).apply(to: promise, transform: id)
                     }
                     }
                     .onError { _ in
                         self.iterate(queue: queue, parents: parents,
-                                     source: source, isFinal: isFinal).nest(to: promise, using: id)
+                                     source: source, isFinal: isFinal).apply(to: promise, transform: id)
                 }
             } else {
                 promise.success(with: nil)
@@ -186,7 +186,7 @@ extension Graph {
                             if let result = result.1 {
                                 promise.success(with: (parents, result))
                             } else {
-                                self.iterate(nodes: nodes, parents: parents, source: source, until: isFinal).nest(to: promise, using: id)
+                                self.iterate(nodes: nodes, parents: parents, source: source, until: isFinal).apply(to: promise, transform: id)
                             }
                         }
                     }
