@@ -41,8 +41,8 @@ public protocol PromiseBody {
     associatedtype ErrorType: Error
     func onSuccess(call handler: @escaping (ResultType) -> ()) -> Promise<ResultType, ErrorType>
     func onError(call handler: @escaping (ErrorType) -> ()) -> Promise<ResultType, ErrorType>
-    func nest<V>(to promise: Promise<V, ErrorType>, using mapper: @escaping (ResultType) -> (V))
-    func nest<V>(to promise: Promise<V, ErrorType>, using mapper: @escaping (ResultType) -> ())
+    func nest<V>(to setter: Promise<V, ErrorType>.Setter, using mapper: @escaping (ResultType) -> (V))
+    func nest<V>(to setter: Promise<V, ErrorType>.Setter, using mapper: @escaping (ResultType) -> ())
 }
 
 /// Promise Structs to prevent you from nesting callbacks over and over again
@@ -66,8 +66,9 @@ public class Promise<T, E: Error>: PromiseBody {
     let completionQueue: DispatchQueue
     
     /// Initializer
-    public init(completionQueue: DispatchQueue = .global()) {
+    public init(completionQueue: DispatchQueue = .global(), _ handle: (Setter) -> ()) {
         self.completionQueue = completionQueue
+        handle(.init(promise: self))
     }
     
     public init(result: Result, completionQueue: DispatchQueue = .global()) {
@@ -87,10 +88,8 @@ public class Promise<T, E: Error>: PromiseBody {
         return .with(result: .error(value))
     }
     
-    public static func new(completionQueue: DispatchQueue = .global(), _ handle: (Promise<T, E>) -> ()) -> Promise<T, E> {
-        let promise = Promise<T, E>(completionQueue: completionQueue)
-        handle(promise)
-        return promise
+    public static func new(completionQueue: DispatchQueue = .global(), _ handle: (Promise<T, E>.Setter) -> ()) -> Promise<T, E> {
+        return Promise<T, E>(completionQueue: completionQueue, handle)
     }
     
     /**
@@ -130,7 +129,7 @@ public class Promise<T, E: Error>: PromiseBody {
     }
     
     /// Call this when the promise is fulfilled
-    public func success(with value: T) {
+    fileprivate func success(with value: T) {
         guard !state.isDone else {
             return
         }
@@ -145,7 +144,7 @@ public class Promise<T, E: Error>: PromiseBody {
     }
     
     /// Call this when the promise has an error
-    public func error(with value: E) {
+    fileprivate func error(with value: E) {
         guard !state.isDone else {
             return
         }
@@ -160,14 +159,14 @@ public class Promise<T, E: Error>: PromiseBody {
     }
     
     /// Will nest a promise inside another one
-    public func nest<V>(to promise: Promise<V, E>, using mapper: @escaping (T) -> (V)) {
-        nest(to: promise, using: mapper >>> promise.success**)
+    public func nest<V>(to setter: Promise<V, E>.Setter, using mapper: @escaping (T) -> (V)) {
+        nest(to: setter, using: mapper >>> setter.success**)
     }
     
     /// Will nest a promise inside another one
-    public func nest<V>(to promise: Promise<V, E>, using mapper: @escaping (T) -> ()) {
+    public func nest<V>(to setter: Promise<V, E>.Setter, using mapper: @escaping (T) -> ()) {
         onSuccess(call: mapper)
-        onError(call: promise.error)
+        onError(call: setter.error)
     }
     
     /// Will create a Promise that is based on this promise but maps the result
@@ -212,6 +211,32 @@ public class Promise<T, E: Error>: PromiseBody {
         }
         group.wait()
         return result
+    }
+    
+}
+
+extension Promise {
+    
+    public class Setter {
+        weak fileprivate var promise: Promise<T, E>?
+        
+        fileprivate init(promise: Promise<T, E>) {
+            self.promise = promise
+        }
+    }
+    
+}
+
+extension Promise.Setter {
+    
+    /// Call this when the promise is fulfilled
+    public func success(with value: T) {
+        promise?.success(with: value)
+    }
+    
+    /// Call this when the promise has an error
+    public func error(with value: E) {
+        promise?.error(with: value)
     }
     
 }

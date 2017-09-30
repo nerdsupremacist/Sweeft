@@ -7,14 +7,14 @@
 
 import Foundation
 
-public class RetryPromise<I, V, E: Error>: Promise<V, E> {
+public class RetryPromise<I, V, E: Error>: SelfSettingPromise<V, E> {
     
     public typealias Creator = (I) -> Promise<V, E>
     public typealias RetryHandler = (E?) -> ()
     public typealias RetryBehavior = (E, @escaping RetryHandler) -> ()
     
-    var input: I
-    var creator: Creator
+    let input: I
+    let creator: Creator
     var retryBehavior: (E, @escaping RetryHandler) -> ()
     var stopped = false
     var lastError: E?
@@ -29,7 +29,7 @@ public class RetryPromise<I, V, E: Error>: Promise<V, E> {
     
     func `try`() {
         let promise = creator(input)
-        promise.onSuccess(call: self.success)
+        promise.onSuccess(call: self.setter.success)
         promise.onError(call: self.handle(error:))
     }
     
@@ -38,7 +38,7 @@ public class RetryPromise<I, V, E: Error>: Promise<V, E> {
         self.lastError = error
         retryBehavior(error) { error in
             if let error = error {
-                self.error(with: error)
+                self.setter.error(with: error)
             } else {
                 self.try()
             }
@@ -49,7 +49,7 @@ public class RetryPromise<I, V, E: Error>: Promise<V, E> {
         guard !stopped else { return }
         stopped = true
         if let error = lastError {
-            self.error(with: error)
+            self.setter.error(with: error)
         }
     }
     

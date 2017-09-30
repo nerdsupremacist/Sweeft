@@ -6,14 +6,12 @@
 //  Copyright © 2017 Mathias Quintero. All rights reserved.
 //
 
-public class FailableBulkPromise<R, E: Error>: Promise<R, E> {
+public class FailableBulkPromise<R, E: Error>: SelfSettingPromise<R, E> {
     
     public typealias Factory = () -> Promise<R, E>
     
     private let factories: [Factory]
-    
     private var lastError: E?
-    
     private var current = 0
     
     public convenience init<V>(inputs: [V], transform: @escaping (V) -> Promise<R, E>) {
@@ -29,7 +27,7 @@ public class FailableBulkPromise<R, E: Error>: Promise<R, E> {
     func doit() {
         guard current < factories.count else {
             if let lastError = lastError {
-                error(with: lastError)
+                setter.error(with: lastError)
             }
             return
         }
@@ -38,7 +36,7 @@ public class FailableBulkPromise<R, E: Error>: Promise<R, E> {
     }
     
     func handleValue(with output: R) {
-        success(with: output)
+        setter.success(with: output)
     }
     
     func handleError(with error: E) {

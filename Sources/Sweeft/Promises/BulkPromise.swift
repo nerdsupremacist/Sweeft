@@ -9,13 +9,14 @@
 import Foundation
 
 /// A promise that represent a collection of other promises and waits for them all to be finished
-public final class BulkPromise<T, O: Error>: Promise<[T], O> {
+public final class BulkPromise<T, O: Error>: SelfSettingPromise<[T], O> {
     
     private let count: Int
     private var results: [(Int, T)] = .empty {
         didSet {
             if results.count == count {
-                success(with: results.sorted(ascending: firstArgument) => lastArgument)
+                let sorted = results.sorted(ascending: firstArgument) => lastArgument
+                setter?.success(with: sorted)
             }
         }
     }
@@ -24,12 +25,12 @@ public final class BulkPromise<T, O: Error>: Promise<[T], O> {
         count = promises.count
         super.init(completionQueue: completionQueue)
         promises.withIndex => { promise, index in
-            promise.nest(to: self) { result in
+            promise.nest(to: self.setter) { result in
                 self.results.append((index, result))
             }
         }
         if promises.isEmpty {
-            success(with: [])
+            setter.success(with: [])
         }
     }
     
