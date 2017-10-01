@@ -12,7 +12,7 @@ enum AppDefaults: String, StatusKey {
     case lastDate
 }
 
-struct LastDateOpened: Status {
+struct LastDateOpened: SingleStatus {
     static let key: AppDefaults = .lastDate
     static let defaultValue: Date? = nil
 }

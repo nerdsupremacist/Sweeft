@@ -1,5 +1,5 @@
 //
-//  SimpleStatus.swift
+//  DefaultSaving.swift
 //  Pods
 //
 //  Created by Mathias Quintero on 12/11/16.
@@ -8,40 +8,34 @@
 
 import Foundation
 
-/// Wrapper for User Defaults to store a value
 public protocol Status {
-    /// Valuetype
-    associatedtype Value
-    /// Keytype
     associatedtype Key: StatusKey
+    associatedtype Value: Codable
     
-    static var storage: Storage { get }
-    /// Key for defaults
-    static var key: Key { get }
-    /// Default value in case the value is not defined
-    static var defaultValue: Value { get }
+    var storage: Storage { get }
+    var key: Key { get }
+    var defaultValue: Value { get }
 }
 
-public extension Status {
+extension Status {
     
-    static var storage: Storage {
+    public var storage: Storage {
         return .userDefaults
     }
     
-    /// Value stored in defaults
-    static var value: Value {
+    public var value: Value {
         get {
-            return SimpleStatus(storage: storage, key: key, defaultValue: defaultValue).value
+            return storage.object.object(forKey: key.userDefaultsKey) ?? defaultValue
         }
         set {
-            var status = SimpleStatus(storage: storage, key: key, defaultValue: defaultValue)
-            status.value = newValue
+            storage.object.set(newValue, forKey: key.userDefaultsKey)
         }
     }
     
-    /// Reset the value back to the default
-    static func reset() {
-        value = defaultValue
-    }
-    
+}
+
+struct SimpleStatus<K: StatusKey, V: Codable>: Status {
+    let storage: Storage
+    let key: K
+    let defaultValue: V
 }

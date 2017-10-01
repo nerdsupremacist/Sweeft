@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct OAuthManager<V: APIEndpoint>: API {
+public struct OAuthManager<V: APIEndpoint>: API, Codable {
     
     public typealias Endpoint = V
     public let baseURL: String
@@ -42,53 +42,61 @@ public struct OAuthManager<V: APIEndpoint>: API {
         return dict
     }
     
-    private func jsonRequest(to endpoint: Endpoint, auth: Auth, body: [String: String]) -> OAuth.Result {
-        return doObjectRequest(with: .post,
-                               to: endpoint,
-                               auth: auth,
-                               body: body.mapValues({ $0.json }).json)
+    private func jsonRequest(to endpoint: Endpoint, auth: Auth, body: [String: String]) -> Response<OAuth.Token> {
+        return doDecodableRequest(with: .post,
+                                  to: endpoint,
+                                  auth: auth,
+                                  body: body.mapValues({ $0.json }).json.data)
     }
     
-    private func queriedRequest(to endpoint: Endpoint, auth: Auth, body: [String:String]) -> OAuth.Result {
-        return doObjectRequest(with: .post, to: endpoint, queries: body, auth: auth)
+    private func queriedRequest(to endpoint: Endpoint, auth: Auth, body: [String:String]) -> Response<OAuth.Token> {
+        return doDecodableRequest(with: .post, to: endpoint, queries: body, auth: auth)
     }
     
-    private func applyRefresher(to auth: OAuth, with endpoint: Endpoint) -> OAuth {
+    private func applyRefresher(to token: OAuth.Token, with endpoint: Endpoint) -> OAuth {
         let refresher = OAuthManager<OAuthEndpoint>(baseURL: baseURL,
                                                     clientID: clientID,
                                                     secret: secret,
                                                     useBasicHttp: useBasicHttp,
                                                     useJSON: useJSON)
-        auth.manager = refresher
-        auth.endpoint = OAuthEndpoint(rawValue: endpoint.rawValue)
-        return auth
+        
+        let endpoint = OAuthEndpoint(rawValue: endpoint.rawValue)
+        return OAuth(token: token,
+                     updated: .now,
+                     manager: refresher,
+                     endpoint: endpoint)
     }
     
-    private func requestAuth(to endpoint: Endpoint, with grant: Grant) -> OAuth.Result {
+    private func requestAuth(to endpoint: Endpoint, with grant: Grant) -> Response<OAuth.Token> {
         let auth = self.auth()
         let body = self.body(with: grant)
         if useJSON {
-            return jsonRequest(to: endpoint, auth: auth, body: body).map(self.applyRefresher <** endpoint)
+            return jsonRequest(to: endpoint, auth: auth, body: body)
         } else {
-            return queriedRequest(to: endpoint, auth: auth, body: body).map(self.applyRefresher <** endpoint)
+            return queriedRequest(to: endpoint, auth: auth, body: body)
         }
     }
     
-    private func authenticate(at endpoint: Endpoint, with json: JSON) -> OAuth.Result {
-        if let auth = OAuth(from: json) {
-            return .successful(with: auth)
-        }
-        if let authorizationCode = json["code"].string {
-            return authenticate(at: endpoint, authorizationCode: authorizationCode)
-        }
-        return .errored(with: .mappingError(json: json))
+    private func requestAuth(to endpoint: Endpoint, with grant: Grant) -> Response<OAuth> {
+        return requestAuth(to: endpoint, with: grant).map(applyRefresher <** endpoint)
     }
     
-    public func refresh(at endpoint: Endpoint, with auth: OAuth) -> OAuth.Result {
-        return requestAuth(to: endpoint, with: .refreshToken(token: auth.refreshToken))
+    private func authenticate(at endpoint: Endpoint, with json: JSON) -> Response<OAuth> {
+//        if let auth = OAuth(from: json) {
+//            return .successful(with: auth)
+//        }
+//        if let authorizationCode = json["code"].string {
+//            return authenticate(at: endpoint, authorizationCode: authorizationCode)
+//        }
+//        return .errored(with: .mappingError(json: json))
+        fatalError()
     }
     
-    public func authenticate(at endpoint: Endpoint, callback url: URL) -> OAuth.Result {
+    func refresh(at endpoint: Endpoint, with token: OAuth.Token) -> Response<OAuth.Token> {
+        return requestAuth(to: endpoint, with: .refreshToken(token: token.refreshToken))
+    }
+    
+    public func authenticate(at endpoint: Endpoint, callback url: URL) -> Response<OAuth> {
         if let fragment = url.fragment {
             let json = JSON(fragment: fragment)
             return authenticate(at: endpoint, with: json)
@@ -99,11 +107,15 @@ public struct OAuthManager<V: APIEndpoint>: API {
         return .errored(with: .cannotPerformRequest)
     }
     
-    public func authenticate(at endpoint: Endpoint, authorizationCode code: String) -> OAuth.Result {
+    public func authenticate(at endpoint: Endpoint, authorizationCode code: String) -> Response<OAuth> {
         return requestAuth(to: endpoint, with: .authorizationCode(code: code))
     }
     
-    public func authenticate(at endpoint: Endpoint, username: String, password: String, scope: String...) -> OAuth.Result {
+    public func authenticate(at endpoint: Endpoint,
+                             username: String,
+                             password: String,
+                             scope: [String] = []) -> Response<OAuth> {
+        
         let scope = scope.isEmpty ? nil : scope.join(with: " ")
         let grant: Grant = .password(username: username, password: password, scope: scope)
         return requestAuth(to: endpoint, with: grant)
@@ -111,56 +123,6 @@ public struct OAuthManager<V: APIEndpoint>: API {
     
 }
 
-public extension API {
-    
-    func oauthManager(clientID: String, secret: String, useBasicHttp: Bool = true, useJSON: Bool = false) -> OAuthManager<Self.Endpoint> {
-        return OAuthManager(baseURL: self.baseURL, clientID: clientID, secret: secret, useBasicHttp: useBasicHttp, useJSON: useJSON)
-    }
-    
-}
-
-public struct OAuthEndpoint: APIEndpoint {
-    public let rawValue: String
-}
-
-extension OAuthEndpoint: StatusSerializable {
-    
-    public init?(from status: [String : Any]) {
-        guard let rawValue = status["endpoint"] as? String else {
-            return nil
-        }
-        self.init(rawValue: rawValue)
-    }
-    
-    public var serialized: [String : Any] {
-        return [
-            "endpoint": rawValue
-        ]
-    }
-    
-}
-
-extension OAuthManager: StatusSerializable {
-    
-    public init?(from status: [String : Any]) {
-        guard let baseURL = status["url"] as? String,
-            let clientID = status["client"] as? String,
-            let secret = status["secret"] as? String,
-            let basic = status["basic"] as? Bool,
-            let json = status["json"] as? Bool else {
-                return nil
-        }
-        self.init(baseURL: baseURL, clientID: clientID, secret: secret, useBasicHttp: basic, useJSON: json)
-    }
-    
-    public var serialized: [String : Any] {
-        return [
-            "url": baseURL,
-            "client": clientID,
-            "secret": secret,
-            "basic": useBasicHttp,
-            "json": useJSON
-        ]
-    }
-    
+struct OAuthEndpoint: APIEndpoint, Codable {
+    let rawValue: String
 }

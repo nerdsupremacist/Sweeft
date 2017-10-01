@@ -22,25 +22,28 @@ struct Keychain: StorageItem {
         SecItemDelete(query as CFDictionary)
     }
     
-    func set(_ value: Any?, forKey defaultName: String) {
+    func set<C>(_ value: C?, forKey defaultName: String) where C : Codable {
         
         guard let value = value else {
             return delete(at: defaultName)
         }
         
-        guard let data = try? PropertyListSerialization.data(fromPropertyList: value, format: .binary, options: 0) else {
+        let encoder = PropertyListEncoder()
+        
+        
+        guard let data = try? encoder.encode(value) else {
             return
         }
         
         let query: [String : Any] = [
             kSecClass as String : kSecClassGenericPassword,
             kSecAttrService as String : defaultName,
-        ]
+            ]
         
         let dataQuery: [String : Any] = [
             kSecAttrService as String : defaultName,
             kSecValueData as String : data,
-        ]
+            ]
         
         let status = SecItemUpdate(query as CFDictionary, dataQuery as CFDictionary)
         
@@ -51,14 +54,13 @@ struct Keychain: StorageItem {
                 kSecAttrService as String : defaultName,
                 kSecValueData as String : data,
                 kSecAttrAccessible as String : kSecAttrAccessibleWhenUnlocked,
-            ]
-
+                ]
+            
             SecItemAdd(createQuery as CFDictionary, nil)
         }
-        
     }
     
-    func object(forKey defaultName: String) -> Any? {
+    func object<C>(forKey defaultName: String) -> C? where C : Codable {
         
         var result: CFTypeRef?
         
@@ -67,8 +69,8 @@ struct Keychain: StorageItem {
             kSecAttrService as String : defaultName,
             kSecMatchLimit as String : kSecMatchLimitOne,
             kSecReturnData as String : kCFBooleanTrue,
-        ]
-
+            ]
+        
         
         let status = withUnsafeMutablePointer(to: &result) { pointer in
             
@@ -79,7 +81,8 @@ struct Keychain: StorageItem {
             return nil
         }
         
-        return try? PropertyListSerialization.propertyList(from: data, format: nil)
+        let decoder = PropertyListDecoder()
+        return try? decoder.decode(C.self, from: data)
     }
     
 }
