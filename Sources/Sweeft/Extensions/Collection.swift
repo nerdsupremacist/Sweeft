@@ -11,12 +11,12 @@ import Foundation
 public extension Collection {
     
     /// Will Turn any Collection into an Array for easier handling
-    var array: [Iterator.Element] {
+    var array: [Element] {
         return self => id
     }
     
     /// Return a random item in the collection
-    var random: Iterator.Element? {
+    var random: Element? {
         return array | Int(arc4random()) % array.count
     }
     
@@ -28,7 +28,7 @@ public extension Collection {
      
      - Returns: Resulting dictionary
      */
-    func dictionary<K, V>(with keys: @escaping (Iterator.Element) -> K, and values: @escaping (Iterator.Element) -> V) -> [K:V] {
+    func dictionary<K, V>(with keys: @escaping (Element) -> K, and values: @escaping (Element) -> V) -> [K:V] {
         return self ==> >{ dict, item in
             var dict = dict
             dict[keys(item)] = values(item)
@@ -43,7 +43,7 @@ public extension Collection {
      
      - Returns: Resulting dictionary
      */
-    func dictionary<K, V>(byDividingWith handler: @escaping (Iterator.Element) -> (K, V)) -> [K:V] {
+    func dictionary<K, V>(byDividingWith handler: @escaping (Element) -> (K, V)) -> [K:V] {
         return divide(closure: handler) | dictionary
     }
     
@@ -54,7 +54,7 @@ public extension Collection {
      
      - Returns: Resulting dictionary
      */
-    func dictionaryWithoutOptionals<K, V>(byDividingWith handler: @escaping (Iterator.Element) -> (K, V?)) -> [K:V] {
+    func dictionaryWithoutOptionals<K, V>(byDividingWith handler: @escaping (Element) -> (K, V?)) -> [K:V] {
         return self ==> handler >>> iff >>= id
     }
     
@@ -65,7 +65,7 @@ public extension Collection {
      
      - Returns: Result of sum
      */
-    func sum(_ mapper: (Iterator.Element) -> (Double)) -> Double {
+    func sum(_ mapper: (Element) -> (Double)) -> Double {
         return self => mapper ==> >(+)
     }
     
@@ -76,7 +76,7 @@ public extension Collection {
      
      - Returns: Result of sum
      */
-    func sum(_ mapper: (Iterator.Element) -> (Int)) -> Int {
+    func sum(_ mapper: (Element) -> (Int)) -> Int {
         return Int(sum(mapper))
     }
     
@@ -87,7 +87,7 @@ public extension Collection {
      
      - Returns: Result of multiplication
      */
-    func multiply(_ mapper: (Iterator.Element) -> (Double)) -> Double {
+    func multiply(_ mapper: (Element) -> (Double)) -> Double {
         return self => mapper ==> (*) ?? 1
     }
     
@@ -98,7 +98,7 @@ public extension Collection {
      
      - Returns: Result of multiplication
      */
-    func multiply(_ mapper: (Iterator.Element) -> (Int)) -> Int {
+    func multiply(_ mapper: (Element) -> (Int)) -> Int {
         return Int(multiply(mapper))
     }
     
@@ -110,7 +110,7 @@ public extension Collection {
      
      - Returns: String result
      */
-    func join(with string: String = ", ", by mapping: (Iterator.Element) -> (String) = { "\($0)" }) -> String {
+    func join(with string: String = ", ", by mapping: (Element) -> (String) = { "\($0)" }) -> String {
         let joined = self => mapping ==> { "\($0)\(string)\($1)" }
         return joined.?
     }
@@ -122,7 +122,7 @@ public extension Collection {
      
      - Returns: result of concatenation
      */
-    func and(conjunctUsing mapping: (Iterator.Element) -> Bool) -> Bool {
+    func and(conjunctUsing mapping: (Element) -> Bool) -> Bool {
         return self => mapping ==> true ** { $0 && $1 }
     }
     
@@ -133,7 +133,7 @@ public extension Collection {
      
      - Returns: result of disjunction
      */
-    func or(disjunctUsing mapping: (Iterator.Element) -> Bool) -> Bool {
+    func or(disjunctUsing mapping: (Element) -> Bool) -> Bool {
         return !and { !mapping($0) }
     }
     
@@ -144,7 +144,7 @@ public extension Collection {
      
      - Returns: best match if it exists
      */
-    func best(_ shouldChange: @escaping (Iterator.Element, Iterator.Element) -> Bool) -> Iterator.Element? {
+    func best(_ shouldChange: @escaping (Element, Element) -> Bool) -> Element? {
         return self.array ==> { prev, next in
             if shouldChange(next, prev) {
                 return next
@@ -161,7 +161,7 @@ public extension Collection {
      
      - Returns: best match if it exists
      */
-    func best<V>(_ mapping: @escaping (Iterator.Element) -> (V), _ shouldChange: @escaping (V, V) -> Bool) -> Iterator.Element? {
+    func best<V>(_ mapping: @escaping (Element) -> (V), _ shouldChange: @escaping (V, V) -> Bool) -> Element? {
         return best(mapping |>>> shouldChange)
     }
     
@@ -172,7 +172,7 @@ public extension Collection {
      
      - Returns: minimal element
      */
-    func argmin<C: Comparable>(_ mapping: @escaping (Iterator.Element) -> (C)) -> Iterator.Element? {
+    func argmin<C: Comparable>(_ mapping: @escaping (Element) -> (C)) -> Element? {
         return best(mapping, (<))
     }
     
@@ -183,7 +183,7 @@ public extension Collection {
      
      - Returns: maximal element
      */
-    func argmax<C: Comparable>(_ mapping: @escaping (Iterator.Element) -> (C)) -> Iterator.Element? {
+    func argmax<C: Comparable>(_ mapping: @escaping (Element) -> (C)) -> Element? {
         return best(mapping, (>))
     }
     
@@ -194,7 +194,7 @@ public extension Collection {
      
      - Returns: minimal element
      */
-    func min<C: Comparable>(_ mapping: @escaping (Iterator.Element) -> (C)) -> C? {
+    func min<C: Comparable>(_ mapping: @escaping (Element) -> (C)) -> C? {
         return argmin(mapping) | mapping
     }
     
@@ -205,7 +205,7 @@ public extension Collection {
      
      - Returns: maximal element
      */
-    func max<C: Comparable>(_ mapping: @escaping (Iterator.Element) -> (C)) -> C? {
+    func max<C: Comparable>(_ mapping: @escaping (Element) -> (C)) -> C? {
         return argmax(mapping) | mapping
     }
     
@@ -216,7 +216,7 @@ public extension Collection {
      
      - Returns: sorted array
      */
-    func sorted<C: Comparable>(ascending mapping: @escaping (Iterator.Element) -> (C)) -> [Iterator.Element] {
+    func sorted<C: Comparable>(ascending mapping: @escaping (Element) -> (C)) -> [Element] {
         return sorted(by: mapBoth(with: mapping) >>> (<=))
     }
     
@@ -227,22 +227,22 @@ public extension Collection {
      
      - Returns: sorted array
      */
-    func sorted<C: Comparable>(descending mapping: @escaping (Iterator.Element) -> (C)) -> [Iterator.Element] {
+    func sorted<C: Comparable>(descending mapping: @escaping (Element) -> (C)) -> [Element] {
         return <>sorted(ascending: mapping)
     }
     
 }
 
-public extension Collection where Iterator.Element: Hashable {
+public extension Collection where Element: Hashable {
     
     /// Will turn any Collection into a Set
-    var set: Set<Iterator.Element> {
+    var set: Set<Element> {
         return Set(array)
     }
     
 }
 
-extension Collection where Iterator.Element: Serializable {
+extension Collection where Element: Serializable {
     
     public var json: JSON {
         return .array(self => JSON.init)
@@ -250,9 +250,9 @@ extension Collection where Iterator.Element: Serializable {
     
 }
 
-extension Collection where Iterator.Element: PromiseBody {
+extension Collection where Element: PromiseBody {
     
-    public var bulk: BulkPromise<Iterator.Element.ResultType, Iterator.Element.ErrorType> {
+    public var bulk: BulkPromise<Element.ResultType, Element.ErrorType> {
         return BulkPromise(promises: self ==> { $0 as? Promise })
     }
     

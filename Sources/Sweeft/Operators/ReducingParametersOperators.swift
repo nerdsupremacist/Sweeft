@@ -41,7 +41,7 @@ public func **<P: ReducingParameters>(_ initialResult: P.Result, _ nextPartialRe
  
  - Returns: Result of reduce
  */
-public func ==><C: Collection, R>(_ items: C, _ reducingParameters: RegularReducingParameters<C.Iterator.Element, R>) -> R {
+public func ==><C: Collection, R>(_ items: C, _ reducingParameters: RegularReducingParameters<C.Element, R>) -> R {
     return items.reduce(reducingParameters.initialResult, reducingParameters.nextPartialResult)
 }
 

@@ -85,7 +85,7 @@ infix operator =>: AdditionPrecedence
  
  - Returns: result of mapping the array with the function
  */
-@discardableResult public func =><C: Collection, V>(_ items: C?, _ handler: (C.Iterator.Element) -> (V)) -> [V] {
+@discardableResult public func =><C: Collection, V>(_ items: C?, _ handler: (C.Element) -> (V)) -> [V] {
     return (items?.map(handler)).?
 }
 
@@ -123,7 +123,7 @@ infix operator ==>: AdditionPrecedence
  
  - Returns: result of flatMapping the collection with the function
  */
-public func ==><C: Collection, V>(_ items: C?, _ handler: (C.Iterator.Element) -> (V?)) -> [V] {
+public func ==><C: Collection, V>(_ items: C?, _ handler: (C.Element) -> (V?)) -> [V] {
     return (items?.flatMap(handler)).?
 }
 
@@ -149,7 +149,7 @@ infix operator |>: AdditionPrecedence
  
  - Returns: filtered array
  */
-public func |><C: Collection>(_ items: C?, _ handler: (C.Iterator.Element) -> Bool) -> [C.Iterator.Element] {
+public func |><C: Collection>(_ items: C?, _ handler: (C.Element) -> Bool) -> [C.Element] {
     return (items?.filter(handler)).?
 }
 
@@ -161,7 +161,7 @@ public func |><C: Collection>(_ items: C?, _ handler: (C.Iterator.Element) -> Bo
  
  - Returns: filtered array
  */
-public func |><C: Collection>(_ items: C?, _ handler: @escaping (C.Iterator.Element) -> Bool?) -> [C.Iterator.Element] {
+public func |><C: Collection>(_ items: C?, _ handler: @escaping (C.Element) -> Bool?) -> [C.Element] {
     return items |> handler.?
 }
 
@@ -175,7 +175,7 @@ infix operator !|>: AdditionPrecedence
  
  - Returns: filtered array
  */
-public func !|><C: Collection>(_ items: C?, _ handler: (C.Iterator.Element) -> Bool) -> [C.Iterator.Element] {
+public func !|><C: Collection>(_ items: C?, _ handler: (C.Element) -> Bool) -> [C.Element] {
     return items |> { !handler($0) }
 }
 
@@ -187,7 +187,7 @@ public func !|><C: Collection>(_ items: C?, _ handler: (C.Iterator.Element) -> B
  
  - Returns: dictionary
  */
-public func >>=<C: Collection, K, V>(_ items: C?, _ handler: @escaping (C.Iterator.Element) -> (K, V)) -> [K:V] {
+public func >>=<C: Collection, K, V>(_ items: C?, _ handler: @escaping (C.Element) -> (K, V)) -> [K:V] {
     return (items?.dictionary(byDividingWith: handler)).?
 }
 
@@ -365,7 +365,7 @@ infix operator &&>
  
  - Returns: result of concatenation
  */
-public func &&><C: Collection>(_ items: C?, _ handler: (C.Iterator.Element) -> Bool) -> Bool {
+public func &&><C: Collection>(_ items: C?, _ handler: (C.Element) -> Bool) -> Bool {
     return (items?.and(conjunctUsing: handler)) ?? true
 }
 
@@ -379,7 +379,7 @@ infix operator ||>
  
  - Returns: result of disjunction
  */
-public func ||><C: Collection>(_ items: C?, _ handler: (C.Iterator.Element) -> Bool) -> Bool {
+public func ||><C: Collection>(_ items: C?, _ handler: (C.Element) -> Bool) -> Bool {
     return (items?.or(disjunctUsing: handler)).?
 }
 
@@ -441,7 +441,7 @@ public func |>>><V, O, R>(_ map: @escaping (V) -> (R), _ handler: @escaping (R, 
  
  - Returns: Bound closure
  */
-public func |>>><C: Collection, O, R>(_ map: @escaping (C.Iterator.Element) -> (R), _ handler: @escaping ([R]) -> (O)) -> (C) -> O {
+public func |>>><C: Collection, O, R>(_ map: @escaping (C.Element) -> (R), _ handler: @escaping ([R]) -> (O)) -> (C) -> O {
     return (=>) <** map >>> handler
 }
 

@@ -39,7 +39,7 @@ public final class BulkPromise<T, O: Error>: SelfSettingPromise<[T], O> {
 
 extension BulkPromise where T: Collection {
     
-    public var flattened: Promise<[T.Iterator.Element], O> {
+    public var flattened: Promise<[T.Element], O> {
         return map { result in
             return result.flatMap(id)
         }
