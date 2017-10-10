@@ -221,6 +221,17 @@ public extension Collection {
     }
     
     /**
+     Will sort by a comparable property
+     
+     - Parameter path: KeyPath to property
+     
+     - Returns: sorted array
+     */
+    func sorted<C: Comparable>(ascending path: KeyPath<Element, C>) -> [Element] {
+        return sorted(ascending: closure(path))
+    }
+    
+    /**
      Will sort by applying a mapping and sorting
      
      - Parameter mapping: Cost function
@@ -229,6 +240,17 @@ public extension Collection {
      */
     func sorted<C: Comparable>(descending mapping: @escaping (Element) -> (C)) -> [Element] {
         return <>sorted(ascending: mapping)
+    }
+    
+    /**
+     Will sort by a comparable property
+     
+     - Parameter path: KeyPath to property
+     
+     - Returns: sorted array
+     */
+    func sorted<C: Comparable>(descending path: KeyPath<Element, C>) -> [Element] {
+        return sorted(descending: closure(path))
     }
     
 }
