@@ -9,6 +9,17 @@
 import Foundation
 
 /**
+ Will turn any keyPath into a closure
+ 
+ - Parameter keyPath: KeyPath
+ 
+ - Returns: closure returning the property in the keypath
+ */
+public func closure<A, B>(_ keyPath: KeyPath<A, B>) -> (A) -> B {
+    return { $0[keyPath: keyPath] }
+}
+
+/**
  Will return whatever you give it. Useful to replace '{ $0 }' and make the code more approachable and friendly ;)
  
  - Parameter value: value
