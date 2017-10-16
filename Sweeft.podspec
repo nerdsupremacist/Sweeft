@@ -10,6 +10,7 @@ Pod::Spec.new do |s|
   s.author           = { 'Mathias Quintero' => 'mathias.quintero@tum.de' }
   s.source           = { :git => 'https://github.com/mathiasquintero/Sweeft.git', :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/sifrinoimperial'
+  s.pod_target_xcconfig = { 'SWIFT_VERSION' => '3.2' }
 
   s.ios.deployment_target = '10.0'
   s.osx.deployment_target = '10.12'
