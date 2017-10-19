@@ -42,7 +42,7 @@ extension UserDefaults: StorageItem {
         guard let value = value else { return set(nil, forKey: defaultName) }
         let encoder = PropertyListEncoder()
         let data = try? encoder.encode(value)
-        set(data, forKey: defaultName)
+        setValue(data, forKey: defaultName)
     }
     
 }
