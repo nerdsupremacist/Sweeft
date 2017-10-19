@@ -41,7 +41,6 @@ extension UserDefaults: StorageItem {
         
         guard let value = value else { return set(nil, forKey: defaultName) }
         let encoder = PropertyListEncoder()
-        encoder.outputFormat = .xml
         let data = try? encoder.encode(value)
         set(data, forKey: defaultName)
     }
