@@ -184,6 +184,9 @@ public extension API {
                 }
                 setter.success(with: APIResponse(response: response, data: data))
             }
+            setter.onCancel { [weak task] in
+                task?.cancel()
+            }
             task.resume()
         }
     }

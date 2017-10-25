@@ -12,6 +12,7 @@ public typealias ResultPromise<R> = Promise<R, AnyError>
 enum PromiseState<T, E: Error> {
     case done(result: Result<T, E>)
     case waiting
+    case cancelled
     
     var isDone: Bool {
         guard case .done = self else {
@@ -50,6 +51,8 @@ public class Promise<T, E: Error>: PromiseBody {
     typealias SuccessHandler = (T) -> ()
     /// Type of the success
     typealias ErrorHandler = (E) -> ()
+    /// For handling your promise being cancelled
+    typealias CancelHandler = () -> ()
     // Result Type
     public typealias Result = Sweeft.Result<T, E>
     // Type of result handler
@@ -59,6 +62,8 @@ public class Promise<T, E: Error>: PromiseBody {
     var successHandlers = [SuccessHandler]()
     var errorHandlers = [ErrorHandler]()
     var resultHandlers = [ResultHandler]()
+    
+    private var cancelHandlers = [CancelHandler]()
     
     var state: PromiseState<T, E> = .waiting
     
@@ -91,6 +96,23 @@ public class Promise<T, E: Error>: PromiseBody {
                            _ handle: (Promise<T, E>.Setter) -> ()) -> Promise<T, E> {
         
         return Promise<T, E>(completionQueue: completionQueue, handle)
+    }
+    
+    fileprivate func onCancel(call handler: @escaping CancelHandler) {
+        if case .cancelled = state {
+            return handler()
+        }
+        cancelHandlers.append(handler)
+    }
+    
+    public func cancel() {
+        guard case .waiting = state else { return }
+        state = .cancelled
+        print(cancelHandlers.count)
+        cancelHandlers => { $0() }
+        successHandlers = []
+        errorHandlers = []
+        resultHandlers = []
     }
     
     /**
@@ -153,6 +175,7 @@ public class Promise<T, E: Error>: PromiseBody {
     
     func apply<A, B>(to setter: Promise<A, B>.Setter, transform: @escaping (Result) -> Promise<A, B>.Result) {
         onResult(call: transform >>> setter.write)
+        setter.onCancel { [weak self] in self?.cancel() }
     }
     
     public func map<A, B>(completionQueue: DispatchQueue = .global(),
@@ -174,6 +197,7 @@ public class Promise<T, E: Error>: PromiseBody {
                            _ mapper: @escaping (T) -> Promise<V, E>) -> Promise<V, E> {
         
         return .new(completionQueue: completionQueue) { setter in
+            setter.onCancel { [weak self] in self?.cancel() }
             map(mapper).onResult { result in
                 switch result {
                 case .value(let resultPromise):
@@ -221,6 +245,15 @@ extension Promise.Setter {
         return Weak(promise: promise)
     }
     
+    public func cancel() {
+        promise.cancel()
+    }
+    
+    /// Handle your promise being cancelled
+    public func onCancel(call handler: @escaping () -> ()) {
+        promise.onCancel(call: handler)
+    }
+    
     /// Call this when promise status is done
     public func write(result: Result<T, E>) {
         promise.write(result: result)
@@ -253,6 +286,15 @@ extension Promise.Setter {
 }
 
 extension Promise.Setter.Weak {
+    
+    public func cancel() {
+        promise?.cancel()
+    }
+    
+    /// Handle your promise being cancelled
+    public func onCancel(call handler: @escaping () -> ()) {
+        promise?.onCancel(call: handler)
+    }
 
     /// Call this when promise status is done
     public func write(result: Result<T, E>) {
@@ -269,5 +311,31 @@ extension Promise.Setter.Weak {
         write(result: .error(error))
     }
 
+}
+
+extension Promise {
+    
+    public class Canceller {
+        
+        fileprivate weak var promise: Promise<T, E>?
+        
+        fileprivate init(promise: Promise<T, E>) {
+            self.promise = promise
+        }
+        
+    }
+    
+    var canceller: Canceller {
+        return .init(promise: self)
+    }
+    
+}
+
+extension Promise.Canceller {
+    
+    public func cancel() {
+        promise?.cancel()
+    }
+    
 }
 

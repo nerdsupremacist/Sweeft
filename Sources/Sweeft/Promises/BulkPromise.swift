@@ -11,7 +11,7 @@ import Foundation
 /// A promise that represent a collection of other promises and waits for them all to be finished
 public final class BulkPromise<T, O: Error>: SelfSettingPromise<[T], O> {
     
-    private let count: Int
+    private var cancellers: [Promise<T, O>.Canceller]
     private var results: [(Int, T)] = .empty {
         didSet {
             if results.count == count {
@@ -21,8 +21,12 @@ public final class BulkPromise<T, O: Error>: SelfSettingPromise<[T], O> {
         }
     }
     
+    private var count: Int {
+        return cancellers.count
+    }
+    
     public init(promises: [Promise<T,O>], completionQueue: DispatchQueue = .global()) {
-        count = promises.count
+        cancellers = promises => { $0.canceller }
         super.init(completionQueue: completionQueue)
         promises.withIndex => { promise, index in
             promise.onError(call: self.setter.error)
@@ -33,6 +37,11 @@ public final class BulkPromise<T, O: Error>: SelfSettingPromise<[T], O> {
         if promises.isEmpty {
             setter.success(with: [])
         }
+    }
+    
+    public override func cancel() {
+        super.cancel()
+        cancellers => { $0.cancel() }
     }
     
 }
