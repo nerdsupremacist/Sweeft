@@ -39,6 +39,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //            print(path.join(with: "\n"))
 //        }
         
+        LastDateOpened.value = Date()
+        
         superLongAsyncFunction().onResult { result in
             switch result {
             case .value(let value):

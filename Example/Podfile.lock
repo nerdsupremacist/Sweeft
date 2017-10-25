@@ -1,16 +1,16 @@
 PODS:
-  - Sweeft (0.12.1)
+  - Sweeft (0.13.0)
 
 DEPENDENCIES:
   - Sweeft (from `../`)
 
 EXTERNAL SOURCES:
   Sweeft:
-    :path: "../"
+    :path: ../
 
 SPEC CHECKSUMS:
-  Sweeft: fa73622b7d965f59a1198b5ad3161376765b410b
+  Sweeft: 96df844b1bf4f827bd12b6a4ccdd088d1ebfcfbb
 
 PODFILE CHECKSUM: dbb504d538d34fbfdd7509e8ef2b23dd155eae76
 
-COCOAPODS: 1.2.1
+COCOAPODS: 1.4.0.beta.1
