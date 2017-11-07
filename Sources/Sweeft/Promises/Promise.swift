@@ -108,7 +108,6 @@ public class Promise<T, E: Error>: PromiseBody {
     public func cancel() {
         guard case .waiting = state else { return }
         state = .cancelled
-        print(cancelHandlers.count)
         cancelHandlers => { $0() }
         successHandlers = []
         errorHandlers = []
@@ -125,7 +124,7 @@ public class Promise<T, E: Error>: PromiseBody {
     @discardableResult public final func onSuccess(call handler: @escaping (T) -> ()) -> Promise<T, E> {
         if let result = state.value {
             completionQueue >>> handler ** result
-        } else {
+        } else if case .waiting = state {
             successHandlers.append(handler)
         }
         return self
@@ -135,7 +134,7 @@ public class Promise<T, E: Error>: PromiseBody {
     @discardableResult public final func onError(call handler: @escaping (E) -> ()) -> Promise<T, E> {
         if let error = state.error {
             completionQueue >>> handler ** error
-        } else {
+        } else if case .waiting = state {
             errorHandlers.append(handler)
         }
         return self
@@ -145,7 +144,7 @@ public class Promise<T, E: Error>: PromiseBody {
     @discardableResult public func onResult(call handler: @escaping ResultHandler) -> Promise<T, E> {
         if let result = state.result {
             completionQueue >>> handler ** result
-        } else {
+        } else if case .waiting = state {
             resultHandlers.append(handler)
         }
         return self
