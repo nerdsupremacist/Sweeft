@@ -100,9 +100,10 @@ public class Promise<T, E: Error>: PromiseBody {
     
     fileprivate func onCancel(call handler: @escaping CancelHandler) {
         if case .cancelled = state {
-            return handler()
+            handler()
+        } else if case .waiting = state {
+            cancelHandlers.append(handler)
         }
-        cancelHandlers.append(handler)
     }
     
     public func cancel() {
