@@ -40,34 +40,39 @@ enum PromiseState<T, E: Error> {
 public protocol PromiseBody {
     associatedtype ResultType
     associatedtype ErrorType: Error
-    func onSuccess(call handler: @escaping (ResultType) -> ()) -> Promise<ResultType, ErrorType>
-    func onError(call handler: @escaping (ErrorType) -> ()) -> Promise<ResultType, ErrorType>
-    func onResult(call handler: @escaping (Result<ResultType, ErrorType>) -> ()) -> Promise<ResultType, ErrorType>
+    func onSuccess(in queue: DispatchQueue?, call handler: @escaping (ResultType) -> ()) -> Promise<ResultType, ErrorType>
+    func onError(in queue: DispatchQueue?, call handler: @escaping (ErrorType) -> ()) -> Promise<ResultType, ErrorType>
+    func onResult(in queue: DispatchQueue?, call handler: @escaping (Result<ResultType, ErrorType>) -> ()) -> Promise<ResultType, ErrorType>
 }
 
 /// Promise Structs to prevent you from nesting callbacks over and over again
 public class Promise<T, E: Error>: PromiseBody {
-    /// Type of the success
-    typealias SuccessHandler = (T) -> ()
-    /// Type of the success
-    typealias ErrorHandler = (E) -> ()
+    
+    // Type of result handler
+    public typealias ResultHandler = (Result) -> ()
     /// For handling your promise being cancelled
     typealias CancelHandler = () -> ()
     // Result Type
     public typealias Result = Sweeft.Result<T, E>
-    // Type of result handler
-    public typealias ResultHandler = (Result) -> ()
     
     /// All the handlers
-    var successHandlers = [SuccessHandler]()
-    var errorHandlers = [ErrorHandler]()
-    var resultHandlers = [ResultHandler]()
+    var resultHandlers = [Handler]()
     
     private var cancelHandlers = [CancelHandler]()
     
     var state: PromiseState<T, E> = .waiting
     
     let completionQueue: DispatchQueue
+    let internalQueue = DispatchQueue(label: "io.quintero.Sweeft.Promise")
+    
+    struct Handler {
+        let handler: ResultHandler
+        let completionQueue: DispatchQueue
+        
+        func call(with result: Result) {
+            completionQueue >>> handler ** result
+        }
+    }
     
     /// Initializer
     public init(completionQueue: DispatchQueue = .global(), _ handle: (Setter) -> ()) {
@@ -99,20 +104,22 @@ public class Promise<T, E: Error>: PromiseBody {
     }
     
     fileprivate func onCancel(call handler: @escaping CancelHandler) {
-        if case .cancelled = state {
-            handler()
-        } else if case .waiting = state {
-            cancelHandlers.append(handler)
+        internalQueue.async(flags: .barrier) {
+            if case .cancelled = self.state {
+                handler()
+            } else if case .waiting = self.state {
+                self.cancelHandlers.append(handler)
+            }
         }
     }
     
     public func cancel() {
-        guard case .waiting = state else { return }
-        state = .cancelled
-        cancelHandlers => { $0() }
-        successHandlers = []
-        errorHandlers = []
-        resultHandlers = []
+        internalQueue.async(flags: .barrier) {
+            guard case .waiting = self.state else { return }
+            self.state = .cancelled
+            self.resultHandlers = []
+            self.cancelHandlers => { $0() }
+        }
     }
     
     /**
@@ -122,59 +129,56 @@ public class Promise<T, E: Error>: PromiseBody {
      
      - Returns: PromiseHandler Object
      */
-    @discardableResult public final func onSuccess(call handler: @escaping (T) -> ()) -> Promise<T, E> {
-        if let result = state.value {
-            completionQueue >>> handler ** result
-        } else if case .waiting = state {
-            successHandlers.append(handler)
-        }
-        return self
+    @discardableResult public final func onSuccess(in queue: DispatchQueue? = nil,
+                                                   call handler: @escaping (T) -> ()) -> Promise<T, E> {
+        
+        return onResult(in: queue) { $0.value | handler }
     }
     
     /// Add an error Handler
-    @discardableResult public final func onError(call handler: @escaping (E) -> ()) -> Promise<T, E> {
-        if let error = state.error {
-            completionQueue >>> handler ** error
-        } else if case .waiting = state {
-            errorHandlers.append(handler)
-        }
-        return self
+    @discardableResult public final func onError(in queue: DispatchQueue? = nil,
+                                                 call handler: @escaping (E) -> ()) -> Promise<T, E> {
+        
+        return onResult(in: queue) { $0.error | handler }
     }
     
     /// Add a
-    @discardableResult public func onResult(call handler: @escaping ResultHandler) -> Promise<T, E> {
-        if let result = state.result {
-            completionQueue >>> handler ** result
-        } else if case .waiting = state {
-            resultHandlers.append(handler)
+    @discardableResult public func onResult(in queue: DispatchQueue? = nil,
+                                            call handler: @escaping ResultHandler) -> Promise<T, E> {
+        
+        internalQueue.async(flags: .barrier) {
+            
+            let handler = Handler(handler: handler,
+                                  completionQueue: queue ?? self.completionQueue)
+            
+            if let result = self.state.result {
+                handler.call(with: result)
+            } else if case .waiting = self.state {
+                self.resultHandlers.append(handler)
+            }
+            
         }
         return self
     }
     
     fileprivate func write(result: Result) {
-        
-        guard !state.isDone else { return }
-        state = .done(result: result)
-        
-        switch result {
-        case .value(let value):
-            let handlers = successHandlers + (resultHandlers => calling)
-            completionQueue >>> {
-                handlers => { $0(value) }
-            }
-        case .error(let error):
-            let handlers = errorHandlers + (resultHandlers => calling)
-            completionQueue >>> {
-                handlers => { $0(error) }
-            }
+        internalQueue.async(flags: .barrier) {
+            
+            guard !self.state.isDone else { return }
+            self.state = .done(result: result)
+            
+            let handlers = self.resultHandlers
+            
+            self.resultHandlers = []
+            self.cancelHandlers = []
+            
+            handlers => Handler.call ** result
+            
         }
-        successHandlers = []
-        errorHandlers = []
-        resultHandlers = []
     }
     
     func apply<A, B>(to setter: Promise<A, B>.Setter, transform: @escaping (Result) -> Promise<A, B>.Result) {
-        onResult(call: transform >>> setter.write)
+        onResult { setter.write(result: transform($0)) }
         setter.onCancel { [weak self] in self?.cancel() }
     }
     

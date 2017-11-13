@@ -7,14 +7,6 @@
 
 import Foundation
 
-func calling<R, E, V>(_ handler: @escaping (Result<R, E>) -> (V)) -> (R) -> (V) {
-    return { handler(.value($0)) }
-}
-
-func calling<R, E, V>(_ handler: @escaping (Result<R, E>) -> (V)) -> (E) -> (V) {
-    return { handler(.error($0)) }
-}
-
 public enum Result<T, E: Error> {
     case value(T)
     case error(E)
@@ -64,14 +56,12 @@ extension Result {
     }
     
     public func map<A>(_ transform: (E) throws -> A) rethrows -> Result<T, A> {
-        
         switch self {
         case .value(let value):
             return .value(value)
         case .error(let error):
             return .error(try transform(error))
         }
-        
     }
     
     public func flatMap<V>(_ transform: (T) throws -> Result<V, E>) rethrows -> Result<V, E> {
