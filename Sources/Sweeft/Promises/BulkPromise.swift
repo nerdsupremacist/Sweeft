@@ -12,7 +12,7 @@ import Foundation
 public final class BulkPromise<T, O: Error>: SelfSettingPromise<[T], O> {
     
     private var cancellers: [Promise<T, O>.Canceller]
-    private var results: [(Int, T)] = .empty {
+    private var results: [Int : T] = .empty {
         didSet {
             if results.count == count {
                 let sorted = results.sorted(ascending: firstArgument) => lastArgument
@@ -31,7 +31,7 @@ public final class BulkPromise<T, O: Error>: SelfSettingPromise<[T], O> {
         promises.withIndex => { promise, index in
             promise.onError(call: self.setter.error)
             promise.onSuccess { result in
-                self.results.append((index, result))
+                self.results[index] = result
             }
         }
         if promises.isEmpty {
