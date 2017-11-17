@@ -43,6 +43,14 @@ let package = Package(
 )
 ```
 
+### Carthage
+
+Add this to your Cartfile:
+
+```
+github "mathiasquintero/Sweeft"
+```
+
 ## Why use Sweeft?
 
 <div><img src="http://i.giphy.com/l4JyX3V0yydvPHNBe.gif" height=200></div>
