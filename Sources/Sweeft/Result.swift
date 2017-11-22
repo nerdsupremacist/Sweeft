@@ -74,3 +74,15 @@ extension Result {
     }
     
 }
+
+extension Result where E: GenerizableError {
+    
+    public func mapAndCatch<V>(_ transform: (T) throws -> V) -> Result<V, E> {
+        do {
+            return try map(transform)
+        } catch {
+            return .error(E(error: error))
+        }
+    }
+    
+}

@@ -31,6 +31,23 @@ public extension Data {
     
 }
 
+extension Data {
+    
+    public func appending(_ data: Data) -> Data {
+        var output = self
+        output.append(data)
+        return output
+    }
+    
+    public func appending(string: String) -> Data {
+        guard let data = string.data else {
+            return self
+        }
+        return appending(data)
+    }
+    
+}
+
 extension Data: Defaultable {
     
     /// Default value is an empty set of data

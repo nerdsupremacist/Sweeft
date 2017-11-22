@@ -231,6 +231,18 @@ public class Promise<T, E: Error>: PromiseBody {
     
 }
 
+extension Promise where E: GenerizableError {
+    
+    public func mapAndCatch<V>(completionQueue: DispatchQueue = .global(),
+                               _ mapper: @escaping (T) throws -> V) -> Promise<V, E> {
+        
+        return map(completionQueue: completionQueue) { result in
+            return result.mapAndCatch(mapper)
+        }
+    }
+    
+}
+
 extension Promise {
     
     public class Setter {

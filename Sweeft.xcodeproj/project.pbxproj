@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E03E2F81FC616E4001A9471 /* MultiFormData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E03E2F71FC616E4001A9471 /* MultiFormData.swift */; };
+		0E03E2FA1FC618FB001A9471 /* WebForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E03E2F91FC618FB001A9471 /* WebForm.swift */; };
 		0EB590441FBF93630095D16F /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EB58FF81FBF93630095D16F /* Storage.swift */; };
 		0EB590451FBF93630095D16F /* SingleStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EB58FF91FBF93630095D16F /* SingleStatus.swift */; };
 		0EB590461FBF93630095D16F /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EB58FFA1FBF93630095D16F /* Keychain.swift */; };
@@ -75,6 +77,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0E03E2F71FC616E4001A9471 /* MultiFormData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiFormData.swift; sourceTree = "<group>"; };
+		0E03E2F91FC618FB001A9471 /* WebForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebForm.swift; sourceTree = "<group>"; };
 		0EB58FEA1FBF93430095D16F /* Sweeft.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Sweeft.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0EB58FF81FBF93630095D16F /* Storage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		0EB58FF91FBF93630095D16F /* SingleStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SingleStatus.swift; sourceTree = "<group>"; };
@@ -275,6 +279,8 @@
 			children = (
 				0EB590111FBF93630095D16F /* Mappable.swift */,
 				0EB590121FBF93630095D16F /* DataRepresentable.swift */,
+				0E03E2F71FC616E4001A9471 /* MultiFormData.swift */,
+				0E03E2F91FC618FB001A9471 /* WebForm.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -495,6 +501,7 @@
 				0EB590681FBF93630095D16F /* BulkPromise.swift in Sources */,
 				0EB5907D1FBF93630095D16F /* Other.swift in Sources */,
 				0EB590441FBF93630095D16F /* Storage.swift in Sources */,
+				0E03E2F81FC616E4001A9471 /* MultiFormData.swift in Sources */,
 				0EB590781FBF93630095D16F /* Set.swift in Sources */,
 				0EB590691FBF93630095D16F /* RetryPromise.swift in Sources */,
 				0EB590451FBF93630095D16F /* SingleStatus.swift in Sources */,
@@ -513,6 +520,7 @@
 				0EB590461FBF93630095D16F /* Keychain.swift in Sources */,
 				0EB590811FBF93630095D16F /* Mutlithreading.swift in Sources */,
 				0EB5907F1FBF93630095D16F /* Node.swift in Sources */,
+				0E03E2FA1FC618FB001A9471 /* WebForm.swift in Sources */,
 				0EB590761FBF93630095D16F /* Bool.swift in Sources */,
 				0EB5906D1FBF93630095D16F /* Date.swift in Sources */,
 				0EB590711FBF93630095D16F /* Int.swift in Sources */,
