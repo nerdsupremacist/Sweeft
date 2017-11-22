@@ -26,7 +26,9 @@ public final class BulkPromise<T, O: Error>: SelfSettingPromise<[T], O> {
     }
     
     public init(promises: [Promise<T,O>], completionQueue: DispatchQueue = .global()) {
-        cancellers = promises => { $0.canceller }
+        let cancellers = promises => { $0.canceller }
+        self.cancellers = cancellers
+        
         super.init(completionQueue: completionQueue)
         promises.withIndex => { promise, index in
             promise.onError(call: self.setter.error)
@@ -34,14 +36,14 @@ public final class BulkPromise<T, O: Error>: SelfSettingPromise<[T], O> {
                 self.results[index] = result
             }
         }
+        
+        setter.onCancel {
+            cancellers => { $0.cancel() }
+        }
+        
         if promises.isEmpty {
             setter.success(with: [])
         }
-    }
-    
-    public override func cancel() {
-        super.cancel()
-        cancellers => { $0.cancel() }
     }
     
 }
