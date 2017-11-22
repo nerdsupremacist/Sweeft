@@ -37,7 +37,7 @@ enum PromiseState<T, E: Error> {
     }
 }
 
-public protocol PromiseBody {
+public protocol PromiseProtocol {
     associatedtype ResultType
     associatedtype ErrorType: Error
     func onSuccess(in queue: DispatchQueue?, call handler: @escaping (ResultType) -> ()) -> Promise<ResultType, ErrorType>
@@ -46,7 +46,7 @@ public protocol PromiseBody {
 }
 
 /// Promise Structs to prevent you from nesting callbacks over and over again
-open class Promise<T, E: Error>: PromiseBody {
+open class Promise<T, E: Error>: PromiseProtocol {
     
     // Type of result handler
     public typealias ResultHandler = (Result) -> ()

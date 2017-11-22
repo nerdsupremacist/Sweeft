@@ -272,7 +272,7 @@ extension Collection where Element: Serializable {
     
 }
 
-extension Collection where Element: PromiseBody {
+extension Collection where Element: PromiseProtocol {
     
     public var bulk: BulkPromise<Element.ResultType, Element.ErrorType> {
         return BulkPromise(promises: self ==> { $0 as? Promise })
