@@ -34,8 +34,8 @@ extension PromiseProtocol {
 
 extension PromiseProtocol {
     
-    public func map<A, B>(completionQueue: DispatchQueue = .global(),
-                          _ transform: @escaping (Result<ResultType, ErrorType>) -> Promise<A, B>.Result) -> Promise<A, B> {
+    public func mapResult<A, B>(completionQueue: DispatchQueue = .global(),
+                                _ transform: @escaping (Result<ResultType, ErrorType>) -> Promise<A, B>.Result) -> Promise<A, B> {
         
         return .new(completionQueue: completionQueue) { setter in
             self.apply(to: setter, transform: transform)
@@ -46,7 +46,7 @@ extension PromiseProtocol {
     public func map<V>(completionQueue: DispatchQueue = .global(),
                        _ transform: @escaping (ResultType) -> V) -> Promise<V, ErrorType> {
         
-        return map(completionQueue: completionQueue) { $0.map(transform) }
+        return mapResult(completionQueue: completionQueue) { $0.map(transform) }
     }
     
     public func flatMap<V>(completionQueue: DispatchQueue = .global(),
@@ -66,7 +66,7 @@ extension PromiseProtocol {
     }
     
     public func generalizeError(completionQueue: DispatchQueue = .global()) -> Promise<ResultType, AnyError> {
-        return map(completionQueue: completionQueue) { $0.map(AnyError.error) }
+        return mapResult(completionQueue: completionQueue) { $0.map(AnyError.error) }
     }
     
     public func wait() -> Result<ResultType, ErrorType> {
@@ -88,7 +88,7 @@ extension PromiseProtocol where ErrorType: GenerizableError {
     public func mapAndCatch<V>(completionQueue: DispatchQueue = .global(),
                                _ mapper: @escaping (ResultType) throws -> V) -> Promise<V, ErrorType> {
         
-        return map(completionQueue: completionQueue) { result in
+        return mapResult(completionQueue: completionQueue) { result in
             return result.mapAndCatch(mapper)
         }
     }
