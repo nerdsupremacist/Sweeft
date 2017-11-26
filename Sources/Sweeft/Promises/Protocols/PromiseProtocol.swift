@@ -14,9 +14,14 @@ public protocol PromiseProtocol: AnyObject {
     associatedtype ErrorType
     associatedtype Setter: PromiseSetterProtocol where ResultType == Setter.ResultType, ErrorType == Setter.ErrorType
     
-    @discardableResult func onSuccess(in queue: DispatchQueue?, call handler: @escaping (ResultType) -> ()) -> Self
-    @discardableResult func onError(in queue: DispatchQueue?, call handler: @escaping (ErrorType) -> ()) -> Self
-    @discardableResult func onResult(in queue: DispatchQueue?, call handler: @escaping (Result<ResultType, ErrorType>) -> ()) -> Self
+    @discardableResult func onSuccess(in queue: DispatchQueue?,
+                                      call handler: @escaping (ResultType) -> ()) -> Self
+    
+    @discardableResult func onError(in queue: DispatchQueue?,
+                                    call handler: @escaping (ErrorType) -> ()) -> Self
+    
+    @discardableResult func onResult(in queue: DispatchQueue?,
+                                     call handler: @escaping (Result<ResultType, ErrorType>) -> ()) -> Self
     
     func cancel()
 }
@@ -35,7 +40,7 @@ extension PromiseProtocol {
 extension PromiseProtocol {
     
     public func mapResult<A, B>(completionQueue: DispatchQueue = .global(),
-                                _ transform: @escaping (Result<ResultType, ErrorType>) -> Promise<A, B>.Result) -> Promise<A, B> {
+                                _ transform: @escaping (Result<ResultType, ErrorType>) -> Result<A, B>) -> Promise<A, B> {
         
         return .new(completionQueue: completionQueue) { setter in
             self.apply(to: setter, transform: transform)
