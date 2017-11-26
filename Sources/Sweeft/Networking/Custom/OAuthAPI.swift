@@ -91,6 +91,7 @@ extension OAuthAPI {
         promise.onSuccess { token in
             var token = token
             self.auth = token
+            self.statusFetcher.value = token.token
             token.onChange { self.statusFetcher.value = $0.token }
         }
         return promise
@@ -106,6 +107,7 @@ extension OAuthAPI {
         promise.onSuccess { token in
             var token = token
             self.auth = token
+            self.statusFetcher.value = token.token
             token.onChange { self.statusFetcher.value = $0.token }
         }
         return promise
