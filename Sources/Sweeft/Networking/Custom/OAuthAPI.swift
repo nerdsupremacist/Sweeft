@@ -70,6 +70,11 @@ open class OAuthAPI<E: APIEndpoint, Key: StatusKey>: API {
         self.useJSON = useJSON
     }
     
+    open func logout() {
+        auth = NoAuth.standard
+        statusFetcher.value = nil
+    }
+    
 }
 
 extension OAuthAPI {
