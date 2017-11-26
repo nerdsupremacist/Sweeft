@@ -11,6 +11,14 @@ import Foundation
 public final class OAuth: Auth, Observable {
     
     public struct Token: Codable {
+        
+        enum CodingKeys: String, CodingKey {
+            case token = "access_token"
+            case tokenType = "token_type"
+            case refreshToken = "refresh_token"
+            case expiresIn = "expires_in"
+        }
+        
         let token: String
         let tokenType: String
         let refreshToken: String?
