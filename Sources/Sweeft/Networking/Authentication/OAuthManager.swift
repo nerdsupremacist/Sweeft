@@ -8,6 +8,7 @@
 
 import Foundation
 
+@available(macOS 10.12, *)
 public struct OAuthManager<V: APIEndpoint>: API, Codable {
     
     public typealias Endpoint = V

@@ -497,6 +497,7 @@ public extension API {
             }, completionQueue: completionQueue).flattened
     }
     
+    @available(macOS 10.12, *)
     func doDecodableRequest<T: Decodable>(with method: HTTPMethod = .get,
                                           to endpoint: Endpoint,
                                           arguments: [String:CustomStringConvertible] = .empty,
@@ -539,6 +540,7 @@ public extension API {
         }
     }
     
+    @available(macOS 10.12, *)
     func doAPIObjectRequest<T: APIObjectValue>(with method: HTTPMethod = .get,
                                             endpoint: Endpoint = T.endpoint,
                                             arguments: [String:CustomStringConvertible] = .empty,
@@ -568,6 +570,7 @@ public extension API {
         }
     }
     
+    @available(macOS 10.12, *)
     func doAPIObjectsRequest<T: APIObjectValue>(with method: HTTPMethod = .get,
                                                 endpoint: Endpoint = T.endpoint,
                                                 arguments: [String:CustomStringConvertible] = .empty,
@@ -686,6 +689,7 @@ public extension API {
     
 }
 
+@available(macOS 10.12, *)
 extension Encodable {
     
     fileprivate func encoded(dateEncodingStrategy: JSONEncoder.DateEncodingStrategy = .iso8601,

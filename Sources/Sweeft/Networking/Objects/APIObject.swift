@@ -7,11 +7,13 @@
 
 import Foundation
 
+@available(macOS 10.12, *)
 public protocol Identifiable {
     associatedtype Identifier: CustomStringConvertible
     var id: Identifier { get }
 }
 
+@available(macOS 10.12, *)
 public protocol APIObjectValue: Codable, Identifiable {
     associatedtype Endpoint: APIEndpoint
     associatedtype API: Sweeft.API
@@ -26,6 +28,7 @@ public protocol APIObjectValue: Codable, Identifiable {
     static var dataDecodingStrategy: JSONDecoder.DataDecodingStrategy { get }
 }
 
+@available(macOS 10.12, *)
 extension APIObjectValue {
     
     public var arguments: [String : CustomStringConvertible] {
@@ -50,6 +53,7 @@ extension APIObjectValue {
     
 }
 
+@available(macOS 10.12, *)
 extension APIObjectValue {
     
     public func object(using api: API) -> APIObject<Self> {
@@ -58,11 +62,13 @@ extension APIObjectValue {
     
 }
 
+@available(macOS 10.12, *)
 public struct APIObject<Value: APIObjectValue> {
     let api: Value.API
     public var value: Value
 }
 
+@available(macOS 10.12, *)
 extension APIObjectValue {
     
     public static func all(using api: API,
@@ -88,6 +94,7 @@ extension APIObjectValue {
     
 }
 
+@available(macOS 10.12, *)
 extension APIObjectValue {
     
     func wrappedAPI(using api: API) -> WrappedAPI<API, Endpoint> {
@@ -98,6 +105,7 @@ extension APIObjectValue {
     
 }
 
+@available(macOS 10.12, *)
 extension APIObject {
     
     public func doDecodableRequest<T: Decodable>(with method: HTTPMethod = .get,

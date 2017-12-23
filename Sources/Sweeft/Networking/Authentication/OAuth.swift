@@ -8,6 +8,7 @@
 
 import Foundation
 
+@available(macOS 10.12, *)
 public final class OAuth: Auth, Observable {
     
     public struct Token: Codable {

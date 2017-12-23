@@ -7,8 +7,11 @@
 
 import Foundation
 
+
+@available(macOS 10.12, *)
 public typealias APIBasic = Codable & Identifiable
 
+@available(macOS 10.12, *)
 public protocol APIObjectWithDetail: APIObjectValue {
     associatedtype Basic: APIBasic where Basic.Identifier == Identifier
     associatedtype Detail: Codable
@@ -19,6 +22,7 @@ public protocol APIObjectWithDetail: APIObjectValue {
     init(basic: Basic, detail: Detail?)
 }
 
+@available(macOS 10.12, *)
 extension APIObjectWithDetail {
     
     public var id: Identifier {
@@ -27,6 +31,7 @@ extension APIObjectWithDetail {
     
 }
 
+@available(macOS 10.12, *)
 extension APIObjectWithDetail {
     
     public init(from decoder: Decoder) throws {

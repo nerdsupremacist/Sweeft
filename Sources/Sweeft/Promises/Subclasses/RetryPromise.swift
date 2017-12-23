@@ -55,6 +55,7 @@ public class RetryPromise<I, V, E: Error>: SelfSettingPromise<V, E> {
 
 extension RetryPromise {
     
+    @available(macOS 10.12, *)
     static func new(retrying timeinterval: TimeInterval,
                     creator: @escaping Creator) -> RetryPromise<I, V, E> {
         

@@ -7,6 +7,7 @@
 
 import Foundation
 
+@available(macOS 10.12, *)
 open class OAuthAPI<E: APIEndpoint, Key: StatusKey>: API {
     public typealias Endpoint = E
     
@@ -77,6 +78,7 @@ open class OAuthAPI<E: APIEndpoint, Key: StatusKey>: API {
     
 }
 
+@available(macOS 10.12, *)
 extension OAuthAPI {
     
     private var endpoint: OAuthEndpoint {

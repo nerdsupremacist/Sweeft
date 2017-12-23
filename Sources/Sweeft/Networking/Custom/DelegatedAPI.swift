@@ -7,6 +7,7 @@
 
 import Foundation
 
+@available(macOS 10.12, *)
 struct WrappedAPI<Wrapped: API, EndpointType: APIEndpoint>: API {
     typealias Endpoint = EndpointType
     
@@ -15,6 +16,7 @@ struct WrappedAPI<Wrapped: API, EndpointType: APIEndpoint>: API {
     let endpoint: Wrapped.Endpoint
 }
 
+@available(macOS 10.12, *)
 extension WrappedAPI {
     
     var baseHeaders: [String : String] {
@@ -39,6 +41,7 @@ extension WrappedAPI {
     
 }
 
+@available(macOS 10.12, *)
 extension WrappedAPI {
     
     
