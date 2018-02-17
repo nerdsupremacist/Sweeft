@@ -25,6 +25,8 @@ public protocol API {
     var auth: Auth { get }
     /// Cache where the requests will be stored
     var cache: FileCache { get }
+    /// Dispatcher responsible for running the request
+    var dispatcher: Dispatcher { get }
     /// Will be called before performing a Request for people who like to go deep into the metal
     func willPerform(request: inout URLRequest)
     
@@ -56,6 +58,10 @@ public extension API {
     
     var auth: Auth {
         return NoAuth.standard
+    }
+    
+    var dispatcher: Dispatcher {
+        return ImmediateDispatcher.default
     }
     
     /// Default does nothing
@@ -163,7 +169,9 @@ public extension API {
                         acceptableStatusCodes: [Int] = [200],
                         completionQueue: DispatchQueue = .global()) -> Response<APIResponse> {
         
-        return .new(completionQueue: completionQueue) { setter in
+        return .new(completionQueue: completionQueue,
+                    dispatcher: dispatcher) { setter in
+                        
             var request = request
             self.willPerform(request: &request)
             let session = self.session(for: method, at: endpoint)

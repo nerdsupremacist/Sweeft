@@ -79,6 +79,7 @@
 		0EB590821FBF93630095D16F /* Defaultable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0EB590431FBF93630095D16F /* Defaultable.swift */; };
 		0EB590861FBF937C0095D16F /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0EB590841FBF937C0095D16F /* Info.plist */; };
 		0EB590871FBF937C0095D16F /* Sweeft.h in Headers */ = {isa = PBXBuildFile; fileRef = 0EB590851FBF937C0095D16F /* Sweeft.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0ECEF3C42028B00B001C1986 /* Dispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ECEF3C32028B00B001C1986 /* Dispatcher.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -159,6 +160,7 @@
 		0EB590891FBF94880095D16F /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		0EB5908A1FBF94880095D16F /* Cartfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Cartfile; sourceTree = "<group>"; };
 		0EB5908B1FBF94880095D16F /* Sweeft.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = Sweeft.podspec; sourceTree = "<group>"; };
+		0ECEF3C32028B00B001C1986 /* Dispatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dispatcher.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -175,6 +177,7 @@
 		0E03E3051FC62821001A9471 /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
+				0ECEF3C32028B00B001C1986 /* Dispatcher.swift */,
 				0E03E2FB1FC61A93001A9471 /* PromiseProtocol.swift */,
 				0E03E2FF1FC61B53001A9471 /* PromiseSetterProtocol.swift */,
 			);
@@ -505,6 +508,7 @@
 			files = (
 				0E03E3041FC627B0001A9471 /* PromiseProtocolConformance.swift in Sources */,
 				0EB590501FBF93630095D16F /* APIObject.swift in Sources */,
+				0ECEF3C42028B00B001C1986 /* Dispatcher.swift in Sources */,
 				0EB590641FBF93630095D16F /* VariableInstance.swift in Sources */,
 				0EB5905D1FBF93630095D16F /* JSON.swift in Sources */,
 				0EB590771FBF93630095D16F /* Optional.swift in Sources */,

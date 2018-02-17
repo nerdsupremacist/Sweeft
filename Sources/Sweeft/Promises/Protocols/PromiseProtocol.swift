@@ -59,7 +59,7 @@ extension PromiseProtocol {
         
         return .new(completionQueue: completionQueue) { setter in
             setter.onCancel { [weak self] in self?.cancel() }
-            map(mapper).onResult { result in
+            self.map(mapper).onResult { result in
                 switch result {
                 case .value(let resultPromise):
                     resultPromise.apply(to: setter, transform: id)

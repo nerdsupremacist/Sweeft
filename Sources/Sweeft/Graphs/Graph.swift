@@ -61,7 +61,7 @@ extension Graph {
         return .new { setter in
             if let current = queue.pop()?.item {
                 if isFinal(current.identifier) {
-                    setter.success(with: <>computePath(using: prevs, until: current.identifier))
+                    setter.success(with: <>self.computePath(using: prevs, until: current.identifier))
                 } else {
                     let cost = costs[current.identifier].?
                     current.neighbours(in: self).onSuccess { neighbours in

@@ -35,10 +35,13 @@ public class Promise<T, E: Error> {
     
     /// Initializer
     public init(completionQueue: DispatchQueue = .global(),
-                _ handle: (Setter) -> ()) {
+                dispatcher: Dispatcher = ImmediateDispatcher.default,
+                _ handle: @escaping (Setter) -> ()) {
         
         self.completionQueue = completionQueue
-        handle(.init(promise: self))
+        dispatcher.perform {
+            handle(.init(promise: self))
+        }
     }
     
     public init(result: Result,
@@ -53,9 +56,10 @@ public class Promise<T, E: Error> {
 extension Promise {
     
     public static func new(completionQueue: DispatchQueue = .global(),
-                           _ handle: (Setter) -> ()) -> Promise<T, E> {
+                           dispatcher: Dispatcher = ImmediateDispatcher.default,
+                           _ handle: @escaping (Setter) -> ()) -> Promise<T, E> {
         
-        return .init(completionQueue: completionQueue, handle)
+        return .init(completionQueue: completionQueue, dispatcher: dispatcher, handle)
     }
     
 }
