@@ -37,6 +37,8 @@ public struct ImmediateDispatcher: Dispatcher {
     
     public static let `default` = ImmediateDispatcher()
     
+    private init() { }
+    
     public func perform(operation: @escaping () -> ()) {
         operation()
     }
