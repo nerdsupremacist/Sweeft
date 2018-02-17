@@ -21,6 +21,8 @@ public protocol API {
     var baseHeaders: [String:String] { get }
     /// Queries that should be included into every single request
     var baseQueries: [String:String] { get }
+    /// URLSession used to run request
+    var session: URLSession { get }
     /// Holds the authentication related to the entire API
     var auth: Auth { get }
     /// Cache where the requests will be stored
@@ -54,6 +56,10 @@ public extension API {
     /// Default is empty
     var baseQueries: [String:String] {
         return .empty
+    }
+    
+    var session: URLSession {
+        return .shared
     }
     
     var auth: Auth {

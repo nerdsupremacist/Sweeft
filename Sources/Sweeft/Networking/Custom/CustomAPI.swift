@@ -7,19 +7,18 @@
 
 import Foundation
 
-public protocol CustomAPI: API, URLSessionDataDelegate {
-    func configuration(for method: HTTPMethod, at endpoint: Endpoint) -> URLSessionConfiguration
+public protocol CustomAPI: class, API, URLSessionDataDelegate {
+    var configuration: URLSessionConfiguration { get }
 }
 
-extension CustomAPI {
+public extension CustomAPI {
     
-    public func configuration(for method: HTTPMethod, at endpoint: Endpoint) -> URLSessionConfiguration {
-        return .default
+    var session: URLSession {
+        return URLSession(configuration: self.configuration, delegate: self, delegateQueue: nil)
     }
     
-    public func session(for method: HTTPMethod, at endpoint: Endpoint) -> URLSession {
-        let configuration = self.configuration(for: method, at: endpoint)
-        return URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+    var configuration: URLSessionConfiguration {
+        return .default
     }
     
 }
