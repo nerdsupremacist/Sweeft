@@ -27,16 +27,16 @@ extension WrappedAPI {
         return api.baseQueries
     }
     
+    var session: URLSession {
+        return api.session
+    }
+    
     var auth: Auth {
         return api.auth
     }
     
     func willPerform(request: inout URLRequest) {
         api.willPerform(request: &request)
-    }
-    
-    func session(for method: HTTPMethod, at endpoint: EndpointType) -> URLSession {
-        return api.session(for: method, at: self.endpoint)
     }
     
 }

@@ -31,9 +31,6 @@ public protocol API {
     var dispatcher: Dispatcher { get }
     /// Will be called before performing a Request for people who like to go deep into the metal
     func willPerform(request: inout URLRequest)
-    
-    /// Will allow you to prepare more customizable URL Sessions
-    func session(for method: HTTPMethod, at endpoint: Endpoint) -> URLSession
 }
 
 public extension API {
@@ -73,11 +70,6 @@ public extension API {
     /// Default does nothing
     func willPerform(request: inout URLRequest) {
         // Do Nothing
-    }
-    
-    /// Default is the shared session
-    func session(for method: HTTPMethod, at endpoint: Endpoint) -> URLSession {
-        return .shared
     }
     
 }
@@ -180,7 +172,7 @@ public extension API {
                         
             var request = request
             self.willPerform(request: &request)
-            let session = self.session(for: method, at: endpoint)
+            let session = self.session
             let task = session.dataTask(with: request) { (data, response, error) in
                 if let error = error {
                     if let error = error as? URLError, error.code == .timedOut {
