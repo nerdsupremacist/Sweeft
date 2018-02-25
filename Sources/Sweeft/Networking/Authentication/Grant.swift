@@ -29,7 +29,7 @@ enum Grant {
             ]
         case .authorizationCode(let code):
             return [
-                "grant_type": "authoriation_code",
+                "grant_type": "authorization_code",
                 "code": code
             ]
         }

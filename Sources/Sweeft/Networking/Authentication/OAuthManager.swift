@@ -8,68 +8,76 @@
 
 import Foundation
 
-@available(macOS 10.12, *)
-public struct OAuthManager<V: APIEndpoint>: API, Codable {
+public protocol RefreshPerformer: class {
+    func refresh(using refreshToken: String?) -> Response<OAuth.Token>
+}
+
+public protocol OAuthCabableAPI: API, RefreshPerformer {
     
-    public typealias Endpoint = V
-    public let baseURL: String
-    public let clientID: String
-    public let secret: String
-    public let useBasicHttp: Bool
-    public let useJSON: Bool
+    var authEndpoint: Endpoint { get }
+    var refreshEndpoint: Endpoint { get }
     
-    public init(baseURL: String, clientID: String, secret: String, useBasicHttp: Bool = true, useJSON: Bool = false) {
-        self.baseURL = baseURL
-        self.clientID = clientID
-        self.secret = secret
-        self.useBasicHttp = useBasicHttp
-        self.useJSON = useJSON
+    var clientID: String { get }
+    var clientSecret: String { get }
+    
+    var useBasicHttp: Bool { get }
+    var useJSON: Bool { get }
+    
+    func store(token: OAuth)
+}
+
+// MARK: Default Implementations
+
+extension OAuthCabableAPI {
+    
+    var refreshEndpoint: Endpoint {
+        return authEndpoint
     }
     
-    func auth() -> Auth {
+    var useBasicHttp: Bool {
+        return true
+    }
+    
+    var useJSON: Bool {
+        return true
+    }
+    
+}
+
+// MARK: Helper Request and other methods
+
+extension OAuthCabableAPI {
+    
+    private func authRequestAuth() -> Auth {
         if useBasicHttp {
-            return BasicAuth(username: clientID, password: secret)
+            return BasicAuth(username: clientID, password: clientSecret)
         } else {
             return NoAuth.standard
         }
     }
     
-    func body(with grant: Grant) -> [String:String] {
+    private func body(with grant: Grant) -> [String : String] {
         var dict = grant.dict.dictionaryWithoutOptionals(byDividingWith: id)
         if !useBasicHttp {
             dict["client_id"] = clientID
-            dict["client_secret"] = secret
+            dict["client_secret"] = clientSecret
         }
         return dict
     }
     
-    private func jsonRequest(to endpoint: Endpoint, auth: Auth, body: [String: String]) -> Response<OAuth.Token> {
+    private func jsonRequest(to endpoint: Endpoint, auth: Auth, body: [String : String]) -> Response<OAuth.Token> {
         return doDecodableRequest(with: .post,
                                   to: endpoint,
                                   auth: auth,
-                                  body: body.mapValues({ $0.json }).json.data)
+                                  body: body)
     }
     
-    private func queriedRequest(to endpoint: Endpoint, auth: Auth, body: [String:String]) -> Response<OAuth.Token> {
+    private func queriedRequest(to endpoint: Endpoint, auth: Auth, body: [String : String]) -> Response<OAuth.Token> {
         return doDecodableRequest(with: .post, to: endpoint, queries: body, auth: auth)
     }
     
-    private func applyRefresher(to token: OAuth.Token, with endpoint: Endpoint) -> OAuth {
-        let refresher = OAuthManager<OAuthEndpoint>(baseURL: baseURL,
-                                                    clientID: clientID,
-                                                    secret: secret,
-                                                    useBasicHttp: useBasicHttp,
-                                                    useJSON: useJSON)
-        
-        let endpoint = OAuthEndpoint(rawValue: endpoint.rawValue)
-        return OAuth(token: token,
-                     updated: .now,
-                     manager: refresher,
-                     endpoint: endpoint)
-    }
-    
-    private func requestAuth(to endpoint: Endpoint, with grant: Grant) -> Response<OAuth.Token> {
-        let auth = self.auth()
+    fileprivate func requestAuth(to endpoint: Endpoint, with grant: Grant) -> Response<OAuth.Token> {
+        let auth = self.authRequestAuth()
         let body = self.body(with: grant)
         if useJSON {
             return jsonRequest(to: endpoint, auth: auth, body: body)
@@ -78,52 +86,99 @@ public struct OAuthManager<V: APIEndpoint>: API, Codable {
         }
     }
     
-    private func requestAuth(to endpoint: Endpoint, with grant: Grant) -> Response<OAuth> {
-        return requestAuth(to: endpoint, with: grant).map(applyRefresher <** endpoint)
-    }
-    
-    private func authenticate(at endpoint: Endpoint, with json: JSON) -> Response<OAuth> {
-//        if let auth = OAuth(from: json) {
-//            return .successful(with: auth)
-//        }
-//        if let authorizationCode = json["code"].string {
-//            return authenticate(at: endpoint, authorizationCode: authorizationCode)
-//        }
-//        return .errored(with: .mappingError(json: json))
-        fatalError()
-    }
-    
-    func refresh(at endpoint: Endpoint, with token: OAuth.Token) -> Response<OAuth.Token> {
-        return requestAuth(to: endpoint, with: .refreshToken(token: token.refreshToken))
-    }
-    
-    public func authenticate(at endpoint: Endpoint, callback url: URL) -> Response<OAuth> {
-        if let fragment = url.fragment {
-            let json = JSON(fragment: fragment)
-            return authenticate(at: endpoint, with: json)
-        } else if let query = url.query {
-            let json = JSON(fragment: query)
-            return authenticate(at: endpoint, with: json)
+    fileprivate func requestAuth(to endpoint: Endpoint, with grant: Grant) -> Response<OAuth> {
+        return requestAuth(to: endpoint, with: grant).map { token in
+            return OAuth(token: token,
+                         updated: .now,
+                         performer: self)
         }
-        return .errored(with: .cannotPerformRequest)
     }
     
-    public func authenticate(at endpoint: Endpoint, authorizationCode code: String) -> Response<OAuth> {
-        return requestAuth(to: endpoint, with: .authorizationCode(code: code))
-    }
-    
-    public func authenticate(at endpoint: Endpoint,
-                             username: String,
-                             password: String,
-                             scope: [String] = []) -> Response<OAuth> {
-        
-        let scope = scope.isEmpty ? nil : scope.join(with: " ")
-        let grant: Grant = .password(username: username, password: password, scope: scope)
-        return requestAuth(to: endpoint, with: grant)
+    fileprivate func authenticate(at endpoint: Endpoint, from json: JSON) -> Response<OAuth> {
+        do {
+            guard let data = json.data else {
+                return .errored(with: .cannotPerformRequest)
+            }
+            let token = try JSONDecoder().decode(OAuth.Token.self, from: data)
+            
+            let auth = OAuth(token: token,
+                             updated: .now,
+                             performer: self)
+            
+            return .successful(with: auth)
+        } catch {
+            guard let code = json["code"].string else {
+                return .errored(with: .cannotPerformRequest)
+            }
+            return requestAuth(to: endpoint,
+                               with: .authorizationCode(code: code))
+        }
     }
     
 }
 
-struct OAuthEndpoint: APIEndpoint, Codable {
-    let rawValue: String
+// MARK: Refreshing
+
+extension OAuthCabableAPI {
+    
+    public func refresh(using refreshToken: String?) -> Promise<OAuth.Token, APIError> {
+        return requestAuth(to: refreshEndpoint, with: .refreshToken(token: refreshToken))
+    }
+    
+}
+
+// MARK: Public Authentication Methods
+
+extension OAuthCabableAPI {
+    
+    public func authenticate(callback url: URL) -> Response<OAuth> {
+        
+        guard let json = url.json else {
+            return .errored(with: .cannotPerformRequest)
+        }
+        let promise = authenticate(at: authEndpoint,
+                                   from: json)
+        
+        promise.onSuccess { token in
+            self.store(token: token)
+        }
+        
+        return promise
+    }
+    
+    public func authenticate(authorizationCode code: String) -> Response<OAuth> {
+        
+        let promise: Response<OAuth> = requestAuth(to: authEndpoint,
+                                                   with: .authorizationCode(code: code))
+        
+        promise.onSuccess { token in
+            self.store(token: token)
+        }
+        
+        return promise
+    }
+    
+    public func authenticate(username: String, password: String, scope: String...) -> Response<OAuth> {
+        
+        let scope = scope.isEmpty ? nil : scope.join(with: " ")
+        let grant: Grant = .password(username: username, password: password, scope: scope)
+        
+        let promise: Response<OAuth> = requestAuth(to: authEndpoint,
+                                                   with: grant)
+        
+        promise.onSuccess { token in
+            self.store(token: token)
+        }
+        
+        return promise
+    }
+    
+}
+
+fileprivate extension URL {
+    
+    var json: JSON? {
+        return fragment.map(JSON.init(fragment:)) ?? query.map(JSON.init(fragment:))
+    }
+    
 }

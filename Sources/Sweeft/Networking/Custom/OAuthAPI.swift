@@ -8,18 +8,11 @@
 import Foundation
 
 @available(macOS 10.12, *)
-open class OAuthAPI<E: APIEndpoint, Key: StatusKey>: API {
+open class OAuthAPI<E: APIEndpoint, Key: StatusKey>: OAuthCabableAPI {
+    
     public typealias Endpoint = E
     
-    fileprivate var manager: OAuthManager<OAuthEndpoint> {
-        return OAuthManager(baseURL: self.baseURL,
-                            clientID: self.clientID,
-                            secret: self.clientSecret,
-                            useBasicHttp: self.useBasicHttp,
-                            useJSON: self.useJSON)
-    }
-    
-    fileprivate lazy var statusFetcher: SimpleStatus<Key, OAuth.Token?> = { [unowned self] in
+    fileprivate lazy var statusFetcher: SimpleStatus<Key, OAuth.Stored?> = { [unowned self] in
         return SimpleStatus(storage: self.storage,
                             key: self.tokenKey,
                             defaultValue: nil)
@@ -27,35 +20,56 @@ open class OAuthAPI<E: APIEndpoint, Key: StatusKey>: API {
     
     public fileprivate(set) lazy var auth: Auth = { [unowned self] in
         var status = self.statusFetcher
-        guard let token = status.value else {
+        guard let storedToken = status.value else {
             return NoAuth.standard
         }
-        let manager = self.manager
-        var oauth = OAuth(token: token,
-                          updated: .now,
-                          manager: manager,
-                          endpoint: OAuthEndpoint(rawValue: self.authEndpoint.rawValue))
-        oauth.onChange { status.value = $0.token }
+        
+        var oauth = OAuth(stored: storedToken,
+                          performer: self)
+        
+        oauth.onChange { status.value = $0.storable }
         return oauth
     }()
+    
+    public var isLoggedIn: Bool {
+        return self.statusFetcher.value != nil
+    }
+    
+    open var baseHeaders: [String:String] {
+        return .empty
+    }
+    
+    open var baseQueries: [String:String] {
+        return .empty
+    }
+    
+    open var session: URLSession {
+        return .shared
+    }
+    
+    open var dispatcher: Dispatcher {
+        return ImmediateDispatcher.default
+    }
     
     public let baseURL: String
     
     let storage: Storage
     let tokenKey: Key
     
-    let authEndpoint: Endpoint
+    public let authEndpoint: Endpoint
+    public let refreshEndpoint: Endpoint
     
-    let clientID: String
-    let clientSecret: String
+    public let clientID: String
+    public let clientSecret: String
     
-    let useBasicHttp: Bool
-    let useJSON: Bool
+    public let useBasicHttp: Bool
+    public let useJSON: Bool
     
     public init(baseURL: String,
                 storage: Storage = .keychain,
                 tokenKey: Key,
                 authEndpoint: Endpoint,
+                refreshEndpoint: Endpoint? = nil,
                 clientID: String,
                 clientSecret: String,
                 useBasicHttp: Bool = true,
@@ -65,55 +79,23 @@ open class OAuthAPI<E: APIEndpoint, Key: StatusKey>: API {
         self.storage = storage
         self.tokenKey = tokenKey
         self.authEndpoint = authEndpoint
+        self.refreshEndpoint = refreshEndpoint ?? authEndpoint
         self.clientID = clientID
         self.clientSecret = clientSecret
         self.useBasicHttp = useBasicHttp
         self.useJSON = useJSON
     }
     
+    public func store(token: OAuth) {
+        var token = token
+        self.auth = token
+        self.statusFetcher.value = token.storable
+        token.onChange { self.statusFetcher.value = $0.storable }
+    }
+    
     open func logout() {
         auth = NoAuth.standard
         statusFetcher.value = nil
     }
-    
-}
-
-@available(macOS 10.12, *)
-extension OAuthAPI {
-    
-    private var endpoint: OAuthEndpoint {
-        return .init(rawValue: authEndpoint.rawValue)
-    }
-    
-    public func authenticate(authorizationCode: String) -> Response<OAuth> {
-        
-        let promise = self.manager.authenticate(at: endpoint,
-                                                authorizationCode: authorizationCode)
-        
-        promise.onSuccess { token in
-            var token = token
-            self.auth = token
-            self.statusFetcher.value = token.token
-            token.onChange { self.statusFetcher.value = $0.token }
-        }
-        return promise
-    }
-    
-    public func authenticate(username: String, password: String, scope: String...) -> Response<OAuth> {
-        
-        let promise = self.manager.authenticate(at: endpoint,
-                                                username: username,
-                                                password: password,
-                                                scope: scope)
-        
-        promise.onSuccess { token in
-            var token = token
-            self.auth = token
-            self.statusFetcher.value = token.token
-            token.onChange { self.statusFetcher.value = $0.token }
-        }
-        return promise
-    }
-    
     
 }

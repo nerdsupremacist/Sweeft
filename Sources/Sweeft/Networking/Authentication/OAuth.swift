@@ -26,34 +26,49 @@ public final class OAuth: Auth, Observable {
         let expiresIn: Int?
     }
     
+    public struct Stored: Codable {
+        public let token: Token
+        public let updated: Date
+    }
+    
     public var listeners = [Listener]()
     
     var token: Token
     var updated: Date
     
-    var manager: OAuthManager<OAuthEndpoint>
-    var endpoint: OAuthEndpoint
+    weak var performer: RefreshPerformer?
     private var refreshPromise: Response<Token>?
     
     var expirationDate: Date? {
         return token.expiresIn.map { updated.addingTimeInterval(Double($0)) }
     }
     
-    init(token: Token,
-         updated: Date,
-         manager: OAuthManager<OAuthEndpoint>,
-         endpoint: OAuthEndpoint) {
+    public init(token: Token,
+                updated: Date,
+                performer: RefreshPerformer) {
         
         self.token = token
         self.updated = updated
-        self.manager = manager
-        self.endpoint = endpoint
+        self.performer = performer
+    }
+    
+    public convenience init(stored: Stored,
+                            performer: RefreshPerformer) {
+        
+        self.init(token: stored.token,
+                  updated: stored.updated,
+                  performer: performer)
     }
     
     public func update(with token: Token) {
         self.token = token
         updated = .now
         hasChanged()
+    }
+    
+    public var storable: Stored {
+        return Stored(token: token,
+                      updated: updated)
     }
     
     public var isExpired: Bool {
@@ -68,7 +83,11 @@ public final class OAuth: Auth, Observable {
     }
     
     public func refresh() -> Response<Token> {
-        return manager.refresh(at: endpoint, with: token)
+        guard let performer = performer else {
+                
+            return .errored(with: .cannotPerformRequest)
+        }
+        return performer.refresh(using: token.refreshToken)
     }
     
     public func apply(to request: URLRequest) -> Promise<URLRequest, APIError> {
