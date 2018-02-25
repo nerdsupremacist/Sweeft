@@ -11,6 +11,7 @@ import Foundation
 /// A promise that represent a collection of other promises and waits for them all to be finished
 public final class BulkPromise<T, O: Error>: SelfSettingPromise<[T], O> {
     
+    private let queue = DispatchQueue(label: "io.quintero.Sweeft.BulkPromise")
     private var cancellers: [Promise<T, O>.Canceller]
     private var results: [Int : T] = .empty {
         didSet {
@@ -31,8 +32,8 @@ public final class BulkPromise<T, O: Error>: SelfSettingPromise<[T], O> {
         
         super.init(completionQueue: completionQueue)
         promises.withIndex => { promise, index in
-            promise.onError(call: self.setter.error)
-            promise.onSuccess { result in
+            promise.onError(in: queue, call: self.setter.error)
+            promise.onSuccess(in: queue) { result in
                 self.results[index] = result
             }
         }
