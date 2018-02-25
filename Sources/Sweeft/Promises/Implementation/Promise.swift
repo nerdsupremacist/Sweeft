@@ -10,7 +10,7 @@ import Foundation
 public typealias ResultPromise<R> = Promise<R, AnyError>
 
 /// Promise Structs to prevent you from nesting callbacks over and over again
-public class Promise<T, E: Error> {
+open class Promise<T, E: Error> {
     
     /// For handling your promise being cancelled
     typealias CancelHandler = () -> ()
