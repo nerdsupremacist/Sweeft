@@ -531,6 +531,10 @@ public extension API {
             $0.encoded(dateEncodingStrategy: dateEncodingStrategy, dataEncodingStrategy: dataEncodingStrategy)
         }
         
+        var headers = headers
+        headers["Content-Type"] <- body != nil ? "application/json" : nil
+        headers["Accept"] = "application/json"
+        
         return doDataRequest(with: method,
                              to: endpoint,
                              arguments: arguments,
