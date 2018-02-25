@@ -137,7 +137,7 @@ public extension Array {
             let a = (self.randomIndex).?
             let b = (self.randomIndex).?
             if a != b {
-                array[a] <=> array[b]
+                array.swapAt(a, b)
             }
         }
         return array
