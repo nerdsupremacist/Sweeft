@@ -39,7 +39,7 @@ extension UserDefaults: StorageItem {
     
     func set<C>(_ value: C?, forKey defaultName: String) where C : Decodable, C : Encodable {
         
-        guard let value = value else { return set(nil, forKey: defaultName) }
+        guard let value = value else { return removeObject(forKey: defaultName) }
         let encoder = PropertyListEncoder()
         let data = try? encoder.encode(value)
         setValue(data, forKey: defaultName)

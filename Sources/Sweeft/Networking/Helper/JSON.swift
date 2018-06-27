@@ -178,6 +178,9 @@ extension JSON {
     
     /// Get underlying Bool
     public var bool: Bool? {
+        if let double: Double = get() {
+            return double != 0.0
+        }
         return get()
     }
     

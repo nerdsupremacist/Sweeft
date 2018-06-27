@@ -29,9 +29,10 @@ public protocol PromiseProtocol: AnyObject {
 extension PromiseProtocol {
     
     func apply<S>(to setter: S,
+                  in queue: DispatchQueue? = nil,
                   transform: @escaping (Result<ResultType, ErrorType>) -> Result<S.ResultType, S.ErrorType>) where S: PromiseSetterProtocol {
         
-        onResult(in: nil) { setter.write(result: transform($0)) }
+        onResult(in: queue) { setter.write(result: transform($0)) }
         setter.onCancel { [weak self] in self?.cancel() }
     }
     
@@ -43,7 +44,7 @@ extension PromiseProtocol {
                                 _ transform: @escaping (Result<ResultType, ErrorType>) -> Result<A, B>) -> Promise<A, B> {
         
         return .new(completionQueue: completionQueue) { setter in
-            self.apply(to: setter, transform: transform)
+            self.apply(to: setter, in: completionQueue, transform: transform)
         }
     }
     

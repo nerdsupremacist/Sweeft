@@ -31,9 +31,8 @@ struct Keychain: StorageItem {
         
         let encoder = PropertyListEncoder()
         
-        
         guard let data = try? encoder.encode(value) else {
-            return
+            return delete(at: defaultName)
         }
         
         let query: [String : Any] = [
