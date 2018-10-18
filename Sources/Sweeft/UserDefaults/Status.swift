@@ -25,10 +25,10 @@ extension Status {
     
     public var value: Value {
         get {
-            return storage.object.object(forKey: key.userDefaultsKey) ?? defaultValue
+            return try! storage.object.object(forKey: key.userDefaultsKey) ?? defaultValue
         }
         set {
-            storage.object.set(newValue, forKey: key.userDefaultsKey)
+            try! storage.object.set(newValue, forKey: key.userDefaultsKey)
         }
     }
     

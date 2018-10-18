@@ -24,24 +24,24 @@ public enum Storage {
 }
 
 protocol StorageItem {
-    func object<C: Codable>(forKey defaultName: String) -> C?
-    func set<C: Codable>(_ value: C?, forKey defaultName: String)
+    func object<C: Codable>(forKey defaultName: String) throws -> C?
+    func set<C: Codable>(_ value: C?, forKey defaultName: String) throws
 }
 
 extension UserDefaults: StorageItem {
     
-    func object<C>(forKey defaultName: String) -> C? where C: Codable {
+    func object<C>(forKey defaultName: String) throws -> C? where C: Codable {
         
         guard let data = data(forKey: defaultName) else { return nil }
         let decoder = PropertyListDecoder()
-        return try? decoder.decode(C.self, from: data)
+        return try decoder.decode(C.self, from: data)
     }
     
-    func set<C>(_ value: C?, forKey defaultName: String) where C : Decodable, C : Encodable {
+    func set<C>(_ value: C?, forKey defaultName: String) throws where C : Decodable, C : Encodable {
         
         guard let value = value else { return removeObject(forKey: defaultName) }
         let encoder = PropertyListEncoder()
-        let data = try? encoder.encode(value)
+        let data = try encoder.encode(value)
         setValue(data, forKey: defaultName)
     }
     
