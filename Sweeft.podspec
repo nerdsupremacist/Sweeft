@@ -5,10 +5,10 @@ Pod::Spec.new do |s|
 
   s.description      = "A collection of different operators and extensions that make writing in Swift a bit sweeter."
 
-  s.homepage         = 'https://github.com/mathiasquintero/Sweeft'
+  s.homepage         = 'https://github.com/nerdsupremacist/Sweeft'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Mathias Quintero' => 'mathias.quintero@tum.de' }
-  s.source           = { :git => 'https://github.com/mathiasquintero/Sweeft.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/nerdsupremacist/Sweeft.git', :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/sifrinoimperial'
   s.pod_target_xcconfig = { 'SWIFT_VERSION' => '3.2' }
 

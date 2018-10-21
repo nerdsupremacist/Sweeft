@@ -1,4 +1,4 @@
-<div style="text-align:center;"><img src="https://raw.githubusercontent.com/mathiasquintero/Sweeft/master/logo.png" height=250></div>
+<div style="text-align:center;"><img src="https://raw.githubusercontent.com/nerdsupremacist/Sweeft/master/logo.png" height=250></div>
 
 
 # Sweeft
@@ -38,7 +38,7 @@ let package = Package(
     // ... your project details
     dependencies: [
         // As a required dependency
-        .Package(url: "ssh://git@github.com/mathiasquintero/Sweeft.git", majorVersion: 0)
+        .Package(url: "ssh://git@github.com/nerdsupremacist/Sweeft.git", majorVersion: 0)
     ]
 )
 ```
@@ -48,7 +48,7 @@ let package = Package(
 Add this to your Cartfile:
 
 ```
-github "mathiasquintero/Sweeft"
+github "nerdsupremacist/Sweeft"
 ```
 
 ## Why use Sweeft?
